@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 * {
   margin: 0;
@@ -14,4 +12,121 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar for Logs - Template Inspired */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #05060a;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #5B8E7D, #8CB369);
+  border-radius: 10px;
+  border: 2px solid #05060a;
+  transition: all 0.3s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #6BA08D, #9DC479);
+  box-shadow: 0 0 10px rgba(91, 142, 125, 0.3);
+}
+
+.theme-green-blue {
+  /* for buttons, icons, highlighted text etc */
+  background: linear-gradient(135deg, #58de7c, #107884);
+}
+
+.app-bg {
+  min-height: 100vh;
+  width: 100%;
+  background:
+    radial-gradient(circle at 10% 90%, rgba(34, 197, 94, 0.25), transparent 40%),
+    radial-gradient(circle at 90% 20%, rgba(20, 184, 166, 0.25), transparent 45%),
+    linear-gradient(135deg, #ffffff 0%, #dcfce7 45%, #ccfbf1 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.bg-blob {
+  position: absolute;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.bg-blob.green {
+  background: #22c55e;
+  bottom: -120px;
+  left: -120px;
+}
+
+.bg-blob.teal {
+  background: #14b8a6;
+  top: -120px;
+  right: -120px;
+}
+
+.title-color {
+  color: #134e4a;
+}
+
+/* Global Theme Utilities */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.glass-panel-dark {
+  background: rgba(2, 6, 23, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.theme-input {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(209, 213, 219, 0.5);
+  color: #0f172a;
+  transition: all 0.2s ease;
+}
+
+.theme-input:focus {
+  background: #ffffff;
+  border-color: #14b8a6;
+  box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.1);
+  outline: none;
+}
+
+.theme-btn-primary {
+  background: linear-gradient(135deg, #58de7c, #107884);
+  color: white;
+  box-shadow: 0 4px 14px 0 rgba(20, 184, 166, 0.39);
+  transition: all 0.2s ease;
+}
+
+.theme-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(20, 184, 166, 0.23);
+}
+
+.theme-btn-primary:active {
+  transform: translateY(0);
+}
+
+.theme-text-gradient {
+  background: linear-gradient(135deg, #58de7c, #107884);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

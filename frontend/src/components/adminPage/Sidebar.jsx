@@ -1,0 +1,115 @@
+import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { FaHome, FaCogs, FaSignOutAlt, FaLeaf } from 'react-icons/fa';
+import { useAuth } from '../../contexts/AuthContext';
+import { motion } from 'framer-motion';
+
+const Sidebar = () => {
+    const location = useLocation();
+    const { logout } = useAuth();
+
+    const isActive = (path) => location.pathname === path;
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+        } catch (error) {
+            console.error("Failed to log out", error);
+        }
+    };
+
+    return (
+        <motion.div
+            initial={{ x: -40, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.4 }}
+            className="w-72 min-h-screen bg-transparent backdrop-blur-xl shadow-2xl flex flex-col relative"
+        >
+            {/* ✅ LOGO HEADER */}
+            <div className="p-8 flex items-center gap-4 border-b border-white/20">
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center theme-btn-primary text-white">
+                    <FaLeaf size={24} />
+                </div>
+                <div>
+                    <h1 className="text-3xl font-extrabold title-color tracking-tight">
+                        Rizqa
+                    </h1>
+                    <p className="text-[11px] uppercase tracking-widest text-green-500 font-bold">
+                        Automation
+                    </p>
+                </div>
+            </div>
+
+            {/* ✅ NAVIGATION */}
+            <nav className="flex-1 px-6 py-8 space-y-3">
+                <p className="px-3 text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4">
+                    System
+                </p>
+
+                {/* ✅ DASHBOARD */}
+                <Link
+                    to="/"
+                    className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
+            ${isActive('/')
+                            ? 'bg-gradient-to-r from-green-100 to-teal-100 text-[#134e4a] shadow-lg'
+                            : 'text-gray-500 hover:bg-white hover:shadow-md'
+                        }`}
+                >
+                    <FaHome
+                        className={`${isActive('/') ? 'text-green-500' : 'text-gray-400'
+                            }`}
+                    />
+                    <span>Dashboard</span>
+                </Link>
+
+                {/* ✅ PIPELINE */}
+                <Link
+                    to="/admin"
+                    className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
+            ${isActive('/admin')
+                            ? 'bg-gradient-to-r from-green-100 to-teal-100 text-[#134e4a] shadow-lg'
+                            : 'text-gray-500 hover:bg-white hover:shadow-md'
+                        }`}
+                >
+                    <FaCogs
+                        className={`${isActive('/admin') ? 'text-green-500' : 'text-gray-400'
+                            }`}
+                    />
+                    <span>Pipeline</span>
+                </Link>
+
+                {/* ✅ ACCOUNT */}
+                <div className="pt-10 mt-10 border-t border-white/20">
+                    <p className="px-3 text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4">
+                        Account
+                    </p>
+
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.96 }}
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl font-medium text-gray-500 hover:bg-red-50 hover:text-red-500 transition"
+                    >
+                        <FaSignOutAlt />
+                        <span>Logout</span>
+                    </motion.button>
+                </div>
+            </nav>
+
+            {/* ✅ USER CARD */}
+            <div className="p-6 border-t border-white/20">
+                <div className="flex items-center gap-3 glass-panel p-4 rounded-2xl">
+                    <div className="w-11 h-11 rounded-full theme-btn-primary flex items-center justify-center text-white font-bold text-sm">
+                        AD
+                    </div>
+                    <div>
+                        <p className="text-sm font-bold text-[#134e4a]">Admin</p>
+                        <p className="text-xs text-gray-400">admin@rizqa.com</p>
+                    </div>
+                </div>
+            </div>
+        </motion.div>
+    );
+};
+
+export default Sidebar;

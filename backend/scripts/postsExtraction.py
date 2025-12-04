@@ -2,7 +2,7 @@
 NOISE_PHRASES_LIST = [
     "see translation", "see more", "view insights", "write a comment",
     "like", "comment", "share", "sponsored", "reply",
-     "عرض الترجمة", "أعجبني", "تعليق", "مشاركة", 
+    "عرض الترجمة", "أعجبني", "تعليق", "مشاركة", 
     "أرسل تعليقك الأول...", "تمت المشاركة مع مجموعة عامة", 
     "תגובה", "שתף", "אהבתי", "דקות", "تمت ال  مع مجموعة عامة", "أرسل  ك الأول...", "كل التفاعلات"
 ]
@@ -204,7 +204,13 @@ def scrape_group(driver, group_id):
 
     posts_data = []
     seen_post_keys = set()
-    max_scrolls = 10  # safety limit so we don't scroll forever
+    # Read max_scrolls from env, default to 100 if not set or invalid
+    try:
+        max_scrolls = int(os.getenv("MAX_SCROLLS", "100"))
+    except ValueError:
+        max_scrolls = 100
+    
+    print(f"[*] Max scrolls set to: {max_scrolls}")
     scroll_count = 0
     last_seen_post_id = load_seen_posts(group_id)
     stop_scraping = False
@@ -222,7 +228,6 @@ def scrape_group(driver, group_id):
                 By.XPATH,
                 "//div[@role='button' and (contains(., 'عرض المزيد') or contains(., 'See more') or contains(., 'see more'))]"
             )
-            print(f"[*] Found {len(show_more_buttons)} 'show more' buttons on this view. Clicking to expand posts...")
             for btn in show_more_buttons:
                 try:
                     driver.execute_script("arguments[0].click();", btn)
@@ -243,7 +248,6 @@ def scrape_group(driver, group_id):
             # Fallback for mbasic structure if 'article' role isn't found
             potential_posts = soup.select('div[data-ft]')
 
-        print(f"[*] Found {len(potential_posts)} potential posts on this view. Collected so far: {len(posts_data)}")
 
         for post in potential_posts:
             # Prefer the main text span (like the one you showed: <span dir="auto"> ... )
@@ -334,17 +338,73 @@ def scrape_group(driver, group_id):
                 "window.scrollBy(0, Math.max(window.innerHeight * 0.5, 300));"
             )
             time.sleep(random.uniform(0.8, 1.4))
+            
+    return posts_data
 
-    # Update the last seen post ID for the next run
+
+def save_data(posts):
+    """Saves the scraped posts to the JSON file."""
+    if not posts:
+        print("[*] No new posts to save.")
+        return
+
+    # Load existing data
+    if os.path.exists(OUTPUT_FILE):
+        try:
+            with open(OUTPUT_FILE, "r", encoding="utf-8") as f:
+                existing_data = json.load(f)
+        except (json.JSONDecodeError, ValueError):
+            existing_data = []
+    else:
+        existing_data = []
+
+    # Append new data
+    existing_data.extend(posts)
+
+    # Write back to file
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+        json.dump(existing_data, f, indent=4, ensure_ascii=False)
+    
+    print(f"[+] Saved {len(posts)} new posts to {OUTPUT_FILE}")
+
+
+if __name__ == "__main__":
+    driver = setup_driver()
     try:
         load_cookies(driver, COOKIES_FILE)
-        jobs = scrape_group(driver, GROUP_ID)
-        save_data(jobs)
+        
+        print(f"[*] Starting scrape for group {GROUP_ID}...")
+        new_jobs = scrape_group(driver, GROUP_ID)
+        
+        if new_jobs:
+            save_data(new_jobs)
+            
+            # Find the newest post ID to update the marker
+            newest_id = None
+            for job in new_jobs:
+                pid = extract_post_id(job.get('post_link', ''))
+                if pid:
+                    newest_id = pid
+                    break
+            
+            if newest_id:
+                print(f"[*] Updating last seen post ID to: {newest_id}")
+                save_last_seen_post(GROUP_ID, newest_id)
+            else:
+                print("[!] Could not determine a new post ID to save.")
+        else:
+            print("[*] No posts collected.")
 
     except Exception as e:
-        print(f"[!] An error occurred: {e}")
-
+        print(f"[!] Critical Error: {e}")
+        import traceback
+        traceback.print_exc()
     finally:
+        print("[~] Closing driver...")
         if 'driver' in locals():
-            print("[~] Closing driver...")
-            driver.quit()
+            try:
+                driver.quit()
+            except Exception as e:
+                print(f"[!] Warning: Error closing driver: {e}")
+            except KeyboardInterrupt:
+                print("[!] Warning: Driver close interrupted.")

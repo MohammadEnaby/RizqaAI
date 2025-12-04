@@ -77,7 +77,7 @@ def ensure_structured_ready() -> bool:
 
 def clear_data_files() -> None:
     """Remove pipeline artifacts once data is uploaded."""
-    for path in (JOBS_PATH, STRUCTURED_PATH):
+    for path in (STRUCTURED_PATH,):
         try:
             # Write an empty list to clear the file
             with open(path, "w", encoding="utf-8") as fh:
