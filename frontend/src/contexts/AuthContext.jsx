@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { 
-  createUserWithEmailAndPassword, 
+import {
+  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
-  signOut, 
+  signOut,
   onAuthStateChanged,
   updateProfile,
   sendPasswordResetEmail
@@ -26,12 +26,12 @@ export function AuthProvider({ children }) {
 
   async function signup(email, password, name, role, phone) {
     if (!auth) throw new Error("Firebase not initialized");
-    
+
     try {
       console.log("🔐 Creating user account...");
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       console.log("✅ Account created successfully");
-      
+
       // Update profile with display name
       await updateProfile(userCredential.user, {
         displayName: name
@@ -68,12 +68,21 @@ export function AuthProvider({ children }) {
 
   async function login(email, password) {
     if (!auth) throw new Error("Firebase not initialized");
-    
+
     try {
       console.log("🔐 Logging in...");
       const result = await signInWithEmailAndPassword(auth, email, password);
       console.log("✅ Login successful");
-      return result;
+
+      let profile = null;
+      if (db) {
+        const userDoc = await getDoc(doc(db, "users", result.user.uid));
+        if (userDoc.exists()) {
+          profile = userDoc.data();
+        }
+      }
+
+      return { result, profile };
     } catch (error) {
       console.error("❌ Login error:", error);
       throw error;
@@ -82,14 +91,14 @@ export function AuthProvider({ children }) {
 
   async function initiateGoogleSignIn() {
     if (!auth) throw new Error("Firebase not initialized");
-    
+
     const provider = new GoogleAuthProvider();
-    
+
     try {
       console.log("🔐 Opening Google sign-in popup...");
       const result = await signInWithPopup(auth, provider);
       console.log("✅ Google sign-in successful");
-      
+
       // Check if user already exists in Firestore
       if (db) {
         try {
@@ -114,10 +123,10 @@ export function AuthProvider({ children }) {
         // No Firestore - treat as existing user
         return { user: result.user, isNewUser: false };
       }
-      
+
     } catch (error) {
       console.error("❌ Google Sign-In Error:", error);
-      
+
       if (error.code === 'auth/popup-closed-by-user') {
         throw new Error("Sign-in cancelled.");
       } else if (error.code === 'auth/popup-blocked') {
@@ -125,14 +134,14 @@ export function AuthProvider({ children }) {
       } else if (error.code === 'auth/operation-not-allowed') {
         throw new Error("Google Sign-In not enabled in Firebase Console.");
       }
-      
+
       throw error;
     }
   }
 
   async function completeGoogleProfile(uid, name, role, password, phone) {
     if (!db) throw new Error("Firestore not initialized");
-    
+
     try {
       await setDoc(doc(db, "users", uid), {
         name: name,
@@ -142,16 +151,16 @@ export function AuthProvider({ children }) {
         hasCustomPassword: !!password,
         createdAt: new Date().toISOString()
       });
-      
+
       // Update display name
       if (currentUser) {
         await updateProfile(currentUser, {
           displayName: name
         });
       }
-      
+
       console.log("✅ Google user profile completed");
-      
+
       // Refresh user profile
       const userDoc = await getDoc(doc(db, "users", uid));
       if (userDoc.exists()) {
@@ -170,7 +179,7 @@ export function AuthProvider({ children }) {
 
   async function resetPassword(email) {
     if (!auth) throw new Error("Firebase not initialized");
-    
+
     try {
       console.log("📧 Sending password reset email...");
       await sendPasswordResetEmail(auth, email);
@@ -195,7 +204,7 @@ export function AuthProvider({ children }) {
 
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
-      
+
       if (user && db) {
         try {
           const userDoc = await getDoc(doc(db, "users", user.uid));
@@ -216,7 +225,7 @@ export function AuthProvider({ children }) {
       } else {
         setUserProfile(null);
       }
-      
+
       setLoading(false);
     });
 
@@ -258,7 +267,7 @@ export function AuthProvider({ children }) {
               borderRadius: '4px'
             }}>.env</code> file.
           </p>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             style={{
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',

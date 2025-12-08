@@ -8,4 +8,7 @@ export default {
         extend: {},
     },
     plugins: [],
+    corePlugins: {
+        preflight: false, // Disable Tailwind's CSS reset to prevent conflicts
+    },
 }
