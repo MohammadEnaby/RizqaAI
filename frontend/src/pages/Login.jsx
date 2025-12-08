@@ -24,7 +24,7 @@ export default function Login() {
       setError('');
       setLoading(true);
       const { profile } = await login(data.email, data.password);
-      
+
       if (profile && profile.role === 'admin') {
         navigate('/admin');
       } else {
@@ -91,65 +91,69 @@ export default function Login() {
 
   if (showForgotPassword) {
     return (
-      <div className="h-screen flex items-center justify-center bg-[linear-gradient(135deg,#0f172a_0%,#1e293b_50%,#0f172a_100%)] p-4 overflow-hidden relative">
-        <div className="absolute top-[10%] left-[10%] w-[300px] h-[300px] bg-[radial-gradient(circle,rgba(6,182,212,0.15)_0%,transparent_70%)] rounded-full blur-[40px] animate-pulse-custom" />
-        
-        <div className="max-w-[400px] w-full bg-[rgba(30,41,59,0.8)] backdrop-blur-[20px] p-[30px] rounded-[20px] border border-[rgba(148,163,184,0.1)] shadow-[0_25px_50px_rgba(0,0,0,0.5)] relative z-10 animate-[fadeInUp_0.6s_ease-out]">
-          <div className="text-center mb-6">
-            <div className="text-[40px] mb-3 animate-bounce-custom">🔐</div>
-            <h2 className="text-[22px] font-bold text-slate-100 mb-1.5">Reset Password</h2>
-            <p className="text-[13px] text-slate-400">Enter your email to receive a reset link</p>
+      <div className="min-h-screen flex items-center justify-center bg-[#070b14] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-[#070b14] to-[#070b14] p-4 font-sans text-slate-100 overflow-hidden relative selection:bg-cyan-500/30">
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+          <div className="absolute top-[10%] left-[25%] w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[100px] animate-pulse-custom mix-blend-screen" />
+          <div className="absolute bottom-[10%] right-[25%] w-[500px] h-[500px] bg-violet-600/10 rounded-full blur-[100px] animate-pulse-custom animation-delay-700 mix-blend-screen" />
+        </div>
+
+        <div className="w-full max-w-[440px] bg-white/[0.03] backdrop-blur-2xl p-10 rounded-[32px] border border-white/[0.08] shadow-[0_35px_60px_-15px_rgba(0,0,0,0.6)] relative z-10 flex flex-col items-center">
+          <div className="text-center mb-10 w-full">
+            <div className="text-7xl mb-6 animate-bounce-custom drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">🔐</div>
+            <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-slate-400 mb-3">Reset Password</h2>
+            <p className="text-slate-400 text-lg">Enter your email to receive a reset link</p>
           </div>
 
           {resetSuccess ? (
-            <div className="bg-[rgba(16,185,129,0.1)] border border-[rgba(16,185,129,0.3)] rounded-xl p-5 text-center animate-scale-in">
-              <div className="text-4xl mb-2.5 animate-[bounce_1s]">✅</div>
-              <p className="text-emerald-500 mb-3.5">Reset email sent!</p>
-              <button 
-                onClick={() => setShowForgotPassword(false)} 
-                className="bg-transparent text-cyan-500 border-none text-sm font-semibold cursor-pointer hover:underline"
+            <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-8 text-center w-full animate-scale-in">
+              <div className="text-6xl mb-4">✅</div>
+              <p className="text-emerald-400 mb-6 text-xl font-semibold">Reset email sent!</p>
+              <button
+                onClick={() => setShowForgotPassword(false)}
+                className="text-cyan-400 hover:text-cyan-300 text-lg font-medium transition-colors flex items-center justify-center gap-2 mx-auto"
+              >
+                <span>←</span> Back to Login
+              </button>
+            </div>
+          ) : (
+            <div className="w-full space-y-6">
+              {error && (
+                <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl text-sm flex items-center gap-3 animate-shake backdrop-blur-sm">
+                  <span className="text-lg">⚠️</span> <span className="font-medium">{error}</span>
+                </div>
+              )}
+
+              <div className="space-y-6">
+                <input
+                  type="email"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  placeholder="name@example.com"
+                  className="w-full p-5 text-lg bg-slate-900/50 border border-white/10 rounded-2xl text-white placeholder-slate-500 outline-none transition-all duration-300
+                    focus:bg-slate-900/80 focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 focus:shadow-[0_0_20px_rgba(6,182,212,0.15)]
+                    hover:border-white/20"
+                />
+
+                <button
+                  onClick={handleForgotPassword}
+                  disabled={loading}
+                  className="w-full p-5 bg-gradient-to-r from-cyan-500 to-violet-600 text-white text-lg rounded-2xl font-bold
+                    transition-all duration-300 shadow-[0_10px_25px_-5px_rgba(6,182,212,0.4)]
+                    hover:shadow-[0_20px_35px_-10px_rgba(6,182,212,0.5)] hover:scale-[1.02] hover:-translate-y-0.5
+                    active:scale-95 active:translate-y-0
+                    disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
+                >
+                  {loading ? 'Sending...' : 'Send Reset Link'}
+                </button>
+              </div>
+
+              <button
+                onClick={() => { setShowForgotPassword(false); setError(''); }}
+                className="w-full p-4 text-slate-400 hover:text-white rounded-2xl text-base font-semibold transition-all duration-300 hover:bg-white/5"
               >
                 ← Back to Login
               </button>
             </div>
-          ) : (
-            <>
-              {error && (
-                <div className="bg-[rgba(239,68,68,0.1)] border border-[rgba(239,68,68,0.3)] text-red-400 p-2.5 rounded-lg mb-4 text-xs animate-shake">
-                  {error}
-                </div>
-              )}
-              
-              <input 
-                type="email" 
-                value={resetEmail} 
-                onChange={(e) => setResetEmail(e.target.value)} 
-                placeholder="Enter your email" 
-                className="w-full p-3 bg-[rgba(15,23,42,0.6)] border-2 border-[rgba(148,163,184,0.2)] rounded-xl text-sm text-slate-100 outline-none transition-all duration-300
-                  focus:bg-[rgba(6,182,212,0.1)] focus:border-cyan-500 focus:shadow-[0_0_25px_rgba(6,182,212,0.3)]
-                  hover:bg-[rgba(6,182,212,0.05)]"
-              />
-              
-              <button 
-                onClick={handleForgotPassword} 
-                disabled={loading}
-                className="w-full p-3 mt-4 bg-[linear-gradient(135deg,#06b6d4_0%,#8b5cf6_100%)] text-white rounded-xl text-sm font-semibold border-none cursor-pointer
-                  transition-all duration-300 shadow-lg shadow-cyan-500/20
-                  hover:scale-[1.02] hover:-translate-y-0.5
-                  disabled:opacity-70 disabled:cursor-not-allowed"
-              >
-                {loading ? 'Sending...' : 'Send Reset Link'}
-              </button>
-              
-              <button 
-                onClick={() => { setShowForgotPassword(false); setError(''); }}
-                className="w-full p-3 mt-2.5 bg-transparent text-slate-400 border-2 border-[rgba(148,163,184,0.2)] rounded-xl text-[13px] font-semibold cursor-pointer
-                  transition-all duration-300
-                  hover:border-[rgba(148,163,184,0.5)] hover:text-slate-300"
-              >
-                ← Back to Login
-              </button>
-            </>
           )}
         </div>
       </div>
@@ -157,165 +161,168 @@ export default function Login() {
   }
 
   return (
-    <div className="h-screen flex items-center justify-center bg-[linear-gradient(135deg,#0f172a_0%,#1e293b_50%,#0f172a_100%)] p-4 overflow-hidden relative">
-      {/* Animated background orbs */}
-      <div className="absolute top-[5%] left-[5%] w-[350px] h-[350px] bg-[radial-gradient(circle,rgba(6,182,212,0.12)_0%,transparent_70%)] rounded-full blur-[40px] animate-float1" />
-      <div className="absolute bottom-[5%] right-[5%] w-[400px] h-[400px] bg-[radial-gradient(circle,rgba(139,92,246,0.12)_0%,transparent_70%)] rounded-full blur-[40px] animate-float2" />
-      <div className="absolute top-1/2 left-1/2 w-[200px] h-[200px] bg-[radial-gradient(circle,rgba(236,72,153,0.08)_0%,transparent_70%)] rounded-full blur-[30px] animate-float3 -translate-x-1/2 -translate-y-1/2" />
+    <div className="min-h-screen flex items-center justify-center bg-[#070b14] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-[#070b14] to-[#070b14] p-4 font-sans text-slate-100 overflow-hidden relative selection:bg-cyan-500/30">
+      {/* Premium ambient background */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute -top-[20%] -left-[10%] w-[800px] h-[800px] bg-indigo-600/10 rounded-full blur-[120px] mix-blend-screen opacity-50 animate-float1" />
+        <div className="absolute top-[20%] right-[10%] w-[600px] h-[600px] bg-cyan-500/10 rounded-full blur-[100px] mix-blend-screen opacity-50 animate-float2" />
+        <div className="absolute -bottom-[20%] left-[20%] w-[600px] h-[600px] bg-violet-600/10 rounded-full blur-[100px] mix-blend-screen opacity-50 animate-float3" />
+      </div>
 
-      <div 
-        className={`max-w-[420px] w-full bg-[rgba(30,41,59,0.85)] backdrop-blur-[20px] p-8 pb-7 rounded-[24px] border border-[rgba(148,163,184,0.1)] shadow-[0_25px_60px_rgba(0,0,0,0.5)] relative z-10
-          transition-all duration-[800ms] ease-[cubic-bezier(0.175,0.885,0.32,1.275)]
-          ${isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-10 scale-95'}`}
+      <div
+        className={`w-full max-w-[420px] min-h-[85vh] md:min-h-[820px] bg-white/[0.02] backdrop-blur-3xl px-8 py-10 rounded-[36px] border border-white/[0.08] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.7),inset_0_1px_1px_rgba(255,255,255,0.1)] relative z-10 flex flex-col justify-between
+          transition-all duration-[1000ms] ease-[cubic-bezier(0.19,1,0.22,1)]
+          ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
       >
-        
-        {/* Navigation to Signup */}
+
+        {/* Navigation - Top Right */}
         <div className="flex justify-end mb-4">
-          <Link 
+          <Link
             to="/signup"
-            className="group flex items-center gap-2 px-5 py-2.5 bg-[rgba(6,182,212,0.1)] border-2 border-[rgba(6,182,212,0.3)] rounded-full text-cyan-500 text-[13px] font-bold no-underline
-              transition-all duration-[400ms] ease-[cubic-bezier(0.175,0.885,0.32,1.275)]
-              hover:bg-[linear-gradient(135deg,#06b6d4_0%,#8b5cf6_100%)] hover:border-transparent hover:text-white hover:scale-[1.08] hover:translate-x-[5px] hover:shadow-[0_10px_30px_rgba(6,182,212,0.4)]"
+            className="group flex items-center gap-2.5 px-5 py-2.5 bg-white/[0.05] border border-white/[0.1] rounded-full text-cyan-400 text-sm font-bold no-underline
+              transition-all duration-300
+              hover:bg-cyan-500/10 hover:border-cyan-500/30 hover:shadow-[0_0_20px_rgba(6,182,212,0.2)] hover:scale-105 active:scale-95"
           >
-            <span className="text-base transition-transform duration-300 group-hover:rotate-[20deg] group-hover:scale-[1.2]">✨</span>
+            <span className="text-lg transition-transform duration-300 group-hover:rotate-12">✨</span>
             <span>Create Account</span>
-            <span className="transition-transform duration-300 group-hover:translate-x-[5px]">→</span>
+            <span className="opacity-0 -ml-2 transition-all duration-300 group-hover:opacity-100 group-hover:ml-0">→</span>
           </Link>
         </div>
 
-        {/* Logo with pulse animation */}
-        <div className="text-center mb-5">
-          <div className="group w-[65px] h-[65px] bg-[linear-gradient(135deg,#06b6d4_0%,#8b5cf6_100%)] rounded-[18px] flex items-center justify-center mx-auto mb-3.5 text-[28px] text-white font-bold cursor-pointer
-            transition-all duration-[400ms] ease-[cubic-bezier(0.175,0.885,0.32,1.275)] animate-pulse-logo
-            hover:scale-[1.15] hover:rotate-[5deg] hover:shadow-[0_15px_40px_rgba(6,182,212,0.5),0_0_60px_rgba(139,92,246,0.3)]">
-            JS
+        {/* Brand Header - Centered */}
+        <div className="text-center mb-8 flex-shrink-0">
+          <div className="relative group mx-auto mb-8 cursor-pointer">
+            <div className="absolute inset-0 bg-gradient-to-tr from-cyan-400 to-violet-500 rounded-[28px] blur-xl opacity-40 group-hover:opacity-60 transition-opacity duration-500" />
+            <div className="relative w-28 h-28 bg-gradient-to-tr from-cyan-500 to-violet-600 rounded-[28px] flex items-center justify-center text-5xl text-white font-bold
+              shadow-[inset_0_2px_4px_rgba(255,255,255,0.3),0_10px_30px_rgba(0,0,0,0.3)]
+              transition-transform duration-500 group-hover:scale-105 group-hover:rotate-3">
+              JS
+            </div>
           </div>
-          <h1 className="text-2xl font-extrabold bg-[linear-gradient(135deg,#f1f5f9_0%,#06b6d4_50%,#8b5cf6_100%)] bg-[length:200%_200%] bg-clip-text text-transparent mb-1.5 animate-gradient">
+
+          <h1 className="text-4xl font-bold text-white mb-2 tracking-tight drop-shadow-sm">
             Welcome Back
           </h1>
-          <p className="text-[13px] text-slate-500">
-            Sign in to continue to JobScout
+          <p className="text-lg text-slate-400 font-medium">
+            Sign in to your dashboard
           </p>
         </div>
 
-        {error && (
-          <div className="bg-[rgba(239,68,68,0.1)] border border-[rgba(239,68,68,0.3)] text-red-400 px-3.5 py-2.5 rounded-[10px] mb-4 text-xs flex items-center gap-2 animate-shake">
-            <span>⚠️</span> {error}
-          </div>
-        )}
+        {/* Form Section */}
+        <div className="flex-1 flex flex-col w-full">
+          {error && (
+            <div className="mb-6 bg-red-500/10 border border-red-500/20 text-red-200 px-4 py-3 rounded-xl text-sm flex items-center gap-3 animate-shake font-medium backdrop-blur-md">
+              <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-red-500/20 rounded-full text-xs">!</span>
+              <span>{error}</span>
+            </div>
+          )}
 
-        {/* Google Sign In */}
-        <button
-          onClick={handleGoogleSignIn}
-          disabled={loading}
-          type="button"
-          className="group w-full p-3 bg-[rgba(255,255,255,0.05)] border-2 border-[rgba(148,163,184,0.2)] rounded-xl text-sm font-semibold text-slate-200 cursor-pointer flex items-center justify-center gap-2.5
-            transition-all duration-[400ms] ease-[cubic-bezier(0.175,0.885,0.32,1.275)]
-            hover:bg-[rgba(255,255,255,0.1)] hover:border-[rgba(6,182,212,0.5)] hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-lg
-            disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <svg className="w-[18px] h-[18px] transition-transform duration-300 group-hover:rotate-[360deg]" viewBox="0 0 20 20">
-            <path fill="#4285F4" d="M19.6 10.23c0-.82-.1-1.42-.25-2.05H10v3.72h5.5c-.15.96-.74 2.31-2.04 3.22v2.45h3.16c1.89-1.73 2.98-4.3 2.98-7.34z"/>
-            <path fill="#34A853" d="M13.46 15.13c-.83.59-1.96 1-3.46 1-2.64 0-4.88-1.74-5.68-4.15H1.07v2.52C2.72 17.75 6.09 20 10 20c2.7 0 4.96-.89 6.62-2.42l-3.16-2.45z"/>
-            <path fill="#FBBC05" d="M3.99 10c0-.69.12-1.35.32-1.97V5.51H1.07A9.973 9.973 0 000 10c0 1.61.39 3.14 1.07 4.49l3.24-2.52c-.2-.62-.32-1.28-.32-1.97z"/>
-            <path fill="#EA4335" d="M10 3.88c1.88 0 3.13.81 3.85 1.48l2.84-2.76C14.96.99 12.7 0 10 0 6.09 0 2.72 2.25 1.07 5.51l3.24 2.52C5.12 5.62 7.36 3.88 10 3.88z"/>
-          </svg>
-          Continue with Google
-        </button>
+          {/* SocialAuth */}
+          <button
+            onClick={handleGoogleSignIn}
+            disabled={loading}
+            type="button"
+            className="w-full p-4 bg-white/[0.05] border border-white/[0.1] rounded-2xl text-lg font-semibold text-slate-200 cursor-pointer flex items-center justify-center gap-3
+              transition-all duration-300 mb-8
+              hover:bg-white/[0.1] hover:border-white/[0.2] hover:scale-[1.02] hover:-translate-y-0.5 active:scale-[0.98]
+              disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <svg className="w-6 h-6" viewBox="0 0 24 24">
+              <path fill="#ffffff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" opacity="0.9" />
+              <path fill="#ffffff" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" opacity="0.9" />
+              <path fill="#ffffff" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" opacity="0.9" />
+              <path fill="#ffffff" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" opacity="0.9" />
+            </svg>
+            <span className="tracking-wide">Continue with Google</span>
+          </button>
 
-        {/* Animated Divider */}
-        <div className="flex items-center gap-3.5 my-4.5">
-          <div className="flex-1 h-[2px] bg-gradient-to-r from-transparent via-[rgba(6,182,212,0.3)] to-transparent animate-shimmer" />
-          <span className="text-slate-500 text-[11px] font-semibold px-2.5 py-1 bg-[rgba(6,182,212,0.1)] rounded-full">or</span>
-          <div className="flex-1 h-[2px] bg-gradient-to-r from-transparent via-[rgba(139,92,246,0.3)] to-transparent animate-shimmer" />
-        </div>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5">
-          {/* Email Input */}
-          <div className="group">
-            <label className="block text-xs font-semibold text-slate-400 mb-1.5 transition-all duration-300 group-focus-within:text-cyan-500 group-focus-within:translate-x-[5px]">
-              ✉️ Email Address
-            </label>
-            <input
-              {...register("email", { required: "Email is required", pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, message: "Invalid email" } })}
-              type="email"
-              placeholder="you@example.com"
-              className="w-full p-3 px-4 bg-[rgba(15,23,42,0.6)] border-2 border-[rgba(148,163,184,0.2)] rounded-xl text-sm text-slate-100 outline-none
-                transition-all duration-300
-                focus:bg-[rgba(6,182,212,0.08)] focus:border-cyan-500 focus:shadow-[0_0_25px_rgba(6,182,212,0.3),inset_0_0_20px_rgba(6,182,212,0.05)] focus:-translate-y-[2px] focus:scale-[1.02]
-                hover:bg-[rgba(6,182,212,0.04)] hover:border-[rgba(6,182,212,0.5)] hover:shadow-[0_0_15px_rgba(6,182,212,0.15),0_4px_12px_rgba(0,0,0,0.2)] hover:-translate-y-[1px] hover:scale-[1.01]"
-            />
-            {errors.email && <p className="text-red-400 text-[11px] mt-1.5">{errors.email.message}</p>}
+          <div className="relative flex py-2 items-center mb-8">
+            <div className="flex-grow border-t border-white/[0.1]"></div>
+            <span className="flex-shrink-0 mx-4 text-slate-500 text-sm font-semibold tracking-wider uppercase">or email</span>
+            <div className="flex-grow border-t border-white/[0.1]"></div>
           </div>
 
-          {/* Password Input */}
-          <div className="group">
-            <label className="block text-xs font-semibold text-slate-400 mb-1.5 transition-all duration-300 group-focus-within:text-cyan-500 group-focus-within:translate-x-[5px]">
-              🔒 Password
-            </label>
-            <div className="relative">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 flex-1 flex flex-col">
+            {/* Dark Modern Inputs */}
+            <div className="group">
+              <label className="block text-sm font-semibold text-slate-400 mb-2 pl-1 uppercase tracking-wider">Email Address</label>
               <input
-                {...register("password", { required: "Password is required" })}
-                type={showPassword ? "text" : "password"}
-                placeholder="Enter your password"
-                className="w-full p-3 px-4 pr-[45px] bg-[rgba(15,23,42,0.6)] border-2 border-[rgba(148,163,184,0.2)] rounded-xl text-sm text-slate-100 outline-none
+                {...register("email", { required: "Email is required", pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, message: "Invalid email" } })}
+                type="email"
+                placeholder="name@company.com"
+                className="w-full p-4 px-5 text-lg bg-slate-950/40 border border-white/10 rounded-2xl text-white placeholder-slate-600 outline-none
                   transition-all duration-300
-                  focus:bg-[rgba(6,182,212,0.08)] focus:border-cyan-500 focus:shadow-[0_0_25px_rgba(6,182,212,0.3),inset_0_0_20px_rgba(6,182,212,0.05)] focus:-translate-y-[2px] focus:scale-[1.02]
-                  hover:bg-[rgba(6,182,212,0.04)] hover:border-[rgba(6,182,212,0.5)] hover:shadow-[0_0_15px_rgba(6,182,212,0.15),0_4px_12px_rgba(0,0,0,0.2)] hover:-translate-y-[1px] hover:scale-[1.01]"
+                  focus:bg-slate-900/60 focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 focus:shadow-[0_0_30px_-5px_rgba(6,182,212,0.15)]
+                  hover:bg-slate-900/50 hover:border-white/20"
               />
+              {errors.email && <p className="text-red-400 text-sm mt-2 pl-1 font-medium">{errors.email.message}</p>}
+            </div>
+
+            <div className="group">
+              <label className="block text-sm font-semibold text-slate-400 mb-2 pl-1 uppercase tracking-wider">Password</label>
+              <div className="relative">
+                <input
+                  {...register("password", { required: "Password is required" })}
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••••••"
+                  className="w-full p-4 px-5 pr-14 text-lg bg-slate-950/40 border border-white/10 rounded-2xl text-white placeholder-slate-600 outline-none
+                    transition-all duration-300
+                    focus:bg-slate-900/60 focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 focus:shadow-[0_0_30px_-5px_rgba(6,182,212,0.15)]
+                    hover:bg-slate-900/50 hover:border-white/20"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className={`absolute right-4 top-1/2 -translate-y-1/2 border-none cursor-pointer p-2 rounded-lg transition-colors
+                    ${showPassword ? 'text-cyan-400 bg-cyan-500/10' : 'text-slate-500 hover:text-slate-300'}`}
+                >
+                  {showPassword ? (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  ) : (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                      <line x1="1" y1="1" x2="23" y2="23" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+              {errors.password && <p className="text-red-400 text-sm mt-2 pl-1 font-medium">{errors.password.message}</p>}
+            </div>
+
+            <div className="flex justify-end">
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className={`absolute right-3 top-1/2 -translate-y-1/2 border-none cursor-pointer p-1 flex items-center justify-center
-                  transition-all duration-300 rounded-md hover:scale-[1.2]
-                  ${showPassword ? 'text-cyan-500' : 'text-slate-500 hover:text-cyan-500'}`}
+                onClick={() => setShowForgotPassword(true)}
+                className="text-cyan-400/80 hover:text-cyan-300 text-sm font-semibold transition-colors hover:underline decoration-cyan-500/30 underline-offset-4"
               >
-                {showPassword ? (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                  </svg>
-                ) : (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-                    <line x1="1" y1="1" x2="23" y2="23"/>
-                  </svg>
-                )}
+                Forgot password?
               </button>
             </div>
-            {errors.password && <p className="text-red-400 text-[11px] mt-1.5">{errors.password.message}</p>}
-          </div>
 
-          {/* Forgot Password */}
-          <div className="text-right">
+            <div className="flex-grow" />
+
+            {/* Gradient Submit Button */}
             <button
-              type="button"
-              onClick={() => setShowForgotPassword(true)}
-              className="border-none text-cyan-500 text-xs font-semibold cursor-pointer px-2 py-1 rounded-md
-                transition-all duration-300
-                hover:bg-[rgba(6,182,212,0.1)] hover:text-violet-500"
+              type="submit"
+              disabled={loading}
+              className={`w-full p-5 bg-gradient-to-r from-cyan-500 to-violet-600 text-white text-xl rounded-2xl font-bold cursor-pointer
+                transition-all duration-300 mt-auto
+                shadow-[0_10px_40px_-10px_rgba(6,182,212,0.5),inset_0_1px_0_rgba(255,255,255,0.2)]
+                hover:shadow-[0_20px_50px_-10px_rgba(6,182,212,0.6),inset_0_1px_0_rgba(255,255,255,0.3)] hover:scale-[1.02] hover:-translate-y-1
+                active:scale-[0.98] active:translate-y-0
+                disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none
+                ${!loading ? 'animate-gradient bg-[length:200%_200%]' : ''}`}
             >
-              Forgot password? 🔑
+              <span className="flex items-center justify-center gap-3 drop-shadow-md">
+                {loading ? 'Signing in...' : 'Sign In'}
+                {!loading && <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="opacity-70 group-hover:opacity-100 transition-opacity"><path d="M5 12h14" /><path d="M12 5l7 7-7 7" /></svg>}
+              </span>
             </button>
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className={`group w-full p-3.5 bg-[linear-gradient(135deg,#06b6d4_0%,#8b5cf6_100%)] bg-[length:200%_200%] text-white border-none rounded-[14px] text-[15px] font-bold cursor-pointer
-              transition-all duration-[400ms] ease-[cubic-bezier(0.175,0.885,0.32,1.275)] relative overflow-hidden
-              shadow-[0_10px_30px_rgba(6,182,212,0.3)]
-              hover:shadow-[0_20px_40px_rgba(6,182,212,0.4),0_0_60px_rgba(139,92,246,0.2)] hover:scale-[1.03] hover:-translate-y-[3px]
-              disabled:opacity-70 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:scale-100 disabled:hover:translate-y-0
-              ${!loading ? 'animate-gradient' : ''}`}
-          >
-            <span className="relative z-10 flex items-center justify-center gap-2">
-              {loading ? 'Signing in...' : 'Sign In'}
-              {!loading && <span className="transition-transform duration-300 group-hover:translate-x-[5px]">→</span>}
-            </span>
-          </button>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );
