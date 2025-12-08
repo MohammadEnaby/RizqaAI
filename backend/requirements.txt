@@ -5,3 +5,5 @@ webdriver-manager
 beautifulsoup4
 google-generativeai
 pydantic
+fastapi
+uvicorn
