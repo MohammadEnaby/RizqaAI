@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -8,15 +8,8 @@ export default function Signup() {
   const { signup, initiateGoogleSignIn } = useAuth();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   const password = watch('password', '');
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
 
   const onSubmit = async (data) => {
     if (data.password !== data.confirmPassword) {
@@ -51,11 +44,7 @@ export default function Signup() {
       setError('');
       setLoading(true);
       const result = await initiateGoogleSignIn();
-      if (result.isNewUser) {
-        navigate('/complete-profile');
-      } else {
-        navigate('/');
-      }
+      navigate(result.isNewUser ? '/complete-profile' : (result.profile?.role === 'admin' ? '/admin' : '/'));
     } catch (err) {
       console.error(err);
       setError(err.message || 'Failed to sign in with Google.');
@@ -65,279 +54,165 @@ export default function Signup() {
   };
 
   return (
-    <div className="h-screen flex items-center justify-center bg-[linear-gradient(135deg,#0f172a_0%,#1e293b_50%,#0f172a_100%)] p-3 overflow-hidden relative">
-      {/* Animated background orbs */}
-      <div className="absolute top-[5%] right-[10%] w-[300px] h-[300px] bg-[radial-gradient(circle,rgba(139,92,246,0.12)_0%,transparent_70%)] rounded-full blur-[40px] animate-float1" />
-      <div className="absolute bottom-[10%] left-[5%] w-[350px] h-[350px] bg-[radial-gradient(circle,rgba(6,182,212,0.12)_0%,transparent_70%)] rounded-full blur-[40px] animate-float2" />
-      <div className="absolute top-[40%] left-[30%] w-[180px] h-[180px] bg-[radial-gradient(circle,rgba(236,72,153,0.08)_0%,transparent_70%)] rounded-full blur-[30px] animate-float3" />
+    <div className="h-screen flex items-center justify-center app-bg p-2 py-4 overflow-hidden">
 
-      <div 
-        className={`max-w-[620px] w-full bg-[rgba(30,41,59,0.85)] backdrop-blur-[20px] px-6 py-5 rounded-[22px] border border-[rgba(148,163,184,0.1)] shadow-[0_25px_60px_rgba(0,0,0,0.5)] relative z-10
-          transition-all duration-[800ms] ease-[cubic-bezier(0.175,0.885,0.32,1.275)]
-          ${isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-10 scale-95'}`}
-      >
-        {/* Navigation to Login */}
-        <div className="flex justify-end mb-2.5">
-          <Link 
+      {/* Main Card */}
+      <div className="w-full max-w-[95vw] sm:max-w-lg lg:max-w-3xl xl:max-w-5xl glass-panel rounded-xl sm:rounded-3xl shadow-2xl p-4 sm:p-8 lg:p-12 xl:p-16 relative flex flex-col justify-center max-h-screen">
+
+        {/* Top decoration dot - hidden on very small screens */}
+        <div className="absolute top-2 sm:top-6 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-teal-500 rounded-full animate-pulse-custom hidden min-[375px]:block"></div>
+
+        {/* Login Link */}
+        <div className="absolute top-2 sm:top-6 right-2 sm:right-6">
+          <Link
             to="/login"
-            className="group flex items-center gap-2 px-4 py-2 bg-[rgba(139,92,246,0.1)] border-2 border-[rgba(139,92,246,0.3)] rounded-full text-violet-500 text-xs font-bold no-underline
-              transition-all duration-[400ms] ease-[cubic-bezier(0.175,0.885,0.32,1.275)]
-              hover:bg-[linear-gradient(135deg,#8b5cf6_0%,#06b6d4_100%)] hover:border-transparent hover:text-white hover:scale-[1.08] hover:-translate-x-[5px] hover:shadow-[0_10px_30px_rgba(139,92,246,0.4)]"
+            className="flex items-center gap-1 sm:gap-2 px-2 py-1 bg-white/80 border border-teal-400 rounded-full text-teal-700 text-[9px] sm:text-xs font-bold hover:bg-white transition-transform hover:scale-105"
           >
-            <span className="transition-transform duration-300 group-hover:-translate-x-[5px]">←</span>
-            <span>Sign In</span>
-            <span className="text-sm transition-transform duration-300 group-hover:rotate-[-20deg] group-hover:scale-[1.2]">👋</span>
+            <span>🔓 Sign In</span>
           </Link>
         </div>
 
-        {/* Header */}
-        <div className="text-center mb-3">
-          <div className="group w-[52px] h-[52px] bg-[linear-gradient(135deg,#8b5cf6_0%,#06b6d4_100%)] rounded-[15px] flex items-center justify-center mx-auto mb-2.5 text-2xl text-white font-bold cursor-pointer
-            transition-all duration-[400ms] ease-[cubic-bezier(0.175,0.885,0.32,1.275)] animate-pulse-logo
-            hover:scale-[1.15] hover:-rotate-[5deg] hover:shadow-[0_15px_40px_rgba(139,92,246,0.5),0_0_60px_rgba(6,182,212,0.3)]">
-            JS
+        {/* Header - Compact */}
+        <div className="text-center mt-4 sm:mt-0 mb-2 sm:mb-4 md:mb-6 lg:mb-8 shrink-0">
+          <div className="w-8 h-8 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 theme-green-blue rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-1 sm:mb-2 md:mb-3 lg:mb-4 shadow-lg">
+            <span className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-black text-white">JS</span>
           </div>
-          <h1 className="text-xl font-extrabold bg-[linear-gradient(135deg,#f1f5f9_0%,#8b5cf6_50%,#06b6d4_100%)] bg-[length:200%_200%] bg-clip-text text-transparent mb-1 animate-gradient">
-            Create Account
-          </h1>
-          <p className="text-xs text-slate-500">
-            Join JobScout and start your journey
-          </p>
+          <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold title-color leading-tight mb-1 lg:mb-2">Create Account</h1>
+          <p className="text-[9px] sm:text-sm md:text-sm lg:text-base text-gray-600 font-medium leading-tight">Join Risqa today</p>
         </div>
 
-        {error && (
-          <div className="bg-[rgba(239,68,68,0.1)] border border-[rgba(239,68,68,0.3)] text-red-400 px-3 py-2 rounded-lg mb-2.5 text-[11px] flex items-center gap-1.5 animate-shake">
-            <span>⚠️</span> {error}
-          </div>
-        )}
+        {/* Content Container - fits remaining space */}
+        <div className="flex-1 flex flex-col justify-center min-h-0">
 
-        {/* Google Sign In */}
-        <button
-          onClick={handleGoogleSignIn}
-          disabled={loading}
-          type="button"
-          className="group w-full p-2.5 bg-[rgba(255,255,255,0.05)] border-2 border-[rgba(148,163,184,0.2)] rounded-xl text-[13px] font-semibold text-slate-200 cursor-pointer flex items-center justify-center gap-2.5
-            transition-all duration-[400ms] ease-[cubic-bezier(0.175,0.885,0.32,1.275)]
-            hover:bg-[rgba(255,255,255,0.1)] hover:border-[rgba(139,92,246,0.5)] hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-lg
-            disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <svg className="w-4 h-4 transition-transform duration-[400ms] group-hover:rotate-[360deg]" viewBox="0 0 20 20">
-            <path fill="#4285F4" d="M19.6 10.23c0-.82-.1-1.42-.25-2.05H10v3.72h5.5c-.15.96-.74 2.31-2.04 3.22v2.45h3.16c1.89-1.73 2.98-4.3 2.98-7.34z"/>
-            <path fill="#34A853" d="M13.46 15.13c-.83.59-1.96 1-3.46 1-2.64 0-4.88-1.74-5.68-4.15H1.07v2.52C2.72 17.75 6.09 20 10 20c2.7 0 4.96-.89 6.62-2.42l-3.16-2.45z"/>
-            <path fill="#FBBC05" d="M3.99 10c0-.69.12-1.35.32-1.97V5.51H1.07A9.973 9.973 0 000 10c0 1.61.39 3.14 1.07 4.49l3.24-2.52c-.2-.62-.32-1.28-.32-1.97z"/>
-            <path fill="#EA4335" d="M10 3.88c1.88 0 3.13.81 3.85 1.48l2.84-2.76C14.96.99 12.7 0 10 0 6.09 0 2.72 2.25 1.07 5.51l3.24 2.52C5.12 5.62 7.36 3.88 10 3.88z"/>
-          </svg>
-          Continue with Google
-        </button>
-
-        {/* Animated Divider */}
-        <div className="flex items-center gap-3.5 my-3">
-          <div className="flex-1 h-[2px] bg-gradient-to-r from-transparent via-[rgba(139,92,246,0.3)] to-transparent animate-shimmer" />
-          <span className="text-slate-500 text-[10px] font-semibold px-2.5 py-1 bg-[rgba(139,92,246,0.1)] rounded-full">or</span>
-          <div className="flex-1 h-[2px] bg-gradient-to-r from-transparent via-[rgba(6,182,212,0.3)] to-transparent animate-shimmer" />
-        </div>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-2.5">
-          {/* Name Row */}
-          <div className="grid grid-cols-2 gap-2.5">
-            <div className="group">
-              <label className="block text-[11px] font-semibold text-slate-400 mb-1 transition-all duration-300 group-focus-within:text-violet-500 group-focus-within:translate-x-[3px]">
-                👤 First Name
-              </label>
-              <input
-                {...register("firstName", { required: "Required" })}
-                type="text"
-                placeholder="John"
-                className="w-full p-2.5 px-3 bg-[rgba(15,23,42,0.6)] border-2 border-[rgba(148,163,184,0.2)] rounded-xl text-[13px] text-slate-100 outline-none
-                  transition-all duration-300
-                  focus:bg-[rgba(139,92,246,0.08)] focus:border-violet-500 focus:shadow-[0_0_20px_rgba(139,92,246,0.25),inset_0_0_15px_rgba(139,92,246,0.03)] focus:-translate-y-[1px] focus:scale-[1.01]
-                  hover:bg-[rgba(139,92,246,0.04)] hover:border-[rgba(139,92,246,0.5)]"
-              />
-              {errors.firstName && <p className="text-red-400 text-[10px] mt-1">{errors.firstName.message}</p>}
-            </div>
-            <div className="group">
-              <label className="block text-[11px] font-semibold text-slate-400 mb-1 transition-all duration-300 group-focus-within:text-violet-500 group-focus-within:translate-x-[3px]">
-                👤 Last Name
-              </label>
-              <input
-                {...register("lastName", { required: "Required" })}
-                type="text"
-                placeholder="Doe"
-                className="w-full p-2.5 px-3 bg-[rgba(15,23,42,0.6)] border-2 border-[rgba(148,163,184,0.2)] rounded-xl text-[13px] text-slate-100 outline-none
-                  transition-all duration-300
-                  focus:bg-[rgba(139,92,246,0.08)] focus:border-violet-500 focus:shadow-[0_0_20px_rgba(139,92,246,0.25),inset_0_0_15px_rgba(139,92,246,0.03)] focus:-translate-y-[1px] focus:scale-[1.01]
-                  hover:bg-[rgba(139,92,246,0.04)] hover:border-[rgba(139,92,246,0.5)]"
-              />
-              {errors.lastName && <p className="text-red-400 text-[10px] mt-1">{errors.lastName.message}</p>}
-            </div>
-          </div>
-
-          {/* Email & Phone Row */}
-          <div className="grid grid-cols-2 gap-2.5">
-            <div className="group">
-              <label className="block text-[11px] font-semibold text-slate-400 mb-1 transition-all duration-300 group-focus-within:text-cyan-500 group-focus-within:translate-x-[3px]">
-                ✉️ Email
-              </label>
-              <input
-                {...register("email", { required: "Required", pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, message: "Invalid" } })}
-                type="email"
-                placeholder="you@example.com"
-                className="w-full p-2.5 px-3 bg-[rgba(15,23,42,0.6)] border-2 border-[rgba(148,163,184,0.2)] rounded-xl text-[13px] text-slate-100 outline-none
-                  transition-all duration-300
-                  focus:bg-[rgba(6,182,212,0.08)] focus:border-cyan-500 focus:shadow-[0_0_20px_rgba(6,182,212,0.25),inset_0_0_15px_rgba(6,182,212,0.03)] focus:-translate-y-[1px] focus:scale-[1.01]
-                  hover:bg-[rgba(6,182,212,0.04)] hover:border-[rgba(6,182,212,0.5)]"
-              />
-              {errors.email && <p className="text-red-400 text-[10px] mt-1">{errors.email.message}</p>}
-            </div>
-            <div className="group">
-              <label className="block text-[11px] font-semibold text-slate-400 mb-1 transition-all duration-300 group-focus-within:text-cyan-500 group-focus-within:translate-x-[3px]">
-                📱 Phone
-              </label>
-              <input
-                {...register("phone", { required: "Required" })}
-                type="tel"
-                placeholder="+1 234 567 890"
-                className="w-full p-2.5 px-3 bg-[rgba(15,23,42,0.6)] border-2 border-[rgba(148,163,184,0.2)] rounded-xl text-[13px] text-slate-100 outline-none
-                  transition-all duration-300
-                  focus:bg-[rgba(6,182,212,0.08)] focus:border-cyan-500 focus:shadow-[0_0_20px_rgba(6,182,212,0.25),inset_0_0_15px_rgba(6,182,212,0.03)] focus:-translate-y-[1px] focus:scale-[1.01]
-                  hover:bg-[rgba(6,182,212,0.04)] hover:border-[rgba(6,182,212,0.5)]"
-              />
-              {errors.phone && <p className="text-red-400 text-[10px] mt-1">{errors.phone.message}</p>}
-            </div>
-          </div>
-
-          {/* Account Type */}
-          <div>
-            <label className="block text-[11px] font-semibold text-slate-400 mb-1.5">⚡ Account Type</label>
-            <div className="flex gap-2.5">
-              {['user', 'admin'].map((type) => (
-                <label
-                  key={type}
-                  className="flex-1 p-2.5 px-3 bg-[rgba(15,23,42,0.6)] border-2 border-[rgba(148,163,184,0.2)] rounded-xl cursor-pointer flex items-center gap-2
-                    transition-all duration-[400ms] ease-[cubic-bezier(0.175,0.885,0.32,1.275)]
-                    hover:border-violet-500 hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(139,92,246,0.2)]
-                    has-[:checked]:border-violet-500 has-[:checked]:bg-[rgba(139,92,246,0.1)]"
-                >
-                  <input
-                    type="radio"
-                    value={type}
-                    {...register("role", { required: true })}
-                    defaultChecked={type === 'user'}
-                    className="hidden"
-                  />
-                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center
-                    ${type === 'user' ? 'border-cyan-500' : 'border-violet-500'}`}
-                  >
-                    <div className={`w-2 h-2 rounded-full transition-transform duration-300
-                      ${type === 'user' ? 'bg-cyan-500' : 'bg-violet-500'}`}
-                    />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-xs text-slate-200">
-                      {type === 'user' ? '👤 User' : '⚙️ Admin'}
-                    </div>
-                    <div className="text-[10px] text-slate-500">
-                      {type === 'user' ? 'Browse & apply' : 'Manage platform'}
-                    </div>
-                  </div>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Password Row */}
-          <div className="grid grid-cols-2 gap-2.5">
-            <div className="group">
-              <label className="block text-[11px] font-semibold text-slate-400 mb-1 transition-all duration-300 group-focus-within:text-violet-500 group-focus-within:translate-x-[3px]">
-                🔒 Password
-              </label>
-              <div className="relative">
-                <input
-                  {...register("password", { required: "Required", minLength: { value: 6, message: "Min 6 chars" } })}
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  className="w-full p-2.5 px-3 pr-10 bg-[rgba(15,23,42,0.6)] border-2 border-[rgba(148,163,184,0.2)] rounded-xl text-[13px] text-slate-100 outline-none
-                    transition-all duration-300
-                    focus:bg-[rgba(139,92,246,0.08)] focus:border-violet-500 focus:shadow-[0_0_20px_rgba(139,92,246,0.25),inset_0_0_15px_rgba(139,92,246,0.03)] focus:-translate-y-[1px] focus:scale-[1.01]
-                    hover:bg-[rgba(139,92,246,0.04)] hover:border-[rgba(139,92,246,0.5)]"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className={`absolute right-2.5 top-1/2 -translate-y-1/2 border-none cursor-pointer p-1 flex items-center justify-center
-                    transition-all duration-300 rounded-md hover:scale-[1.2]
-                    ${showPassword ? 'text-violet-500' : 'text-slate-500 hover:text-violet-500'}`}
-                >
-                  {showPassword ? (
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                      <circle cx="12" cy="12" r="3"/>
-                    </svg>
-                  ) : (
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-                      <line x1="1" y1="1" x2="23" y2="23"/>
-                    </svg>
-                  )}
-                </button>
-              </div>
-              {errors.password && <p className="text-red-400 text-[10px] mt-1">{errors.password.message}</p>}
-            </div>
-            <div className="group">
-              <label className="block text-[11px] font-semibold text-slate-400 mb-1 transition-all duration-300 group-focus-within:text-violet-500 group-focus-within:translate-x-[3px]">
-                🔒 Confirm
-              </label>
-              <div className="relative">
-                <input
-                  {...register("confirmPassword", { required: "Required", validate: value => value === password || "Mismatch" })}
-                  type={showConfirmPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  className="w-full p-2.5 px-3 pr-10 bg-[rgba(15,23,42,0.6)] border-2 border-[rgba(148,163,184,0.2)] rounded-xl text-[13px] text-slate-100 outline-none
-                    transition-all duration-300
-                    focus:bg-[rgba(139,92,246,0.08)] focus:border-violet-500 focus:shadow-[0_0_20px_rgba(139,92,246,0.25),inset_0_0_15px_rgba(139,92,246,0.03)] focus:-translate-y-[1px] focus:scale-[1.01]
-                    hover:bg-[rgba(139,92,246,0.04)] hover:border-[rgba(139,92,246,0.5)]"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className={`absolute right-2.5 top-1/2 -translate-y-1/2 border-none cursor-pointer p-1 flex items-center justify-center
-                    transition-all duration-300 rounded-md hover:scale-[1.2]
-                    ${showConfirmPassword ? 'text-violet-500' : 'text-slate-500 hover:text-violet-500'}`}
-                >
-                  {showConfirmPassword ? (
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                      <circle cx="12" cy="12" r="3"/>
-                    </svg>
-                  ) : (
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-                      <line x1="1" y1="1" x2="23" y2="23"/>
-                    </svg>
-                  )}
-                </button>
-              </div>
-              {errors.confirmPassword && <p className="text-red-400 text-[10px] mt-1">{errors.confirmPassword.message}</p>}
-            </div>
-          </div>
-
-          {/* Submit Button */}
+          {/* Google Sign In */}
           <button
-            type="submit"
+            onClick={handleGoogleSignIn}
             disabled={loading}
-            className={`group w-full p-3 bg-[linear-gradient(135deg,#8b5cf6_0%,#06b6d4_100%)] bg-[length:200%_200%] text-white border-none rounded-xl text-sm font-bold cursor-pointer
-              transition-all duration-[400ms] ease-[cubic-bezier(0.175,0.885,0.32,1.275)] relative overflow-hidden
-              shadow-[0_8px_25px_rgba(139,92,246,0.3)]
-              hover:shadow-[0_20px_40px_rgba(139,92,246,0.4),0_0_60px_rgba(6,182,212,0.2)] hover:scale-[1.02] hover:-translate-y-[3px]
-              disabled:opacity-70 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:scale-100 disabled:hover:translate-y-0
-              ${!loading ? 'animate-gradient' : ''}`}
+            className="w-full bg-white border-2 border-gray-300 rounded-lg sm:rounded-xl py-2 sm:py-3 md:py-3.5 lg:py-4 px-3 sm:px-4 flex items-center justify-center gap-2 sm:gap-3 text-xs sm:text-sm md:text-base lg:text-base font-semibold text-gray-700 hover:bg-gray-50 hover:border-teal-400 transition-all shrink-0 mb-3 sm:mb-4 md:mb-5 lg:mb-6"
           >
-            <span className="relative z-10 flex items-center justify-center gap-2">
-              {loading ? 'Creating...' : 'Create Account'}
-              {!loading && <span className="transition-transform duration-300 group-hover:scale-[1.3] group-hover:rotate-[20deg]">🚀</span>}
-            </span>
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-6 lg:h-6" />
+            <span>Continue with Google</span>
           </button>
-        </form>
+
+          {/* Divider */}
+          <div className="flex items-center gap-2 sm:gap-4 mb-3 sm:mb-4 lg:mb-6 shrink-0">
+            <div className="flex-1 h-px bg-gray-200"></div>
+            <span className="text-[8px] sm:text-xs lg:text-sm text-gray-400 font-semibold">OR</span>
+            <div className="flex-1 h-px bg-gray-200"></div>
+          </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 sm:py-3 rounded-lg text-xs sm:text-sm mb-3 sm:mb-4 lg:mb-6 text-center font-semibold animate-shake shrink-0">
+              ⚠️ {error}
+            </div>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2 sm:gap-4 md:gap-5 lg:gap-6">
+
+            {/* Name Fields */}
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <input
+                  {...register("firstName", { required: "Required" })}
+                  type="text"
+                  className="w-full px-3 py-2 sm:py-2.5 md:py-3 lg:py-4 bg-white border-2 border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 text-xs sm:text-sm md:text-base lg:text-base focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-100 transition-all"
+                  placeholder="First Name"
+                />
+                {errors.firstName && <p className="text-red-500 text-[8px] sm:text-xs mt-0.5 ml-1">⚠️ {errors.firstName.message}</p>}
+              </div>
+              <div>
+                <input
+                  {...register("lastName", { required: "Required" })}
+                  type="text"
+                  className="w-full px-3 py-2 sm:py-2.5 md:py-3 lg:py-4 bg-white border-2 border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 text-xs sm:text-sm md:text-base lg:text-base focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-100 transition-all"
+                  placeholder="Last Name"
+                />
+                {errors.lastName && <p className="text-red-500 text-[8px] sm:text-xs mt-0.5 ml-1">⚠️ {errors.lastName.message}</p>}
+              </div>
+            </div>
+
+            {/* Email & Phone Grid for compactness on mobile if needed, but stacked is safer for width. Let's keep stacked but small padding. */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+              <div className="relative">
+                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] sm:text-sm">📧</span>
+                <input
+                  {...register("email", { required: "Required" })}
+                  type="email"
+                  className="w-full pl-6 sm:pl-8 pr-2 py-1.5 sm:py-2 bg-white border border-gray-300 rounded-md sm:rounded-lg text-gray-900 placeholder-gray-400 text-[10px] sm:text-sm focus:outline-none focus:border-teal-500 transition-all"
+                  placeholder="Email"
+                />
+                {errors.email && <p className="text-red-500 text-[8px] sm:text-xs mt-0.5 ml-1 absolute right-0 top-0">⚠️</p>}
+              </div>
+              <div className="relative">
+                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] sm:text-sm">📱</span>
+                <input
+                  {...register("phone", { required: "Required" })}
+                  type="tel"
+                  className="w-full pl-6 sm:pl-8 pr-2 py-1.5 sm:py-2 bg-white border border-gray-300 rounded-md sm:rounded-lg text-gray-900 placeholder-gray-400 text-[10px] sm:text-sm focus:outline-none focus:border-teal-500 transition-all"
+                  placeholder="Phone"
+                />
+                {errors.phone && <p className="text-red-500 text-[8px] sm:text-xs mt-0.5 ml-1 absolute right-0 top-0">⚠️</p>}
+              </div>
+            </div>
+
+            {/* Password Fields */}
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <input
+                  {...register("password", { required: "Required", minLength: { value: 6, message: "Min 6" } })}
+                  type="password"
+                  className="w-full px-3 py-2 sm:py-3 lg:py-4 bg-white border-2 border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 text-xs sm:text-sm lg:text-base focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-100 transition-all"
+                  placeholder="Password"
+                />
+                {errors.password && <p className="text-red-500 text-[8px] sm:text-xs mt-0.5 ml-1">⚠️ {errors.password.message}</p>}
+              </div>
+
+              <div>
+                <input
+                  {...register("confirmPassword", { required: "Required" })}
+                  type="password"
+                  className="w-full px-3 py-2 sm:py-3 lg:py-4 bg-white border-2 border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 text-xs sm:text-sm lg:text-base focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-100 transition-all"
+                  placeholder="Confirm Password"
+                />
+                {errors.confirmPassword && <p className="text-red-500 text-[8px] sm:text-xs mt-0.5 ml-1">⚠️ {errors.confirmPassword.message}</p>}
+              </div>
+            </div>
+
+            {/* Role Selection - Very compact */}
+            <div className="grid grid-cols-2 gap-2">
+              <label className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 lg:p-4 bg-white border-2 border-gray-300 rounded-lg cursor-pointer hover:border-teal-400 transition-all justify-center">
+                <input
+                  {...register("role", { required: true })}
+                  type="radio"
+                  value="user"
+                  className="w-3 h-3 sm:w-4 sm:h-4 text-teal-600 focus:ring-teal-500"
+                />
+                <span className="text-xs sm:text-sm lg:text-base font-semibold text-gray-700">Job Seeker</span>
+              </label>
+              <label className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 lg:p-4 bg-white border-2 border-gray-300 rounded-lg cursor-pointer hover:border-teal-400 transition-all justify-center">
+                <input
+                  {...register("role", { required: true })}
+                  type="radio"
+                  value="admin"
+                  className="w-3 h-3 sm:w-4 sm:h-4 text-teal-600 focus:ring-teal-500"
+                />
+                <span className="text-xs sm:text-sm lg:text-base font-semibold text-gray-700">Employer</span>
+              </label>
+            </div>
+            {errors.role && <p className="text-red-500 text-[8px] sm:text-xs text-center -mt-1">⚠️ Select a role</p>}
+
+            {/* Sign Up Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 sm:py-3.5 md:py-4 lg:py-5 rounded-lg sm:rounded-xl font-bold text-sm sm:text-base md:text-lg lg:text-lg text-white bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 transition-all transform hover:scale-[1.02] shadow-lg hover:shadow-xl disabled:opacity-50 mt-2 md:mt-3 lg:mt-4"
+            >
+              {loading ? 'Creating Account...' : 'Create Account'}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
