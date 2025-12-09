@@ -144,7 +144,7 @@ export default function Home() {
             color: '#718096',
             marginBottom: '32px'
           }}>
-            {isAdmin 
+            {isAdmin
               ? "You're logged in as an Administrator. You have full access to manage the platform."
               : "You're successfully logged in. Your dashboard content will appear here."}
           </p>
@@ -216,6 +216,39 @@ export default function Home() {
               </>
             ) : (
               <>
+                <div
+                  onClick={() => navigate('/chatbot')}
+                  style={{
+                    padding: '24px',
+                    background: 'linear-gradient(135deg, #10b981 0%, #14b8a6 100%)',
+                    borderRadius: '12px',
+                    border: '2px solid transparent',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-4px)';
+                    e.currentTarget.style.boxShadow = '0 8px 20px rgba(16, 185, 129, 0.4)';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
+                  }}
+                >
+                  <div style={{ fontSize: '32px', marginBottom: '12px' }}>🤖</div>
+                  <h3 style={{
+                    fontSize: '18px',
+                    fontWeight: '600',
+                    color: 'white',
+                    marginBottom: '8px'
+                  }}>
+                    AI Job Assistant
+                  </h3>
+                  <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.9)' }}>
+                    Chat with AI to find your perfect job
+                  </p>
+                </div>
                 <div style={{
                   padding: '24px',
                   background: 'linear-gradient(135deg, #667eea20 0%, #764ba220 100%)',
