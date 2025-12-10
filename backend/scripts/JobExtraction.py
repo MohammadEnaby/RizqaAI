@@ -141,14 +141,13 @@ def main():
             # Inject post_link
             result['post_link'] = post_link
 
-            # Convert post_time to timestamp
-            # result["post_time"] = datetime.strptime(result["post_time"], "%Y-%m-%dT%H:%M:%S%z").timestamp()
-
-
             # Fallback for contact_info
             if not result.get('contact_info'):
                 result['contact_info'] = post_link
 
+            if not result.get("job_title"):
+                print("[*] Skipped: job_title is missing.")
+                continue
 
             # Only keep entries that are actual job offers
             if result.get("is_job_offer", False):

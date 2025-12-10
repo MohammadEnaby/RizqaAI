@@ -2,7 +2,7 @@ import json
 import os
 import sys
 from typing import List, Dict
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Add the parent directory (backend) to sys.path so we can import core.firebase
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -65,12 +65,17 @@ def upload_to_firebase(jobs: List[Dict]) -> None:
             # For now, we'll just add them.
             
             # Convert post_time to datetime object if it exists
+            expire_base = datetime.now()
             if "post_time" in job and job["post_time"]:
                 try:
                     # Handle ISO 8601 strings
                     job["post_time"] = datetime.fromisoformat(job["post_time"])
+                    expire_base = job["post_time"]
                 except ValueError:
                     print(f"[!] Could not parse post_time '{job['post_time']}' for job '{job.get('job_title')}'. Keeping as string.")
+
+            # Add TTL (expireAt) - 7 days from post_time (or now if invalid/missing)
+            job["expireAt"] = expire_base + timedelta(days=7)
 
             # If the job has an 'id', use it as the document ID
             doc_id = job.get("id")
