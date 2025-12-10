@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import CompleteProfile from './pages/CompleteProfile';
 import Home from './pages/Home';
+import ChatBot from './pages/ChatBot';
 import Admin from './pages/Admin';
 import Layout from './components/adminPage/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -29,6 +30,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Home />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/chatbot"
+            element={
+              <ProtectedRoute>
+                <ChatBot />
               </ProtectedRoute>
             }
           />

@@ -17,19 +17,16 @@ export default function Login() {
     try {
       setError('');
       setLoading(true);
-      await login(data.email, data.password);
-      navigate('/');
+      const { profile } = await login(data.email, data.password);
+      navigate(profile?.role === 'admin' ? '/admin' : '/');
     } catch (err) {
       console.error(err);
-      if (err.code === 'auth/user-not-found') {
-        setError('No account found with this email.');
-      } else if (err.code === 'auth/wrong-password') {
-        setError('Incorrect password.');
-      } else if (err.code === 'auth/invalid-credential') {
-        setError('Invalid email or password.');
-      } else {
-        setError('Failed to log in. Please check your credentials.');
-      }
+      const errorMap = {
+        'auth/user-not-found': 'No account found with this email.',
+        'auth/wrong-password': 'Incorrect password.',
+        'auth/invalid-credential': 'Invalid email or password.',
+      };
+      setError(errorMap[err.code] || 'Failed to log in. Please check your credentials.');
     } finally {
       setLoading(false);
     }
@@ -40,14 +37,7 @@ export default function Login() {
       setError('');
       setLoading(true);
       const result = await initiateGoogleSignIn();
-      
-      if (result.isNewUser) {
-        // New user - redirect to complete profile
-        navigate('/complete-profile');
-      } else {
-        // Existing user - go to home
-        navigate('/');
-      }
+      navigate(result.isNewUser ? '/complete-profile' : (result.profile?.role === 'admin' ? '/admin' : '/'));
     } catch (err) {
       console.error(err);
       setError(err.message || 'Failed to sign in with Google.');
@@ -61,18 +51,13 @@ export default function Login() {
       setError('Please enter your email address.');
       return;
     }
-
     try {
       setError('');
       setLoading(true);
       await resetPassword(resetEmail);
       setResetSuccess(true);
     } catch (err) {
-      if (err.code === 'auth/user-not-found') {
-        setError('No account found with this email.');
-      } else {
-        setError('Failed to send reset email. Please try again.');
-      }
+      setError(err.code === 'auth/user-not-found' ? 'No account found with this email.' : 'Failed to send reset email.');
     } finally {
       setLoading(false);
     }
@@ -80,407 +65,184 @@ export default function Login() {
 
   if (showForgotPassword) {
     return (
-      <div style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        padding: '20px'
-      }}>
-        <div style={{
-          maxWidth: '450px',
-          width: '100%',
-          background: 'white',
-          padding: '48px 40px',
-          borderRadius: '16px',
-          boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
-        }}>
-          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <div style={{
-              width: '80px',
-              height: '80px',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 20px',
-              fontSize: '36px'
-            }}>
-              🔑
+      <div className="h-screen flex items-center justify-center app-bg p-2 py-4 overflow-hidden">
+        <div className="w-full max-w-[95vw] sm:max-w-md lg:max-w-xl xl:max-w-2xl glass-panel rounded-xl sm:rounded-[2.5rem] shadow-2xl p-4 sm:p-8 lg:p-12 relative flex flex-col justify-center max-h-screen">
+
+          {/* Header */}
+          <div className="text-center mb-6 sm:mb-8 shrink-0">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 theme-green-blue rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-lg">
+              <span className="text-2xl sm:text-3xl">🔐</span>
             </div>
-            <h2 style={{
-              fontSize: '28px',
-              fontWeight: '700',
-              color: '#1a202c',
-              marginBottom: '8px'
-            }}>
-              Reset Password
-            </h2>
-            <p style={{ fontSize: '14px', color: '#718096' }}>
-              Enter your email to receive a password reset link
-            </p>
+            <h2 className="text-xl sm:text-2xl font-bold text-[#0f172a] mb-1 sm:mb-2">Reset Password</h2>
+            <p className="text-gray-600 text-[10px] sm:text-sm">Enter your email to receive a reset link</p>
           </div>
 
-          {resetSuccess ? (
-            <div style={{
-              background: '#d4edda',
-              border: '1px solid #c3e6cb',
-              color: '#155724',
-              padding: '16px',
-              borderRadius: '8px',
-              marginBottom: '20px',
-              textAlign: 'center'
-            }}>
-              <div style={{ fontSize: '32px', marginBottom: '8px' }}>✅</div>
-              <p>Password reset email sent! Check your inbox.</p>
-              <button
-                onClick={() => setShowForgotPassword(false)}
-                style={{
-                  marginTop: '16px',
-                  background: 'transparent',
-                  color: '#667eea',
-                  border: 'none',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  textDecoration: 'underline'
-                }}
-              >
-                Back to Login
-              </button>
-            </div>
-          ) : (
-            <>
-              {error && (
-                <div style={{
-                  background: '#fee',
-                  border: '1px solid #fcc',
-                  color: '#c33',
-                  padding: '12px 16px',
-                  borderRadius: '8px',
-                  marginBottom: '20px',
-                  fontSize: '14px'
-                }}>
-                  {error}
-                </div>
-              )}
-
-              <div style={{ marginBottom: '24px' }}>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#2d3748',
-                  marginBottom: '8px'
-                }}>
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  value={resetEmail}
-                  onChange={(e) => setResetEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  style={{
-                    width: '100%',
-                    padding: '12px 16px',
-                    border: '2px solid #e2e8f0',
-                    borderRadius: '8px',
-                    fontSize: '15px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s',
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                  onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
-                />
+          {/* Content */}
+          <div className="w-full flex-1 flex flex-col justify-center min-h-0">
+            {resetSuccess ? (
+              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 sm:p-6 text-center">
+                <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">✅</div>
+                <p className="text-emerald-700 text-sm sm:text-base font-semibold mb-3 sm:mb-4">Check your inbox!</p>
+                <button
+                  onClick={() => setShowForgotPassword(false)}
+                  className="text-xs sm:text-sm text-teal-600 hover:text-teal-700 font-medium transition-colors"
+                >
+                  ← Back to Login
+                </button>
               </div>
-
-              <button
-                onClick={handleForgotPassword}
-                disabled={loading}
-                style={{
-                  width: '100%',
-                  padding: '14px',
-                  background: loading ? '#a0aec0' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  marginBottom: '16px'
-                }}
-              >
-                {loading ? 'Sending...' : 'Send Reset Link'}
-              </button>
-
-              <button
-                onClick={() => {
-                  setShowForgotPassword(false);
-                  setError('');
-                  setResetEmail('');
-                }}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  background: 'transparent',
-                  color: '#667eea',
-                  border: '2px solid #667eea',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: 'pointer'
-                }}
-              >
-                Back to Login
-              </button>
-            </>
-          )}
+            ) : (
+              <div className="space-y-3 sm:space-y-4">
+                {error && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-[10px] sm:text-sm font-medium">
+                    ⚠️ {error}
+                  </div>
+                )}
+                <div>
+                  <label className="block text-xs sm:text-sm font-semibold text-[#0f172a] mb-1 sm:mb-2">Email Address</label>
+                  <input
+                    type="email"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    className="w-full px-3 py-2.5 sm:px-4 sm:py-3.5 bg-white border-2 border-gray-300 rounded-lg sm:rounded-xl text-gray-900 placeholder-gray-400 text-sm sm:text-base focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200 hover:border-gray-400 transition-all"
+                    placeholder="name@example.com"
+                  />
+                </div>
+                <button
+                  onClick={handleForgotPassword}
+                  disabled={loading}
+                  className="w-full py-3 sm:py-3.5 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base text-white bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 transition-all transform hover:scale-[1.02] hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50 shadow-lg hover:shadow-xl"
+                >
+                  {loading ? 'Sending...' : 'Send Reset Link'}
+                </button>
+                <button
+                  onClick={() => setShowForgotPassword(false)}
+                  className="w-full text-xs sm:text-sm text-gray-600 hover:text-gray-900 font-medium transition-colors"
+                >
+                  ← Back to Login
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      padding: '20px'
-    }}>
-      <div style={{
-        maxWidth: '450px',
-        width: '100%',
-        background: 'white',
-        padding: '48px 40px',
-        borderRadius: '16px',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
-      }}>
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{
-            width: '80px',
-            height: '80px',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 20px',
-            fontSize: '36px',
-            color: 'white',
-            fontWeight: 'bold'
-          }}>
-            JS
-          </div>
-          <h2 style={{
-            fontSize: '28px',
-            fontWeight: '700',
-            color: '#1a202c',
-            marginBottom: '8px'
-          }}>
-            Welcome Back
-          </h2>
-          <p style={{ fontSize: '14px', color: '#718096' }}>
-            Sign in to your JobScout account
-          </p>
-        </div>
+    <div className="h-screen flex items-center justify-center app-bg p-2 py-4 overflow-hidden">
 
-        {error && (
-          <div style={{
-            background: '#fee',
-            border: '1px solid #fcc',
-            color: '#c33',
-            padding: '12px 16px',
-            borderRadius: '8px',
-            marginBottom: '20px',
-            fontSize: '14px'
-          }}>
-            {error}
-          </div>
-        )}
+      {/* Main Card */}
+      <div className="w-full max-w-[95vw] sm:max-w-md lg:max-w-xl xl:max-w-2xl glass-panel rounded-xl sm:rounded-[2.5rem] shadow-2xl p-4 sm:p-8 lg:p-12 relative flex flex-col justify-center max-h-screen">
 
-        <button
-          onClick={handleGoogleSignIn}
-          disabled={loading}
-          type="button"
-          style={{
-            width: '100%',
-            padding: '12px',
-            background: 'white',
-            color: '#444',
-            border: '2px solid #ddd',
-            borderRadius: '8px',
-            fontSize: '15px',
-            fontWeight: '600',
-            cursor: loading ? 'not-allowed' : 'pointer',
-            marginBottom: '24px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '10px',
-            transition: 'all 0.2s'
-          }}
-          onMouseOver={(e) => !loading && (e.target.style.background = '#f9f9f9')}
-          onMouseOut={(e) => !loading && (e.target.style.background = 'white')}
-        >
-          <svg width="20" height="20" viewBox="0 0 20 20">
-            <path fill="#4285F4" d="M19.6 10.23c0-.82-.1-1.42-.25-2.05H10v3.72h5.5c-.15.96-.74 2.31-2.04 3.22v2.45h3.16c1.89-1.73 2.98-4.3 2.98-7.34z"/>
-            <path fill="#34A853" d="M13.46 15.13c-.83.59-1.96 1-3.46 1-2.64 0-4.88-1.74-5.68-4.15H1.07v2.52C2.72 17.75 6.09 20 10 20c2.7 0 4.96-.89 6.62-2.42l-3.16-2.45z"/>
-            <path fill="#FBBC05" d="M3.99 10c0-.69.12-1.35.32-1.97V5.51H1.07A9.973 9.973 0 000 10c0 1.61.39 3.14 1.07 4.49l3.24-2.52c-.2-.62-.32-1.28-.32-1.97z"/>
-            <path fill="#EA4335" d="M10 3.88c1.88 0 3.13.81 3.85 1.48l2.84-2.76C14.96.99 12.7 0 10 0 6.09 0 2.72 2.25 1.07 5.51l3.24 2.52C5.12 5.62 7.36 3.88 10 3.88z"/>
-          </svg>
-          Continue with Google
-        </button>
+        {/* Top decoration dot */}
+        <div className="absolute top-4 sm:top-8 left-1/2 -translate-x-1/2 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-teal-500 rounded-full animate-pulse-custom hidden min-[375px]:block"></div>
 
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          margin: '24px 0',
-          gap: '12px'
-        }}>
-          <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }}></div>
-          <span style={{ color: '#718096', fontSize: '14px', fontWeight: '500' }}>OR</span>
-          <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }}></div>
-        </div>
-
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '14px',
-              fontWeight: '600',
-              color: '#2d3748',
-              marginBottom: '8px'
-            }}>
-              Email Address <span style={{ color: '#e53e3e' }}>*</span>
-            </label>
-            <input
-              {...register("email", { 
-                required: "Email is required",
-                pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: "Invalid email address"
-                }
-              })}
-              type="email"
-              placeholder="Enter your email"
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                border: '2px solid #e2e8f0',
-                borderRadius: '8px',
-                fontSize: '15px',
-                outline: 'none',
-                transition: 'border-color 0.2s',
-              }}
-              onFocus={(e) => e.target.style.borderColor = '#667eea'}
-              onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
-            />
-            {errors.email && (
-              <p style={{ color: '#e53e3e', fontSize: '13px', marginTop: '6px' }}>
-                {errors.email.message}
-              </p>
-            )}
-          </div>
-
-          <div style={{ marginBottom: '12px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '14px',
-              fontWeight: '600',
-              color: '#2d3748',
-              marginBottom: '8px'
-            }}>
-              Password <span style={{ color: '#e53e3e' }}>*</span>
-            </label>
-            <input
-              {...register("password", { required: "Password is required" })}
-              type="password"
-              placeholder="Enter your password"
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                border: '2px solid #e2e8f0',
-                borderRadius: '8px',
-                fontSize: '15px',
-                outline: 'none',
-                transition: 'border-color 0.2s',
-              }}
-              onFocus={(e) => e.target.style.borderColor = '#667eea'}
-              onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
-            />
-            {errors.password && (
-              <p style={{ color: '#e53e3e', fontSize: '13px', marginTop: '6px' }}>
-                {errors.password.message}
-              </p>
-            )}
-          </div>
-
-          <div style={{ textAlign: 'right', marginBottom: '24px' }}>
-            <button
-              type="button"
-              onClick={() => setShowForgotPassword(true)}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#667eea',
-                fontSize: '13px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                textDecoration: 'none'
-              }}
-              onMouseOver={(e) => e.target.style.textDecoration = 'underline'}
-              onMouseOut={(e) => e.target.style.textDecoration = 'none'}
-            >
-              Forgot Password?
-            </button>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              width: '100%',
-              padding: '14px',
-              background: loading ? '#a0aec0' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '16px',
-              fontWeight: '600',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              transition: 'transform 0.2s, box-shadow 0.2s',
-              boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4)'
-            }}
-            onMouseOver={(e) => !loading && (e.target.style.transform = 'translateY(-2px)')}
-            onMouseOut={(e) => !loading && (e.target.style.transform = 'translateY(0)')}
+        {/* Create Account Button */}
+        <div className="absolute top-4 sm:top-8 right-4 sm:right-8">
+          <Link
+            to="/signup"
+            className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 theme-green-blue border border-teal-400/30 rounded-full text-white text-[10px] sm:text-xs font-bold hover:shadow-lg hover:brightness-110 transition-all transform hover:scale-105"
           >
-            {loading ? 'Signing in...' : 'Sign In'}
-          </button>
-        </form>
-
-        <div style={{
-          marginTop: '24px',
-          textAlign: 'center',
-          fontSize: '14px',
-          color: '#718096'
-        }}>
-          Don't have an account?{' '}
-          <Link 
-            to="/signup" 
-            style={{
-              color: '#667eea',
-              fontWeight: '600',
-              textDecoration: 'none'
-            }}
-            onMouseOver={(e) => e.target.style.textDecoration = 'underline'}
-            onMouseOut={(e) => e.target.style.textDecoration = 'none'}
-          >
-            Create Account
+            <span>✨ Create Account</span>
           </Link>
+        </div>
+
+        {/* Header */}
+        <div className="text-center mt-8 sm:mt-0 mb-6 sm:mb-8 md:mb-10 lg:mb-12 shrink-0">
+          <div className="w-12 h-12 sm:w-20 sm:h-20 md:w-22 md:h-22 lg:w-24 lg:h-24 theme-green-blue rounded-2xl sm:rounded-3xl flex items-center justify-center mx-auto mb-3 sm:mb-4 md:mb-5 lg:mb-6 shadow-lg">
+            <span className="text-2xl sm:text-4xl md:text-[2.75rem] lg:text-5xl font-black text-white">JS</span>
+          </div>
+          <h1 className="text-2xl sm:text-4xl md:text-[2.75rem] lg:text-5xl font-bold title-color mb-1 sm:mb-2 lg:mb-3 leading-tight">Welcome Back</h1>
+          <p className="text-gray-600 text-xs sm:text-sm md:text-base lg:text-base font-medium">Sign in to continue to Risqa</p>
+        </div>
+
+        {/* Content Container */}
+        <div className="w-full flex-1 flex flex-col justify-center min-h-0">
+
+          {/* Google Sign In */}
+          <button
+            onClick={handleGoogleSignIn}
+            disabled={loading}
+            className="w-full bg-white border-2 border-gray-300 rounded-lg sm:rounded-xl py-2.5 sm:py-3.5 md:py-4 lg:py-5 px-4 flex items-center justify-center gap-3 font-semibold text-sm sm:text-base md:text-lg lg:text-lg text-gray-700 hover:bg-gray-50 hover:border-teal-400 hover:shadow-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] mb-4 sm:mb-6 md:mb-7 lg:mb-8 shrink-0"
+          >
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5 sm:w-6 sm:h-6 md:w-6.5 md:h-6.5 lg:w-7 lg:h-7" />
+            <span>Continue with Google</span>
+          </button>
+
+          {/* Divider */}
+          <div className="flex items-center gap-4 mb-4 sm:mb-6 lg:mb-8 shrink-0">
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+            <span className="text-[10px] sm:text-xs lg:text-sm text-gray-400 font-semibold">OR</span>
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+          </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 border-2 border-red-200 text-red-700 px-4 py-2 sm:py-3 lg:py-4 rounded-lg sm:rounded-xl text-xs sm:text-sm lg:text-base mb-4 lg:mb-6 text-center font-semibold animate-shake shrink-0">
+              ⚠️ {error}
+            </div>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 sm:space-y-5 md:space-y-6 lg:space-y-7">
+
+            {/* Email Field */}
+            <div>
+              <label className="flex items-center gap-2 text-xs sm:text-sm lg:text-base font-bold text-[#0f172a] mb-1 sm:mb-2 lg:mb-3">
+                <span className="text-sm sm:text-lg lg:text-xl">📧</span>
+                <span>Email Address</span>
+              </label>
+              <input
+                {...register("email", { required: "Email is required" })}
+                type="email"
+                className="w-full px-3 py-2.5 sm:px-4 sm:py-3.5 md:py-4 lg:py-5 bg-white border-2 border-gray-300 rounded-lg sm:rounded-xl text-gray-900 placeholder-gray-400 font-medium text-sm sm:text-base md:text-lg lg:text-lg focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100 hover:border-gray-400 hover:shadow-md transition-all"
+                placeholder="name@example.com"
+              />
+              {errors.email && <p className="text-red-500 text-[10px] sm:text-xs mt-1 ml-1 font-semibold">⚠️ {errors.email.message}</p>}
+            </div>
+
+            {/* Password Field */}
+            <div>
+              <div className="flex items-center justify-between mb-1 sm:mb-2 lg:mb-3">
+                <label className="flex items-center gap-2 text-xs sm:text-sm lg:text-base font-bold text-[#0f172a]">
+                  <span className="text-sm sm:text-lg lg:text-xl">🔒</span>
+                  <span>Password</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowForgotPassword(true)}
+                  className="text-[10px] sm:text-xs lg:text-sm text-teal-600 hover:text-teal-700 hover:underline font-bold flex items-center gap-1 transition-all"
+                >
+                  Forgot password? <span>🔑</span>
+                </button>
+              </div>
+              <input
+                {...register("password", { required: "Password is required" })}
+                type="password"
+                className="w-full px-3 py-2.5 sm:px-4 sm:py-3.5 md:py-4 lg:py-5 bg-white border-2 border-gray-300 rounded-lg sm:rounded-xl text-gray-900 placeholder-gray-400 font-medium text-sm sm:text-base md:text-lg lg:text-lg focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100 hover:border-gray-400 hover:shadow-md transition-all"
+                placeholder="••••••••"
+              />
+              {errors.password && <p className="text-red-500 text-[10px] sm:text-xs mt-1 ml-1 font-semibold">⚠️ {errors.password.message}</p>}
+            </div>
+
+            {/* Sign In Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 sm:py-4 md:py-5 lg:py-6 rounded-lg sm:rounded-xl font-bold text-sm sm:text-base md:text-lg lg:text-xl text-white bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 transition-all transform hover:scale-[1.03] hover:-translate-y-1 active:scale-[0.98] mt-4 sm:mt-6 md:mt-7 lg:mt-8 shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Signing In...
+                </span>
+              ) : 'Sign In'}
+            </button>
+          </form>
+
         </div>
       </div>
     </div>

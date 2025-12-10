@@ -15,7 +15,14 @@ if current_dir not in sys.path:
 
 
 
+from api.chatbot import router as chatbot_router
+
+
+
 app = FastAPI()
+
+# Include chatbot router
+app.include_router(chatbot_router, prefix="/api/chatbot", tags=["chatbot"])
 
 # Configure CORS
 app.add_middleware(

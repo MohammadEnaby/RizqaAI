@@ -1,20 +1,6 @@
 @import "tailwindcss";
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Custom Scrollbar for Logs - Template Inspired */
+/* Custom utilities */
 .custom-scrollbar::-webkit-scrollbar {
   width: 10px;
 }
@@ -37,7 +23,6 @@ body {
 }
 
 .theme-green-blue {
-  /* for buttons, icons, highlighted text etc */
   background: linear-gradient(135deg, #58de7c, #107884);
 }
 
@@ -52,81 +37,17 @@ body {
   overflow: hidden;
 }
 
-.bg-blob {
-  position: absolute;
-  width: 360px;
-  height: 360px;
-  border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.45;
-  pointer-events: none;
-}
-
-.bg-blob.green {
-  background: #22c55e;
-  bottom: -120px;
-  left: -120px;
-}
-
-.bg-blob.teal {
-  background: #14b8a6;
-  top: -120px;
-  right: -120px;
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .title-color {
   color: #134e4a;
 }
 
-/* Global Theme Utilities */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-}
-
-.glass-panel-dark {
-  background: rgba(2, 6, 23, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.theme-input {
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(209, 213, 219, 0.5);
-  color: #0f172a;
-  transition: all 0.2s ease;
-}
-
-.theme-input:focus {
-  background: #ffffff;
-  border-color: #14b8a6;
-  box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.1);
-  outline: none;
-}
-
 .theme-btn-primary {
   background: linear-gradient(135deg, #58de7c, #107884);
   color: white;
-  box-shadow: 0 4px 14px 0 rgba(20, 184, 166, 0.39);
-  transition: all 0.2s ease;
-}
-
-.theme-btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(20, 184, 166, 0.23);
-}
-
-.theme-btn-primary:active {
-  transform: translateY(0);
-}
-
-.theme-text-gradient {
-  background: linear-gradient(135deg, #58de7c, #107884);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
