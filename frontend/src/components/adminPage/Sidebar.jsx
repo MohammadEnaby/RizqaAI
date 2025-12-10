@@ -23,7 +23,7 @@ const Sidebar = () => {
             initial={{ x: -40, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.4 }}
-            className="w-72 min-h-screen bg-transparent backdrop-blur-xl shadow-2xl flex flex-col relative"
+            className="w-72 min-h-screen bg-transparent backdrop-blur-xl shadow-2xl flex flex-col sticky"
         >
             {/* ✅ LOGO HEADER */}
             <div className="p-8 flex items-center gap-4 border-b border-white/20">

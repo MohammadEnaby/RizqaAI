@@ -51,3 +51,7 @@
   background: linear-gradient(135deg, #58de7c, #107884);
   color: white;
 }
+
+.theme-input {
+  background-color: #ffffffa0;
+}

@@ -4,8 +4,8 @@ import PipelineGrid from '../components/adminPage/PipelineGrid';
 import SystemLogs from '../components/adminPage/SystemLogs';
 
 const Admin = () => {
-    const [groupId, setGroupId] = useState('1942419502675158');
-    const [maxScrolls, setMaxScrolls] = useState(5);
+    const [groupId, setGroupId] = useState('');
+    const [maxScrolls, setMaxScrolls] = useState();
     const [isRunning, setIsRunning] = useState(false);
     const [logs, setLogs] = useState([]);
     const [activeStep, setActiveStep] = useState(0); // 0: Idle, 1: Scraping, 2: Extraction, 3: Upload

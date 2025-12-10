@@ -5,21 +5,20 @@ import { motion } from 'framer-motion';
 const SystemLogs = ({ logs, logsEndRef, isRunning }) => {
     return (
         <div className="glass-panel-dark rounded-3xl shadow-2xl overflow-hidden">
-            <div className="bg-[#0f172a]/50 px-4 py-3 flex items-center justify-between border-b border-gray-800/50">
-                <div className="flex items-center space-x-2">
-                    <FaTerminal className="text-gray-500" size={12} />
-                    <span className="text-gray-400 text-[11px] text-center font-mono font-bold tracking-widest uppercase">
-                        SYSTEM LOGS
-                    </span>
-                </div>
+            <div className="p-2.5 h-96 bg-[#131723] overflow-y-auto font-mono text-[13px] leading-relaxed custom-scrollbar">
+                <div className="h-9 sticky top-0 z-10 bg-gradient-to-r from-[#107884] via-[#58de7c] to-[#107884] rounded-full px-4 py-3 flex items-center border-gray-800/50">
                 <div className="flex space-x-1.5">
                     <div className="w-2.5 h-2.5 rounded-full bg-[#ef4444]"></div>
                     <div className="w-2.5 h-2.5 rounded-full bg-[#f59e0b]"></div>
                     <div className="w-2.5 h-2.5 rounded-full bg-[#22c55e]"></div>
                 </div>
+                <div className="flex items-center mx-auto w-64 space-x-1.5">
+                    <FaTerminal className="text-[#131723]" size={16} />
+                    <span className="text-[#131723] text-[16px] text-center font-mono font-bold tracking-widest uppercase">
+                        SYSTEM LOGS
+                    </span>
+                </div>
             </div>
-
-            <div className="p-6 h-96 overflow-y-auto font-mono text-[13px] leading-relaxed custom-scrollbar bg-transparent">
                 {logs.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center text-gray-700">
                         <p className="opacity-50">Waiting for pipeline initiation...</p>

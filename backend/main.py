@@ -153,6 +153,37 @@ async def run_pipeline(request: PipelineRequest):
 def read_root():
     return {"message": "JobScout API is running"}
 
+import json
+import re
+
+@app.get("/api/last-seen-groups")
+async def get_last_seen_groups():
+    try:
+        data_path = os.path.join(current_dir, "Data", "last_post_seen.py")
+        if not os.path.exists(data_path):
+             print(f"File not found: {data_path}")
+             return {"groups": []}
+             
+        with open(data_path, "r", encoding="utf-8") as f:
+            content = f.read()
+            
+        # Extract the dictionary part: look for everything after the first '='
+        # The file format is: dict_of_lastSeenPost_for_each_group = { ... }
+        match = re.search(r"=\s*(\{.*)", content, re.DOTALL)
+        if match:
+            json_str = match.group(1).strip()
+            # It might have a trailing newline, json.loads handles that usually, 
+            # but if it's strictly python dict syntax that isn't valid JSON (e.g. trailing comma), 
+            # json.loads might fail. 
+            # Given postsExtraction.py uses json.dumps(data, indent=4), it should be valid JSON.
+            data = json.loads(json_str)
+            return {"groups": list(data.keys())}
+        
+        return {"groups": []}
+    except Exception as e:
+        print(f"Error reading last seen groups: {e}")
+        return {"groups": []}
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

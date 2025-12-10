@@ -18,8 +18,8 @@ const StatCard = ({ title, description, icon: Icon, value, subtext, progressValu
             </div>
         )}
 
-        <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${isActive ? 'theme-btn-primary text-white' : 'bg-gray-100 text-gray-500'}`}>
-            <Icon size={20} />
+        <div className={`w-12 h-12 rounded-xl theme-green-blue flex items-center justify-center mb-4 ${isActive ? 'theme-btn-primary text-white' : 'bg-gray-100 text-gray-500'}`}>
+            <Icon size={20} color="white" />
         </div>
 
         <h3 className="text-[16px] font-bold text-[#0f172a] mb-2">{title}</h3>
