@@ -55,3 +55,66 @@
 .theme-input {
   background-color: #ffffffa0;
 }
+
+/* Fluid typography for auth pages - strictly based on viewport min dimension or height to prevent scrolling */
+.auth-card {
+  /* Use vmin to scale based on the smaller dimension (width or height) to ensure fit */
+  --fluid-h1: clamp(1rem, 4.5vmin, 3rem);
+  --fluid-h2: clamp(0.75rem, 2.5vmin, 1.25rem);
+
+  /* Text and inputs */
+  --fluid-text-base: clamp(0.75rem, 2vmin, 1.1rem);
+  --fluid-text-sm: clamp(0.6rem, 1.75vmin, 0.9rem);
+
+  /* Vertical Spacing - increased for taller look */
+  --fluid-spacing: clamp(8px, 2.5vh, 32px);
+  --fluid-spacing-sm: clamp(4px, 1.25vh, 16px);
+
+  /* Element Heights - increased for taller look */
+  --fluid-input-height: clamp(32px, 7vh, 60px);
+  --fluid-button-height: clamp(40px, 8vh, 70px);
+
+  /* Margins/Padding scaling */
+  --fluid-p-card: clamp(16px, 4vh, 50px);
+  --fluid-gap: clamp(6px, 1.5vh, 24px);
+}
+
+.fluid-h1 {
+  font-size: var(--fluid-h1);
+}
+
+.fluid-h2 {
+  font-size: var(--fluid-h2);
+}
+
+.fluid-text-base {
+  font-size: var(--fluid-text-base);
+}
+
+.fluid-text-sm {
+  font-size: var(--fluid-text-sm);
+}
+
+.fluid-input {
+  height: var(--fluid-input-height);
+}
+
+.fluid-button {
+  height: var(--fluid-button-height);
+}
+
+.fluid-gap {
+  gap: var(--fluid-gap);
+}
+
+.fluid-p {
+  padding: var(--fluid-p-card);
+}
+
+.fluid-mb {
+  margin-bottom: var(--fluid-spacing);
+}
+
+.fluid-mb-sm {
+  margin-bottom: var(--fluid-spacing-sm);
+}
