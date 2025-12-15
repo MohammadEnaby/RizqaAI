@@ -1,11 +1,12 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { FaHome, FaCogs, FaSignOutAlt, FaLeaf } from 'react-icons/fa';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { FaHome, FaCogs, FaSignOutAlt, FaLeaf, FaDatabase, FaClock } from 'react-icons/fa';
 import { useAuth } from '../../contexts/AuthContext';
 import { motion } from 'framer-motion';
 
 const Sidebar = () => {
     const location = useLocation();
+    const navigate = useNavigate();
     const { logout } = useAuth();
 
     const isActive = (path) => location.pathname === path;
@@ -18,15 +19,23 @@ const Sidebar = () => {
         }
     };
 
+    const handleSidebarClick = (e) => {
+        // Only navigate if clicking the empty background, not interactive elements
+        if (e.target === e.currentTarget || e.target.tagName === 'NAV') {
+            navigate('/admin');
+        }
+    };
+
     return (
         <motion.div
             initial={{ x: -40, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.4 }}
             className="w-72 min-h-screen bg-transparent backdrop-blur-xl shadow-2xl flex flex-col sticky"
+            onClick={handleSidebarClick}
         >
             {/* ✅ LOGO HEADER */}
-            <div className="p-8 flex items-center gap-4 border-b border-white/20">
+            <Link to="/admin" className="p-8 flex items-center gap-4 border-b border-white/20 hover:opacity-80 transition-opacity">
                 <div className="w-14 h-14 rounded-2xl flex items-center justify-center theme-btn-primary text-white">
                     <FaLeaf size={24} />
                 </div>
@@ -38,7 +47,7 @@ const Sidebar = () => {
                         Automation
                     </p>
                 </div>
-            </div>
+            </Link>
 
             {/* ✅ NAVIGATION */}
             <nav className="flex-1 px-6 py-8 space-y-3">
@@ -48,15 +57,15 @@ const Sidebar = () => {
 
                 {/* ✅ DASHBOARD */}
                 <Link
-                    to="/"
+                    to="/admin/dashboard"
                     className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
-            ${isActive('/')
+            ${isActive('/admin/dashboard')
                             ? 'bg-gradient-to-r from-green-100 to-teal-100 text-[#134e4a] shadow-lg'
                             : 'text-gray-500 hover:bg-white hover:shadow-md'
                         }`}
                 >
                     <FaHome
-                        className={`${isActive('/') ? 'text-green-500' : 'text-gray-400'
+                        className={`${isActive('/admin/dashboard') ? 'text-green-500' : 'text-gray-400'
                             }`}
                     />
                     <span>Dashboard</span>
@@ -64,18 +73,50 @@ const Sidebar = () => {
 
                 {/* ✅ PIPELINE */}
                 <Link
-                    to="/admin"
+                    to="/admin/pipeline"
                     className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
-            ${isActive('/admin')
+            ${isActive('/admin/pipeline')
                             ? 'bg-gradient-to-r from-green-100 to-teal-100 text-[#134e4a] shadow-lg'
                             : 'text-gray-500 hover:bg-white hover:shadow-md'
                         }`}
                 >
                     <FaCogs
-                        className={`${isActive('/admin') ? 'text-green-500' : 'text-gray-400'
+                        className={`${isActive('/admin/pipeline') ? 'text-green-500' : 'text-gray-400'
                             }`}
                     />
                     <span>Pipeline</span>
+                </Link>
+
+                {/* ✅ DATASOURCES */}
+                <Link
+                    to="/admin/datasources"
+                    className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
+            ${isActive('/admin/datasources')
+                            ? 'bg-gradient-to-r from-green-100 to-teal-100 text-[#134e4a] shadow-lg'
+                            : 'text-gray-500 hover:bg-white hover:shadow-md'
+                        }`}
+                >
+                    <FaDatabase
+                        className={`${isActive('/admin/datasources') ? 'text-green-500' : 'text-gray-400'
+                            }`}
+                    />
+                    <span>Datasources</span>
+                </Link>
+
+                {/* ✅ SCHEDULED PIPELINES */}
+                <Link
+                    to="/admin/schedules"
+                    className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
+            ${isActive('/admin/schedules')
+                            ? 'bg-gradient-to-r from-green-100 to-teal-100 text-[#134e4a] shadow-lg'
+                            : 'text-gray-500 hover:bg-white hover:shadow-md'
+                        }`}
+                >
+                    <FaClock
+                        className={`${isActive('/admin/schedules') ? 'text-green-500' : 'text-gray-400'
+                            }`}
+                    />
+                    <span>Schedules</span>
                 </Link>
 
                 {/* ✅ ACCOUNT */}

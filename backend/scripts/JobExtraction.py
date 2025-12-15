@@ -125,9 +125,9 @@ def main():
 
     for i, job in enumerate(jobs):
         # Rate limiting: 15 RPM = 1 request every 4 seconds. Using 5s to be safe.
-        if i > 0:
+        if i > 0 and len(jobs) > 15:
             print("Waiting 5 seconds to respect API rate limit...")
-            time.sleep(5)
+            time.sleep(1)
             
         raw_text = job.get('raw_text', '')
         post_time = job.get('post_time', '')
@@ -140,10 +140,21 @@ def main():
         if result:
             # Inject post_link
             result['post_link'] = post_link
+            
+            # Inject groupID (from source_id)
+            source_id = job.get('source_id')
+            if source_id:
+                result['groupID'] = source_id
 
             # Fallback for contact_info
             if not result.get('contact_info'):
                 result['contact_info'] = post_link
+
+            # Default: mark as processed so we don't handle it again (unless logic below stops this)
+            # Originally we only marked it at the end, but 'continue' skipped that.
+            # Now we mark it as processed if we successfully got a result from Gemini.
+            # Whether we decide to SAVE it (append to structured_results) is a separate check.
+            processed_indices.append(i)
 
             if not result.get("job_title"):
                 print("[*] Skipped: job_title is missing.")
@@ -154,10 +165,6 @@ def main():
                 structured_results.append(result)
             else:
                 print("[*] Skipped: model marked this as not a job offer.")
-            
-            # Mark as processed regardless of whether it's a job offer or not,
-            # because we successfully analyzed it.
-            processed_indices.append(i)
         else:
             print("Failed to get result. Will retry next time.")
 

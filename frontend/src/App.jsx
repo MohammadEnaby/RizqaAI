@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import Login from './pages/Login';
@@ -6,9 +6,14 @@ import Signup from './pages/Signup';
 import CompleteProfile from './pages/CompleteProfile';
 import Home from './pages/Home';
 import ChatBot from './pages/ChatBot';
-import Admin from './pages/Admin';
+import Admin from './pages/adminPages/Pipeline';
+import Dashboard from './pages/adminPages/Dashboard';
+import Datasources from './pages/adminPages/Datasources';
+import ScheduledPipelines from './pages/adminPages/ScheduledPipelines';
+import Welcome from './pages/adminPages/Welcome';
 import Layout from './components/adminPage/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
+
 
 function App() {
   return (
@@ -46,7 +51,47 @@ function App() {
             element={
               <ProtectedRoute>
                 <Layout>
+                  <Welcome />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/pipeline"
+            element={
+              <ProtectedRoute>
+                <Layout>
                   <Admin />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Dashboard />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/datasources"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Datasources />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/schedules"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <ScheduledPipelines />
                 </Layout>
               </ProtectedRoute>
             }

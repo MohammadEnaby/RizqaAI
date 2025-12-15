@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 const StatCard = ({ title, description, icon: Icon, value, subtext, progressValue, isActive, isLive }) => (
     <motion.div
         whileHover={{ y: -4, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
-        className={`glass-panel rounded-2xl p-6 relative overflow-hidden transition-all duration-300 ${isActive ? 'ring-2 ring-[#14b8a6]' : ''}`}
+        className={`glass-panel z-0 rounded-2xl p-6 relative overflow-hidden transition-all duration-300 ${isActive ? 'ring-2 ring-[#14b8a6]' : ''}`}
     >
         {isLive && (
             <div className="absolute top-4 right-4 flex items-center space-x-2 bg-[#ecfdf5] px-3 py-1 rounded-full border border-[#22c55e]/20">

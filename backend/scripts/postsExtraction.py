@@ -51,38 +51,48 @@ def normalize_post_text(text: str) -> str:
     return " ".join(text.split())
 
 
-def load_seen_posts(group_id: str, path: str = SEEN_POSTS_FILE):
-    """Load the last seen post ID for the given group."""
+# Import Firestore DB
+try:
+    from core.firebase import db
+    from firebase_admin import firestore
+except ImportError:
+    print("[!] Warning: Could not import core.firebase. Firestore features will fail.")
+    db = None
+
+def load_seen_posts(group_id: str):
+    """Load the last seen post ID for the given group from Firestore (platformGroups collection)."""
+    if not db:
+        print("[!] DB not initialized, cannot load seen posts.")
+        return None
+        
     try:
-        with open(path, "r", encoding="utf-8") as f:
-            content = f.read()
-            local_scope = {}
-            exec(content, {}, local_scope)
-            data = local_scope.get("dict_of_lastSeenPost_for_each_group", {})
-            return data.get(group_id)
-    except (FileNotFoundError, SyntaxError):
+        doc_ref = db.collection("platformGroups").document(str(group_id))
+        doc = doc_ref.get()
+        if doc.exists:
+            return doc.to_dict().get("lastPostId")
+        return None
+    except Exception as e:
+        print(f"[!] Error loading seen posts from DB: {e}")
         return None
 
 
-def save_last_seen_post(group_id: str, post_id: str, path: str = SEEN_POSTS_FILE):
-    """Persist the newest post ID for the group."""
+def save_last_seen_post(group_id: str, post_id: str):
+    """Persist the newest post ID for the group to Firestore (platformGroups collection)."""
     if not post_id:
         return
+    if not db:
+        print("[!] DB not initialized, cannot save seen posts.")
+        return
     
-    data = {}
     try:
-        with open(path, "r", encoding="utf-8") as f:
-            content = f.read()
-            local_scope = {}
-            exec(content, {}, local_scope)
-            data = local_scope.get("dict_of_lastSeenPost_for_each_group", {})
-    except (FileNotFoundError, SyntaxError):
-        pass
-    
-    data[group_id] = post_id
-    
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(f"dict_of_lastSeenPost_for_each_group = {json.dumps(data, indent=4)}\n")
+        doc_ref = db.collection("platformGroups").document(str(group_id))
+        doc_ref.set({
+            "lastPostId": str(post_id),
+            "updatedAt": firestore.SERVER_TIMESTAMP
+        }, merge=True)
+        print(f"[+] Updated last seen post for {group_id} in DB.")
+    except Exception as e:
+        print(f"[!] Error saving seen post to DB: {e}")
 
 
 def is_one_day_marker(post_time: str) -> bool:

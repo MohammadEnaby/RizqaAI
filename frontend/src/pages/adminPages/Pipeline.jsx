@@ -1,11 +1,13 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
-import AdminHeader from '../components/adminPage/AdminHeader';
-import PipelineGrid from '../components/adminPage/PipelineGrid';
-import SystemLogs from '../components/adminPage/SystemLogs';
+import AdminHeader from '../../components/adminPage/AdminHeader';
+import PipelineGrid from '../../components/adminPage/PipelineGrid';
+import SystemLogs from '../../components/adminPage/SystemLogs';
+import { db } from '../../firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const Admin = () => {
     const [groupId, setGroupId] = useState('');
-    const [maxScrolls, setMaxScrolls] = useState();
+    const [maxScrolls, setMaxScrolls] = useState('');
     const [isRunning, setIsRunning] = useState(false);
     const [logs, setLogs] = useState([]);
     const [activeStep, setActiveStep] = useState(0); // 0: Idle, 1: Scraping, 2: Extraction, 3: Upload
@@ -13,7 +15,9 @@ const Admin = () => {
         postsFound: 0,
         jobsExtracted: 0,
         jobsUploaded: 0
+
     });
+    const [timeInterval, setTimeInterval] = useState(1440); // Default Daily (1440 minutes)
 
     // Mock progress for visualization purposes
     const [progress, setProgress] = useState({
@@ -32,7 +36,29 @@ const Admin = () => {
         scrollToBottom();
     }, [logs]);
 
-    const handleRunPipeline = async () => {
+    const handleRunPipeline = async (mode = 'manual') => {
+        if (!groupId || !maxScrolls) {
+            alert("Please fill in all fields");
+            return;
+        }
+
+        if (mode === 'auto') {
+            try {
+                await addDoc(collection(db, "schedulingPipelines"), {
+                    groupID: groupId,
+                    maxScrolls: parseInt(maxScrolls),
+                    interval: parseInt(timeInterval),
+                    createdAt: serverTimestamp(),
+                    lastRunStats: null // Initialize with null stats
+                });
+                alert("Pipeline scheduled successfully!");
+            } catch (error) {
+                console.error("Error scheduling pipeline: ", error);
+                alert("Failed to schedule pipeline.");
+            }
+            return;
+        }
+
         setIsRunning(true);
         setLogs([]);
         setActiveStep(1);
@@ -45,7 +71,11 @@ const Admin = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ groupID: groupId, maxScrolls: parseInt(maxScrolls) }),
+                body: JSON.stringify({
+                    groupID: groupId,
+                    maxScrolls: parseInt(maxScrolls),
+                    timeInterval: parseInt(timeInterval) // Send both, backend can ignore if manual
+                }),
             });
 
             if (!response.ok) {
@@ -117,11 +147,14 @@ const Admin = () => {
     return (
         <div className="min-h-screen p-6 md:p-12 font-sans text-[#0f172a]">
             <div className="max-w-7xl mx-auto">
+
                 <AdminHeader
                     groupId={groupId}
                     setGroupId={setGroupId}
                     maxScrolls={maxScrolls}
                     setMaxScrolls={setMaxScrolls}
+                    timeInterval={timeInterval}
+                    setTimeInterval={setTimeInterval}
                     handleRunPipeline={handleRunPipeline}
                     isRunning={isRunning}
                 />
