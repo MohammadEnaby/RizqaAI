@@ -1,10 +1,10 @@
 
 import os
 import sys
-import time
-import subprocess
+import asyncio
 import logging
 from datetime import datetime, timedelta, timezone
+from typing import Optional
 
 # Add the parent directory to sys.path
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -16,7 +16,9 @@ try:
     from firebase_admin import firestore
 except ImportError as e:
     print(f"[ERROR] Failed to import firebase client: {e}")
-    sys.exit(1)
+    db = None
+
+from core.pipeline import pipeline_generator
 
 # Configure logging
 logging.basicConfig(
@@ -25,43 +27,9 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 
-def run_script(script_name, env_vars):
+async def process_pipeline_background(doc_id: str, config: dict) -> tuple[bool, str]:
     """
-    Runs a script located in the 'scripts' directory.
-    Returns (success: bool, output: str)
-    """
-    script_path = os.path.join(current_dir, "scripts", script_name)
-    if not os.path.exists(script_path):
-        return False, f"Script not found: {script_path}"
-
-    logging.info(f"Running {script_name}...")
-    try:
-        # Inherit environment but update with specific vars
-        process = subprocess.run(
-            [sys.executable, script_path],
-            env=env_vars,
-            capture_output=True,
-            text=True,
-            encoding='utf-8',
-            check=False # Don't raise exception on non-zero exit, handle manually
-        )
-        
-        output = process.stdout + "\n" + process.stderr
-        
-        if process.returncode != 0:
-            logging.error(f"{script_name} failed with code {process.returncode}")
-            return False, output
-            
-        logging.info(f"{script_name} completed successfully.")
-        return True, output
-
-    except Exception as e:
-        logging.error(f"Exception running {script_name}: {e}")
-        return False, str(e)
-
-def process_pipeline(doc_id, config):
-    """
-    Executes the full pipeline: Scrape -> Extract -> Upload
+    Runs the pipeline for a scheduled task and captures output.
     """
     group_id = config.get("groupID")
     max_scrolls = config.get("maxScrolls", 100)
@@ -71,37 +39,44 @@ def process_pipeline(doc_id, config):
 
     logging.info(f"Starting pipeline for Group: {group_id} (Doc ID: {doc_id})")
     
-    # Prepare environment variables
-    env = os.environ.copy()
-    env["FB_GROUP_ID"] = str(group_id)
-    env["MAX_SCROLLS"] = str(max_scrolls)
-    # Ensure correct python path for subprocesses
-    env["PYTHONPATH"] = current_dir
+    output_log = []
+    success = True
+    
+    try:
+        async for line in pipeline_generator(group_id, max_scrolls):
+            # Log significant lines or errors
+            if "[ERROR]" in line or "[EXCEPTION]" in line:
+                logging.error(f"Pipeline {doc_id}: {line.strip()}")
+                success = False
+            elif "Completed" in line or "Success" in line:
+                logging.info(f"Pipeline {doc_id}: {line.strip()}")
+            
+            output_log.append(line)
+            
+            # Stop if we detect failure signal in logs (naive check)
+            if "failed with return code" in line:
+                success = False
+                
+    except Exception as e:
+        logging.error(f"Exception in pipeline {doc_id}: {e}")
+        return False, str(e)
 
-    # 1. Scrape Posts
-    ok, log = run_script("postsExtraction.py", env)
-    if not ok:
-        return False, f"Scraping failed: {log[-200:]}..." # Return last 200 chars of error
+    full_log = "".join(output_log)
+    return success, full_log[-1000:] # Return last 1000 chars of log
 
-    # 2. Extract Jobs
-    ok, log = run_script("JobExtraction.py", env)
-    if not ok:
-        return False, f"Extraction failed: {log[-200:]}..."
-
-    # 3. Upload to Firebase
-    ok, log = run_script("firebaseUploader.py", env)
-    if not ok:
-        return False, f"Upload failed: {log[-200:]}..."
-        
-    return True, "Pipeline completed successfully"
-
-def check_schedules():
+async def check_schedules():
     """
     Checks the 'schedulingPipelines' collection for due tasks.
     """
+    if not db:
+        logging.error("Database not initialized, skipping schedule check.")
+        return
+
     logging.info("Checking schedules...")
     try:
         # Get all scheduling pipelines
+        # Note: In async context, stream() is still synchronous in firebase-admin usually, 
+        # but we run it in executor if needed. For now, direct call is okay if not too heavy.
         docs = db.collection("schedulingPipelines").stream()
         
         for doc in docs:
@@ -130,13 +105,13 @@ def check_schedules():
                         logging.info(f"Pipeline {doc.id} is due (Next run was: {next_run}). Scheduling now.")
                         should_run = True
                     else:
-                        logging.debug(f"Pipeline {doc.id} not due yet. Next run: {next_run}")
+                        pass # logging.debug(f"Pipeline {doc.id} not due yet.")
                 else:
                     should_run = True
 
             if should_run:
                 start_time = datetime.now(timezone.utc)
-                success, message = process_pipeline(doc.id, data)
+                success, message = await process_pipeline_background(doc.id, data)
                 end_time = datetime.now(timezone.utc)
                 duration = (end_time - start_time).total_seconds()
                 
@@ -154,14 +129,18 @@ def check_schedules():
     except Exception as e:
         logging.error(f"Error in scheduler loop: {e}")
 
+async def scheduler_loop():
+    """
+    The main infinite loop for the scheduler.
+    """
+    logging.info("--- Starting AutoFill Scheduler (Async) ---")
+    while True:
+        await check_schedules()
+        await asyncio.sleep(60)
+
 if __name__ == "__main__":
-    logging.info("--- Starting AutoFill Scheduler (Interval-based Database Filler) ---")
-    print("Press Ctrl+C to stop.")
-    
+    # Allow running standalone
     try:
-        while True:
-            check_schedules()
-            # Wait for 60 seconds before next check
-            time.sleep(60)
+        asyncio.run(scheduler_loop())
     except KeyboardInterrupt:
-        logging.info("Scheduler stopped by user.")
+        print("Stopped.")

@@ -24,4 +24,3 @@ dist-ssr
 *.sw?
 secrets.py
 __pycache__
-backend/serviceAccountKey.json
