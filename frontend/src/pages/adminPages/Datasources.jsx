@@ -41,10 +41,13 @@ const Datasources = () => {
         lastPostId: ''
     });
 
+    // Define apiUrl helper or variable
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
     const fetchGroups = async () => {
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:8000/api/platform-groups');
+            const response = await fetch(`${apiUrl}/api/platform-groups`);
             if (response.ok) {
                 const data = await response.json();
                 setGroups(data);
@@ -67,7 +70,7 @@ const Datasources = () => {
     const handleAddSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:8000/api/platform-groups', {
+            const response = await fetch(`${apiUrl}/api/platform-groups`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
@@ -98,7 +101,7 @@ const Datasources = () => {
     const handleEditSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch(`http://localhost:8000/api/platform-groups/${currentGroup.groupID}`, {
+            const response = await fetch(`${apiUrl}/api/platform-groups/${currentGroup.groupID}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -120,7 +123,7 @@ const Datasources = () => {
     const handleDelete = async (groupId) => {
         if (window.confirm("Are you sure you want to delete this datasource?")) {
             try {
-                const response = await fetch(`http://localhost:8000/api/platform-groups/${groupId}`, {
+                const response = await fetch(`${apiUrl}/api/platform-groups/${groupId}`, {
                     method: 'DELETE'
                 });
                 if (response.ok) {
