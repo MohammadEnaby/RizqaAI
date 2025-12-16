@@ -25,3 +25,4 @@ dist-ssr
 serviceAccountKey.json
 secrets.py
 __pycache__
+.env
