@@ -21,17 +21,20 @@ from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 import sys
 
-# Add the parent directory (backend) to sys.path so we can import core.secrets
+# Add backend root to sys.path to allow imports from core
 current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.dirname(current_dir)
-if parent_dir not in sys.path:
-    sys.path.insert(0, parent_dir)
+backend_root = os.path.dirname(current_dir)
+if backend_root not in sys.path:
+    sys.path.insert(0, backend_root)
 
 try:
     from core.secrets import facebook_cookies
-except ImportError as e:
-    print(f"[!] Failed to import secrets: {e}")
-    raise SystemExit(1)
+except ImportError:
+    # Fallback/Mock for environments where secrets.py might not exist or be needed
+    # (e.g. if using environment variables instead)
+    facebook_cookies = None
+    print("[!] Warning: Could not import core.secrets. dependent features might fail if env vars are not set.")
+
 
 # --- CONFIGURATION ---
 # Replace with the Group ID (found in the URL of the group)

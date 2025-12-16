@@ -7,19 +7,23 @@ import time
 from datetime import datetime
 import sys
 
-# Add the parent directory (backend) to sys.path so we can import core.secrets
+# Add backend root to sys.path to allow imports from core
 current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.dirname(current_dir)
-if parent_dir not in sys.path:
-    sys.path.insert(0, parent_dir)
+backend_root = os.path.dirname(current_dir)
+if backend_root not in sys.path:
+    sys.path.insert(0, backend_root)
 
 try:
     from core.secrets import API_KEY_Gimini
-except ImportError as e:
-    print(f"[ERROR] Failed to import secrets: {e}")
-    raise SystemExit(1)
+    API_KEY = API_KEY_Gimini
+except ImportError:
+    # Verify if API_KEY is available via Environment Variable (Railway/Cloud)
+    API_KEY = os.getenv("GEMINI_API_KEY")
+    if not API_KEY:
+        print("[ERROR] No Gemini API Key found in secrets.py OR environment variables.")
+        raise SystemExit(1)
+    print("[*] Using Gemini API Key from environment variables.")
 
-API_KEY = API_KEY_Gimini
 
 genai.configure(api_key=API_KEY)
 
