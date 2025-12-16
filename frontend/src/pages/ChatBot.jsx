@@ -47,7 +47,8 @@ export default function ChatBot() {
 
         try {
             // Call backend API here
-            const response = await fetch('/api/chatbot/query', {
+            const apiUrl = import.meta.env.VITE_API_URL || '';
+            const response = await fetch(`${apiUrl}/api/chatbot/query`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: inputValue, userId: userProfile?.uid })

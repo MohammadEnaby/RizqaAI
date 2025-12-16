@@ -157,7 +157,12 @@ def extract_post_id(post_href: str) -> str:
 def setup_driver():
     """Sets up the Chrome Browser to look like a real user."""
     chrome_options = Options()
-    # chrome_options.add_argument("--headless") # Uncomment this to run without opening a window
+    
+    # Check for HEADLESS environment variable (common in CI/CD and Cloud)
+    if os.getenv("HEADLESS", "false").lower() == "true":
+        print("[*] Running in Headless Mode")
+        chrome_options.add_argument("--headless")
+    
     chrome_options.add_argument("--disable-notifications")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
