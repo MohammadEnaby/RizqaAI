@@ -12,6 +12,7 @@ import json
 import time
 import random
 import re
+import shutil
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -21,17 +22,25 @@ from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 import sys
 
-# Add the parent directory (backend) to sys.path so we can import core.secrets
+# Add backend root to sys.path to allow imports from core
 current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.dirname(current_dir)
-if parent_dir not in sys.path:
-    sys.path.insert(0, parent_dir)
+backend_root = os.path.dirname(current_dir)
+if backend_root not in sys.path:
+    sys.path.insert(0, backend_root)
 
-try:
-    from core.secrets import facebook_cookies
-except ImportError as e:
-    print(f"[!] Failed to import secrets: {e}")
-    raise SystemExit(1)
+
+    # Try getting from environment variable
+env_cookies = os.getenv("facebook_cookies")
+if env_cookies:
+    # If it looks like a JSON string, use it. Otherwise assume it's a path.
+    if env_cookies.strip().startswith("["):
+        facebook_cookies = env_cookies
+    else:
+        facebook_cookies = env_cookies
+else:
+    facebook_cookies = None
+    print("[!] Warning: Could not import core.secrets and no 'facebook_cookies' env var found.")
+
 
 # --- CONFIGURATION ---
 # Replace with the Group ID (found in the URL of the group)
@@ -40,8 +49,8 @@ except ImportError as e:
 GROUP_ID = os.getenv("FB_GROUP_ID", "1942419502675158")
 
 COOKIES_FILE = facebook_cookies
-OUTPUT_FILE = os.path.join(parent_dir, "Data", "jobs.json")
-SEEN_POSTS_FILE = os.path.join(parent_dir, "Data", "last_post_seen.py")
+OUTPUT_FILE = os.path.join(backend_root, "Data", "jobs.json")
+SEEN_POSTS_FILE = os.path.join(backend_root, "Data", "last_post_seen.py")
 
 
 def normalize_post_text(text: str) -> str:
@@ -157,29 +166,76 @@ def extract_post_id(post_href: str) -> str:
 def setup_driver():
     """Sets up the Chrome Browser to look like a real user."""
     chrome_options = Options()
-    # chrome_options.add_argument("--headless") # Uncomment this to run without opening a window
+    
+    # Check for HEADLESS environment variable (common in CI/CD and Cloud)
+    if os.getenv("HEADLESS", "false").lower() == "true":
+        print("[*] Running in Headless Mode")
+        chrome_options.add_argument("--headless")
+    
     chrome_options.add_argument("--disable-notifications")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     # Use a standard User Agent so FB thinks we are a normal laptop
     chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36")
 
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+    # Debug: Print PATH to see where things might be
+    print(f"[DEBUG] PATH: {os.environ.get('PATH')}")
+
+    # Check for system-installed Chromium (Dynamic lookup with shutil.which)
+    chromium_path = shutil.which("chromium") or shutil.which("chromium-browser") or shutil.which("google-chrome")
+
+    if chromium_path:
+        print(f"[*] Found system Chromium binary at: {chromium_path}")
+        chrome_options.binary_location = chromium_path
+
+    # Check for system-installed ChromeDriver
+    chromedriver_path = shutil.which("chromedriver")
+
+    if chromedriver_path and chromium_path:
+        print(f"[*] Found system ChromeDriver at: {chromedriver_path}")
+        service = Service(chromedriver_path)
+    else:
+        # Fallback to webdriver_manager if system binaries are not found
+        print(f"[*] System binaries not found (Chromium={chromium_path}, Driver={chromedriver_path}). Attempting to use webdriver_manager...")
+        try:
+            service = Service(ChromeDriverManager().install())
+        except Exception as e:
+            print(f"[!] webdriver_manager failed: {e}")
+            raise
+
+    driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
 
 def load_cookies(driver, cookies_data):
     """Injects the saved cookies to bypass login."""
+    if not cookies_data:
+        print("[!] No cookies data provided. Skipping login.")
+        return
+
     try:
         # If cookies_data is a list, use it directly.
-        # If it's a string (path), load it from file (backward compatibility or if changed back).
-        if isinstance(cookies_data, str):
-            if not os.path.exists(cookies_data):
-                 print("[!] Cookie file not found! Please export cookies first.")
-                 exit()
-            with open(cookies_data, 'r') as file:
-                cookies = json.load(file)
-        else:
+        if isinstance(cookies_data, list):
             cookies = cookies_data
+        # If it's a string, checks if it is a JSON string or a file path.
+        elif isinstance(cookies_data, str):
+            # Check if it looks like JSON content (starts with [)
+            if cookies_data.strip().startswith("["):
+                try:
+                    cookies = json.loads(cookies_data)
+                except json.JSONDecodeError as e:
+                    print(f"[!] Error parsing cookies from JSON string: {e}")
+                    return
+            else:
+                # Assume it is a file path
+                if not os.path.exists(cookies_data):
+                     print("[!] Cookie file not found! Please export cookies first.")
+                     # Do not exit, just return so we can try to proceed without login or stop gracefully
+                     return
+                with open(cookies_data, 'r') as file:
+                    cookies = json.load(file)
+        else:
+            print("[!] Invalid type for cookies_data.")
+            return
 
         # We must be on the domain before adding cookies
         driver.get("https://mbasic.facebook.com")

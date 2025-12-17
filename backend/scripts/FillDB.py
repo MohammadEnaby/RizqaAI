@@ -7,7 +7,8 @@ from typing import Sequence
 
 
 # Determine the absolute path to the 'backend' directory
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Since this script is now in backend/scripts, we go up one level
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Data file paths
 JOBS_PATH = os.path.join(BASE_DIR, "Data", "jobs.json")

@@ -66,7 +66,8 @@ const Admin = () => {
         setProgress({ scrape: 0, structure: 0, upload: 0 });
 
         try {
-            const response = await fetch('http://localhost:8000/api/run-pipeline', {
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+            const response = await fetch(`${apiUrl}/api/run-pipeline`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

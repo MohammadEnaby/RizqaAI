@@ -10,7 +10,8 @@ const AdminHeader = ({ groupId, setGroupId, maxScrolls, setMaxScrolls, timeInter
     useEffect(() => {
         const fetchPastGroups = async () => {
             try {
-                const response = await fetch('http://localhost:8000/api/last-seen-groups');
+                const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+                const response = await fetch(`${apiUrl}/api/last-seen-groups`);
                 const data = await response.json();
                 if (data.groups) {
                     setPastGroups(data.groups);
