@@ -89,7 +89,7 @@ def extract_search_filters(user_query: str) -> dict:
         return {"intent": "general"}
     
     try:
-        model = genai.GenerativeModel('gemini-2.0-flash')
+        model = genai.GenerativeModel('gemini-1.5-flash')
         prompt = f"""
         Analyze this job search query and extract structured filters.
         Output ONLY valid JSON.
@@ -446,7 +446,7 @@ async def chat_query(request: ChatMessage):
         print(f"Error in chat_query: {str(e)}")
         print(traceback.format_exc())
         return ChatResponse(
-            response="Error processing request.",
+            response=f"Error processing request: {str(e)}", # Specific error for debugging
             intent="error",
             sessionId=session_id if 'session_id' in locals() else ""
         )
