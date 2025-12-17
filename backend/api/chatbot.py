@@ -95,8 +95,8 @@ def extract_search_filters(user_query: str) -> dict:
         
         Keys:
         - intent: "search" if user is looking for a job, else "general"
-        - keywords: job titles, skills, or roles (e.g. "waiter", "python developer")
-        - location: city or region (e.g. "Jerusalem", "Tel Aviv")
+        - keywords: job titles/skills. IMPORTANT: Include Hebrew and Arabic translations to ensure matching. (e.g. "waiter מלצר نادل")
+        - location: city or region. Include Hebrew/Arabic names if applicable. (e.g. "Jerusalem ירושלים القدس")
         
         JSON:
         """
