@@ -17,12 +17,12 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
-# Copy Requirements (from backend/requirements.txt)
-COPY backend/requirements.txt .
+# Copy Requirements (from context root which is backend/)
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the backend code
-COPY backend/ .
+# Copy the rest of the backend code (from context root)
+COPY . .
 
 # Expose the port (Railway uses $PORT)
 EXPOSE 8000
