@@ -306,6 +306,20 @@ def scrape_group(driver, group_id):
         # Parse the page content
         soup = BeautifulSoup(driver.page_source, 'html.parser')
 
+        # [DEBUG] Diagnostic logging
+        print(f"[DEBUG] Current URL: {driver.current_url}")
+        
+        # Save snapshot on first scroll for inspection
+        if scroll_count == 0:
+            try:
+                debug_html_path = os.path.join(backend_root, "Data", "debug_landing_page.html")
+                os.makedirs(os.path.dirname(debug_html_path), exist_ok=True)
+                with open(debug_html_path, "w", encoding="utf-8") as f:
+                    f.write(driver.page_source)
+                print(f"[DEBUG] Saved landing page HTML to {debug_html_path}")
+            except Exception as e:
+                print(f"[!] Failed to save debug HTML: {e}")
+
         # --- EXTRACTION LOGIC (The 'mbasic' structure) ---
         # In mbasic, posts are usually inside <article> or specific <div> tags
         potential_posts = soup.find_all('div', role='article')
@@ -313,6 +327,8 @@ def scrape_group(driver, group_id):
         if not potential_posts:
             # Fallback for mbasic structure if 'article' role isn't found
             potential_posts = soup.select('div[data-ft]')
+        
+        print(f"[DEBUG] Found {len(potential_posts)} potential posts.")
 
 
         for post in potential_posts:
