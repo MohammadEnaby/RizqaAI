@@ -32,16 +32,20 @@ if GEMINI_API_KEY:
 
 # --- Models ---
 
+# --- Models ---
+
 class ChatMessage(BaseModel):
     message: str
     userId: Optional[str] = None
     sessionId: Optional[str] = None
 
 class JobResult(BaseModel):
+    id: Optional[str] = None
     title: str
     company: str
     location: str
     salary: Optional[str] = None
+    link: Optional[str] = None
 
 class ChatResponse(BaseModel):
     response: str
@@ -73,6 +77,85 @@ def get_db():
         raise HTTPException(status_code=500, detail="Database not initialized")
     return db
 
+def extract_search_filters(user_query: str) -> dict:
+    """
+    Uses Gemini to extract search filters from natural language.
+    Returns dict: {'keywords': str, 'location': str, 'intent': 'search'|'general'}
+    """
+    if not GEMINI_API_KEY:
+        return {"intent": "general"}
+    
+    try:
+        model = genai.GenerativeModel('gemini-2.0-flash')
+        prompt = f"""
+        Analyze this job search query and extract structured filters.
+        Output ONLY valid JSON.
+        
+        Query: "{user_query}"
+        
+        Keys:
+        - intent: "search" if user is looking for a job, else "general"
+        - keywords: job titles, skills, or roles (e.g. "waiter", "python developer")
+        - location: city or region (e.g. "Jerusalem", "Tel Aviv")
+        
+        JSON:
+        """
+        response = model.generate_content(prompt)
+        text = response.text.replace('```json', '').replace('```', '').strip()
+        return json.loads(text)
+    except Exception as e:
+        print(f"Filter extraction failed: {e}")
+        return {"intent": "general"}
+
+def search_jobs_in_db(filters: dict) -> List[dict]:
+    """
+    Searches Firestore 'jobs' collection based on filters.
+    Performs in-memory filtering on recent jobs to avoid complex indexes.
+    """
+    database = get_db()
+    jobs_ref = database.collection("jobs")
+    
+    # optimize: fetch last 100 jobs (most recent)
+    # Ideally we'd use a composite index, but to avoid setup issues we fetch and filter.
+    docs = jobs_ref.order_by("post_time", direction=firestore.Query.DESCENDING).limit(50).stream()
+    
+    found_jobs = []
+    keywords = filters.get("keywords", "").lower()
+    location = filters.get("location", "").lower()
+    
+    for doc in docs:
+        data = doc.to_dict()
+        title = data.get("job_title", "").lower()
+        if not title: continue
+        
+        # Simple match logic
+        match_score = 0
+        if keywords and keywords in title:
+            match_score += 2
+        elif keywords and any(k in title for k in keywords.split()):
+            match_score += 1
+            
+        if location and location in data.get("location", "").lower():
+            match_score += 1
+            
+        # If no specific filters, maybe show recent? No, only show if match or if intent is vague but asking for jobs.
+        # Strict mode: must match at least one if filters exist
+        if (keywords and match_score == 0) and (location and location not in data.get("location", "").lower()):
+            continue
+
+        if match_score > 0 or (not keywords and not location):
+            # Map to JobResult structure
+            found_jobs.append({
+                "id": doc.id,
+                "title": data.get("job_title"),
+                "company": data.get("company", "Unknown"), # Schema might not have company, use Source/Group?
+                "location": data.get("location", "Not specified"),
+                "salary": data.get("wage_per_hour", "Not specified"),
+                "link": data.get("post_link") or data.get("contact_info")
+            })
+            
+    return found_jobs[:5] # Return top 5
+
 # --- Endpoints ---
 
 @router.get("/sessions", response_model=List[SessionResponse])
@@ -99,7 +182,7 @@ async def list_sessions(userId: str):
             # Sort in memory (descending by updatedAt)
             sessions.sort(key=lambda x: x.updatedAt or x.createdAt, reverse=True)
             
-            print(f"DEBUG: Found {len(sessions)} sessions for user {userId}")
+            # print(f"DEBUG: Found {len(sessions)} sessions for user {userId}")
             return sessions
         except Exception as query_error:
             print(f"DEBUG: Query error: {query_error}")
@@ -121,7 +204,6 @@ async def create_session(session: SessionCreate):
         }
         update_time, doc_ref = database.collection("chatSessions").add(new_session)
         
-        # Fetch the created doc to return timestamps (or just return current time)
         doc = doc_ref.get()
         data = doc.to_dict()
         
@@ -139,7 +221,6 @@ async def get_session_messages(session_id: str, userId: str):
     """Get message history for a session"""
     database = get_db()
     try:
-        # Verify ownership
         session_ref = database.collection("chatSessions").document(session_id)
         session = session_ref.get()
         if not session.exists or session.to_dict().get("userId") != userId:
@@ -151,10 +232,11 @@ async def get_session_messages(session_id: str, userId: str):
         messages = []
         for doc in docs:
             data = doc.to_dict()
-            # Convert jobs data back to objects if stored as dicts
             jobs_data = []
             if "jobs" in data:
-                jobs_data = [JobResult(**j) for j in data["jobs"]]
+                # Handle inconsistent field names if any
+                for j in data["jobs"]:
+                    jobs_data.append(JobResult(**j))
 
             messages.append(MessageResponse(
                 id=doc.id,
@@ -180,7 +262,6 @@ async def delete_session(session_id: str, userId: str):
         if not session.exists or session.to_dict().get("userId") != userId:
             raise HTTPException(status_code=404, detail="Session not found")
             
-        # Delete subcollection messages (Firestore requirement: delete docs individually)
         messages = session_ref.collection("messages").stream()
         for msg in messages:
             msg.reference.delete()
@@ -202,9 +283,7 @@ async def chat_query(request: ChatMessage):
     try:
         session_id = request.sessionId
         
-        # If no sessionId, create a new session
         if not session_id:
-            # Generate a title based on the first message (simple first few words)
             title = request.message[:30] + "..." if len(request.message) > 30 else request.message
             new_session = {
                 "userId": request.userId,
@@ -215,12 +294,10 @@ async def chat_query(request: ChatMessage):
             _, doc_ref = database.collection("chatSessions").add(new_session)
             session_id = doc_ref.id
         else:
-            # Update session timestamp
             database.collection("chatSessions").document(session_id).update({
                 "updatedAt": firestore.SERVER_TIMESTAMP
             })
 
-        # Can't use user ID for this check if it's new, but we need session ref
         session_ref = database.collection("chatSessions").document(session_id)
 
         # 1. Save User Message
@@ -232,7 +309,6 @@ async def chat_query(request: ChatMessage):
         session_ref.collection("messages").add(user_msg)
 
         if not GEMINI_API_KEY:
-            # Fallback for no API key, still save it
             error_response = "AI unavailable. Please configure API key."
             bot_msg = {
                 "text": error_response,
@@ -243,44 +319,62 @@ async def chat_query(request: ChatMessage):
             session_ref.collection("messages").add(bot_msg)
             return ChatResponse(response=error_response, intent="error", sessionId=session_id)
 
-        # Initialize Gemini
-        model = genai.GenerativeModel('gemini-2.0-flash')
-
-        # Context (Same as before)
-        system_context = """You are an intelligent job search assistant for JobScout platform. ... (context omitted for brevity, keeping same logic) ...""" 
-        # Ideally we fetch previous context here for continuity, but for now single turn
+        # --- INTELLIGENT SEARCH LOGIC ---
         
-        full_prompt = f"User Query: {request.message}\n\nResponse:" # Simplified for now
+        # 1. Analyze Intent & Extract Filters
+        analysis = extract_search_filters(request.message)
+        intent = analysis.get("intent", "general")
+        
+        found_jobs = []
+        if intent == "search":
+            found_jobs = search_jobs_in_db(analysis)
+            print(f"DEBUG: Found {len(found_jobs)} jobs for query '{request.message}'")
 
-        # Generate Response
-        response = model.generate_content(full_prompt)
+        # 2. Generate AI Response with Context
+        model = genai.GenerativeModel('gemini-2.0-flash')
+        
+        jobs_context = ""
+        if found_jobs:
+            jobs_context = "I found these relevant jobs in the database:\n"
+            for job in found_jobs:
+                jobs_context += f"- {job['title']} at {job['location']} (Pay: {job['salary']})\n"
+        elif intent == "search":
+            jobs_context = "I searched the database but found no exact matches. Advise the user to try broader keywords or different locations."
+
+        system_prompt = f"""
+        You are an intelligent job assistant for JobScout.
+        
+        User Query: "{request.message}"
+        
+        Search Intent: {intent}
+        Search Filters Extracted: {analysis}
+        
+        Database Results:
+        {jobs_context}
+        
+        Instructions:
+        1. If jobs were found, present them enthusiastically. Summarize why they match.
+        2. If NO jobs were found but intent was search, explain that you checked but couldn't find exact matches. Suggest how to search better (e.g. "Try saying 'Waiter in Jerusalem' or 'Python Developer'").
+        3. If intent is 'general', answer the user's question helpfully.
+        4. Always be encouraging and brief.
+        5. remind the user that he can ask for a specific job title or location.
+        """
+        
+        response = model.generate_content(system_prompt)
         response_text = response.text
 
-        # Intent logic
-        message_lower = request.message.lower()
-        intent = "general"
-        if any(w in message_lower for w in ["find", "search", "show"]): intent = "search"
-        
-        # Mock jobs logic
-        mock_jobs = []
-        if intent == "search" and "python" in message_lower:
-            mock_jobs = [
-                JobResult(title="Senior Python Dev", company="Tech Corp", location="Jerusalem", salary="20k"),
-                JobResult(title="Full Stack", company="Startup", location="TLV", salary="18k")
-            ]
-
-        # 2. Save Bot Response
+        # 3. Save Bot Response
         bot_msg = {
             "text": response_text,
             "sender": "bot",
             "timestamp": firestore.SERVER_TIMESTAMP,
-            "jobs": [j.dict() for j in mock_jobs]
+            "jobs": [j for j in found_jobs] # Store found jobs in the message
         }
         session_ref.collection("messages").add(bot_msg)
 
         return ChatResponse(
             response=response_text,
-            jobs=mock_jobs,
+            jobs=[JobResult(**j) for j in found_jobs],
             intent=intent,
             sessionId=session_id
         )

@@ -20,7 +20,7 @@ export default function ChatBot() {
     // Initial greeting message
     const initialMessage = {
         id: 1,
-        text: "👋 Hi! I'm your AI job assistant. Ask me anything about jobs, salaries, companies, or skills!",
+        text: "👋 Hi! I'm your AI job assistant. I can search our live database for you.\n\nFor best results, tell me the **Job Title** and **Location** you want.\nExample: \"Find me a **Waiter** job in **Jerusalem**\" or \"Show **Python** jobs in **Tel Aviv**\".",
         sender: 'bot',
         timestamp: new Date()
     };
