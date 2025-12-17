@@ -264,9 +264,15 @@ def load_cookies(driver, cookies_data):
 def scrape_group(driver, group_id):
     """Navigates to group and extracts posts."""
     url = f"https://mbasic.facebook.com/groups/{group_id}"
-    print(f"[*] Navigating to: {url}")
+    print(f"[DEBUG] Navigating to: {url}")
     driver.get(url)
     time.sleep(random.uniform(3, 5))  # Random sleep to act human
+
+    # [Check] Validate if we are logged in
+    if "login" in driver.current_url.lower():
+        print(f"[!] Critical: Redirected to login page ({driver.current_url}).")
+        print("[!] Your cookies are likely expired or invalid. Please populate 'facebook_cookies' with fresh cookies.")
+        return []
 
     posts_data = []
     seen_post_keys = set()
@@ -306,20 +312,6 @@ def scrape_group(driver, group_id):
         # Parse the page content
         soup = BeautifulSoup(driver.page_source, 'html.parser')
 
-        # [DEBUG] Diagnostic logging
-        print(f"[DEBUG] Current URL: {driver.current_url}")
-        
-        # Save snapshot on first scroll for inspection
-        if scroll_count == 0:
-            try:
-                debug_html_path = os.path.join(backend_root, "Data", "debug_landing_page.html")
-                os.makedirs(os.path.dirname(debug_html_path), exist_ok=True)
-                with open(debug_html_path, "w", encoding="utf-8") as f:
-                    f.write(driver.page_source)
-                print(f"[DEBUG] Saved landing page HTML to {debug_html_path}")
-            except Exception as e:
-                print(f"[!] Failed to save debug HTML: {e}")
-
         # --- EXTRACTION LOGIC (The 'mbasic' structure) ---
         # In mbasic, posts are usually inside <article> or specific <div> tags
         potential_posts = soup.find_all('div', role='article')
@@ -328,9 +320,7 @@ def scrape_group(driver, group_id):
             # Fallback for mbasic structure if 'article' role isn't found
             potential_posts = soup.select('div[data-ft]')
         
-        print(f"[DEBUG] Found {len(potential_posts)} potential posts.")
-
-
+        
         for post in potential_posts:
             # Prefer the main text span (like the one you showed: <span dir="auto"> ... )
             main_text_container = post.select_one('span[dir="auto"]') or post
