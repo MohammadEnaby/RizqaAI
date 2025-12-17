@@ -444,4 +444,17 @@ async def chat_query(request: ChatMessage):
 
 @router.get("/health")
 async def health_check():
-    return {"status": "healthy", "gemini": bool(GEMINI_API_KEY)}
+    models = []
+    try:
+        if GEMINI_API_KEY:
+            for m in genai.list_models():
+                if 'generateContent' in m.supported_generation_methods:
+                    models.append(m.name)
+    except Exception as e:
+        models = [f"Error listing models: {str(e)}"]
+
+    return {
+        "status": "healthy", 
+        "gemini_connected": bool(GEMINI_API_KEY),
+        "available_models": models
+    }
