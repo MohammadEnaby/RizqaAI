@@ -51,6 +51,7 @@ GROUP_ID = os.getenv("FB_GROUP_ID", "1942419502675158")
 COOKIES_FILE = facebook_cookies
 OUTPUT_FILE = os.path.join(backend_root, "Data", "jobs.json")
 SEEN_POSTS_FILE = os.path.join(backend_root, "Data", "last_post_seen.py")
+LOCAL_COOKIES_PATH = os.path.join(backend_root, "Data", "cookies.json")
 
 
 def normalize_post_text(text: str) -> str:
@@ -206,46 +207,64 @@ def setup_driver():
     driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
 
-def load_cookies(driver, cookies_data):
-    """Injects the saved cookies to bypass login."""
-    if not cookies_data:
-        print("[!] No cookies data provided. Skipping login.")
+def save_cookies(driver, path):
+    """Saves current cookies to a file."""
+    try:
+        cookies = driver.get_cookies()
+        with open(path, 'w') as file:
+            json.dump(cookies, file, indent=4)
+        print(f"[+] Cookies saved to {path}")
+    except Exception as e:
+        print(f"[!] Error saving cookies: {e}")
+
+def load_cookies(driver, cookies_data_env):
+    """Injects cookies. Prioritizes local file, falls back to env var."""
+    cookies = None
+    used_local = False
+    
+    # 1. Try local file first
+    if os.path.exists(LOCAL_COOKIES_PATH):
+        print(f"[*] Found local cookies at {LOCAL_COOKIES_PATH}. Using them.")
+        try:
+            with open(LOCAL_COOKIES_PATH, 'r') as file:
+                cookies = json.load(file)
+            used_local = True
+        except Exception as e:
+            print(f"[!] Error reading local cookies: {e}")
+    
+    # 2. Fallback to Env / Argument
+    if not cookies and cookies_data_env:
+        print("[*] Using cookies from environment/argument.")
+        try:
+            # If cookies_data_env is a list, use it directly.
+            if isinstance(cookies_data_env, list):
+                cookies = cookies_data_env
+            # If it's a string, checks if it is a JSON string or a file path.
+            elif isinstance(cookies_data_env, str):
+                if cookies_data_env.strip().startswith("["):
+                    cookies = json.loads(cookies_data_env)
+                else:
+                    if os.path.exists(cookies_data_env):
+                        with open(cookies_data_env, 'r') as file:
+                            cookies = json.load(file)
+                    else:
+                        print("[!] Env cookie file not found.")
+        except Exception as e:
+             print(f"[!] Error parsing env cookies: {e}")
+
+    if not cookies:
+        print("[!] No cookies available (Local or Env). Skipping login.")
         return
 
     try:
-        # If cookies_data is a list, use it directly.
-        if isinstance(cookies_data, list):
-            cookies = cookies_data
-        # If it's a string, checks if it is a JSON string or a file path.
-        elif isinstance(cookies_data, str):
-            # Check if it looks like JSON content (starts with [)
-            if cookies_data.strip().startswith("["):
-                try:
-                    cookies = json.loads(cookies_data)
-                except json.JSONDecodeError as e:
-                    print(f"[!] Error parsing cookies from JSON string: {e}")
-                    return
-            else:
-                # Assume it is a file path
-                if not os.path.exists(cookies_data):
-                     print("[!] Cookie file not found! Please export cookies first.")
-                     # Do not exit, just return so we can try to proceed without login or stop gracefully
-                     return
-                with open(cookies_data, 'r') as file:
-                    cookies = json.load(file)
-        else:
-            print("[!] Invalid type for cookies_data.")
-            return
-
         # We must be on the domain before adding cookies
         driver.get("https://mbasic.facebook.com")
 
         for cookie in cookies:
             if "sameSite" in cookie:
                 if cookie["sameSite"] not in ["Strict", "Lax", "None"]:
-                    cookie["sameSite"] = "Lax" # Fix common cookie error
+                    cookie["sameSite"] = "Lax"
             
-            # Map expirationDate to expiry if needed
             if "expirationDate" in cookie and "expiry" not in cookie:
                 cookie["expiry"] = int(cookie["expirationDate"])
                 del cookie["expirationDate"]
@@ -253,12 +272,19 @@ def load_cookies(driver, cookies_data):
             try:
                 driver.add_cookie(cookie)
             except Exception as e:
-                print(f"[!] Warning: Failed to add cookie {cookie.get('name')}: {e}")
+                pass
+                # print(f"[!] Warning: Failed to add cookie {cookie.get('name')}: {e}")
 
         print("[+] Cookies injected successfully.")
         driver.refresh() # Refresh to apply login
+        
+        # Save fresh cookies immediately after successful injection + refresh
+        save_cookies(driver, LOCAL_COOKIES_PATH)
+        
     except Exception as e:
         print(f"[!] Error loading cookies: {e}")
+        # If we failed with local cookies, and we have env cookies, maybe we should try those?
+        # For simplicity, we just exit or return here.
         exit()
 
 def scrape_group(driver, group_id):
@@ -475,6 +501,8 @@ if __name__ == "__main__":
         print("[~] Closing driver...")
         if 'driver' in locals():
             try:
+                # Save cookies one last time before quitting
+                save_cookies(driver, LOCAL_COOKIES_PATH)
                 driver.quit()
             except Exception as e:
                 print(f"[!] Warning: Error closing driver: {e}")
