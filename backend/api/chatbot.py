@@ -94,7 +94,7 @@ def extract_search_filters(user_query: str) -> dict:
         Query: "{user_query}"
         
         Keys:
-        - intent: "search" if user is looking for a job, else "general"
+        - intent: "search" if user mentions a job role, looking for work, or job related keywords. Default to "search" if unsure.
         - keywords: List of strings. Include the exact term, plus SYNONYMS, RELATED ROLES, and TRANSLATIONS (Hebrew/Arabic). 
           Example: "Food" -> ["food", "waiter", "chef", "cook", "restaurant", "מלצר", "טבח", "מסעדה"]
         - location: city or region. Include Hebrew/Arabic names.
@@ -103,7 +103,13 @@ def extract_search_filters(user_query: str) -> dict:
         """
         response = model.generate_content(prompt)
         text = response.text.replace('```json', '').replace('```', '').strip()
-        return json.loads(text)
+        result = json.loads(text)
+        
+        # Aggressive fallback: If keywords exist, force search intent
+        if result.get("keywords") or result.get("location"):
+             result["intent"] = "search"
+             
+        return result
     except Exception as e:
         print(f"Filter extraction failed: {e}")
         return {"intent": "general"}
@@ -123,8 +129,9 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
     # Keywords is now a list
     keyword_list = filters.get("keywords", [])
     if isinstance(keyword_list, str): keyword_list = [keyword_list]
-    # Normalize list
-    keyword_list = [k.lower() for k in keyword_list if k]
+    # Normalize list and remove generic noise words
+    noise_words = {"job", "jobs", "work", "working", "looking", "seek", "seeking", "position", "role", "career"}
+    keyword_list = [k.lower() for k in keyword_list if k and k.lower() not in noise_words]
     
     location = filters.get("location", "").lower()
     
@@ -137,29 +144,41 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
         match_score = 0
         
         # Check against ALL related keywords
-        for k in keyword_list:
-            if k in title:
-                match_score += 2
-                break # Matched one keyword, good enough for keyword score
+        if keyword_list:
+            for k in keyword_list:
+                if k in title:
+                    match_score += 2
+                    break # Matched one keyword, good enough for keyword score
+        
+        if location:
+            # Flexible location match
+            doc_loc = data.get("location", "").lower()
+            if location in doc_loc or doc_loc in location:
+                match_score += 1
             
-        if location and location in data.get("location", "").lower():
-            match_score += 1
-            
-        # Strict mode: must match at least one if keywords exist
-        # If user gave keywords but we found none of them -> skip
-        if keyword_list and match_score == 0:
-            # If location matched but no keyword, maybe skip or give low score? 
-            # Let's stricter: must match keyword or location if both present?
-            # User wants "smart". If only location matches, it's irrelevant job in right place.
-            # If only keyword matches, it's right job in wrong place (fallback).
-            # So: if keyword_list exists, we MUST match at least one keyword.
-            continue
-            
-        # If only location was asked (no keywords), then location match is enough
-        if not keyword_list and location and match_score > 0:
-            pass # Keep it
-        elif keyword_list and match_score == 0:
-             continue
+        # Decision Logic:
+        # 1. If we have keywords, we ideally want a keyword match.
+        #    BUT if we have a location match and no keyword match, should we show it?
+        #    User: "Selling in Jerusalem". 
+        #    If no sales jobs in JLM, showing "Waiter in JLM" is better than nothing? 
+        #    Let's stick to: Must match Keyword OR Location.
+        
+        if keyword_list and location:
+             # If user asked for specific thing + specific place
+             # Show if EITHER matches (because sorting prioritizes both).
+             if match_score == 0: continue
+             
+        elif keyword_list and not location:
+             # Only asked for keyword (e.g. "Selling")
+             if match_score == 0: continue
+             
+        elif location and not keyword_list:
+             # Only asked for location (e.g. "Jobs in Jerusalem")
+             if match_score == 0: continue
+             
+        else: # No specific filters (e.g. "I want a job")
+             # Show everything (match_score is 0 but we fallback to recent)
+             pass
 
         # Map to JobResult structure
         found_jobs.append({
@@ -360,7 +379,9 @@ async def chat_query(request: ChatMessage):
             for job in found_jobs:
                 jobs_context += f"- {job['title']} at {job['location']} (Pay: {job['salary']})\n"
         elif intent == "search":
-            jobs_context = "I searched the database but found no exact matches. Advise the user to try broader keywords or different locations."
+            keywords = analysis.get("keywords", [])
+            location = analysis.get("location", "Any")
+            jobs_context = f"SEARCH RESULT: 0 matches found.\nI specifically searched for keywords: {keywords} \nIn location: {location}\nNo exact matches in the database."
 
         system_prompt = f"""
         You are an intelligent job assistant for JobScout.
@@ -376,7 +397,7 @@ async def chat_query(request: ChatMessage):
         Instructions:
         1. If jobs were found, present them enthusiastically. Summarize why they match.
         2. If jobs found do NOT match the requested location, say: "I couldn't find matches in [Location], but here are some in other locations:".
-        3. If NO jobs were found but intent was search, explain that you checked but couldn't find exact matches. Suggest how to search better.
+        3. If NO jobs were found but intent was search, DO NOT give generic advice. State clearly: "I searched our database for [Keywords] in [Location] but found no active listings right now." Then suggest trying a different keyword.
         4. If intent is 'general', answer the user's question helpfully.
         5. Always be encouraging and brief.
         6. remind the user that he can ask for a specific job title or location.
