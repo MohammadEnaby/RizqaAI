@@ -264,9 +264,15 @@ def load_cookies(driver, cookies_data):
 def scrape_group(driver, group_id):
     """Navigates to group and extracts posts."""
     url = f"https://mbasic.facebook.com/groups/{group_id}"
-    print(f"[*] Navigating to: {url}")
+    print(f"[DEBUG] Navigating to: {url}")
     driver.get(url)
     time.sleep(random.uniform(3, 5))  # Random sleep to act human
+
+    # [Check] Validate if we are logged in
+    if "login" in driver.current_url.lower():
+        print(f"[!] Critical: Redirected to login page ({driver.current_url}).")
+        print("[!] Your cookies are likely expired or invalid. Please populate 'facebook_cookies' with fresh cookies.")
+        return []
 
     posts_data = []
     seen_post_keys = set()
@@ -313,8 +319,8 @@ def scrape_group(driver, group_id):
         if not potential_posts:
             # Fallback for mbasic structure if 'article' role isn't found
             potential_posts = soup.select('div[data-ft]')
-
-
+        
+        
         for post in potential_posts:
             # Prefer the main text span (like the one you showed: <span dir="auto"> ... )
             main_text_container = post.select_one('span[dir="auto"]') or post

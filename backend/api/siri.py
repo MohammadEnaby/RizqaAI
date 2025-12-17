@@ -115,7 +115,7 @@ async def siri_trigger_automation(request: SiriAutomationRequest):
 
     # Limit scrolls for Siri to avoid timeouts if not specified
     # User can override, but we default to a safe low number for voice interactions
-    safe_scrolls = request.max_scrolls if request.max_scrolls < 10 else 5 
+    safe_scrolls = request.max_scrolls 
     print(f"[*] Siri Trigger: Running for {found_group_name} with {safe_scrolls} scrolls...")
 
     logs = []
