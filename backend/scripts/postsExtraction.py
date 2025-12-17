@@ -27,13 +27,18 @@ backend_root = os.path.dirname(current_dir)
 if backend_root not in sys.path:
     sys.path.insert(0, backend_root)
 
-try:
-    from core.secrets import facebook_cookies
-except ImportError:
-    # Fallback/Mock for environments where secrets.py might not exist or be needed
-    # (e.g. if using environment variables instead)
+
+    # Try getting from environment variable
+env_cookies = os.getenv("facebook_cookies")
+if env_cookies:
+    # If it looks like a JSON string, use it. Otherwise assume it's a path.
+    if env_cookies.strip().startswith("["):
+        facebook_cookies = env_cookies
+    else:
+        facebook_cookies = env_cookies
+else:
     facebook_cookies = None
-    print("[!] Warning: Could not import core.secrets. dependent features might fail if env vars are not set.")
+    print("[!] Warning: Could not import core.secrets and no 'facebook_cookies' env var found.")
 
 
 # --- CONFIGURATION ---
@@ -183,15 +188,28 @@ def load_cookies(driver, cookies_data):
 
     try:
         # If cookies_data is a list, use it directly.
-        # If it's a string (path), load it from file (backward compatibility or if changed back).
-        if isinstance(cookies_data, str):
-            if not os.path.exists(cookies_data):
-                 print("[!] Cookie file not found! Please export cookies first.")
-                 exit()
-            with open(cookies_data, 'r') as file:
-                cookies = json.load(file)
-        else:
+        if isinstance(cookies_data, list):
             cookies = cookies_data
+        # If it's a string, checks if it is a JSON string or a file path.
+        elif isinstance(cookies_data, str):
+            # Check if it looks like JSON content (starts with [)
+            if cookies_data.strip().startswith("["):
+                try:
+                    cookies = json.loads(cookies_data)
+                except json.JSONDecodeError as e:
+                    print(f"[!] Error parsing cookies from JSON string: {e}")
+                    return
+            else:
+                # Assume it is a file path
+                if not os.path.exists(cookies_data):
+                     print("[!] Cookie file not found! Please export cookies first.")
+                     # Do not exit, just return so we can try to proceed without login or stop gracefully
+                     return
+                with open(cookies_data, 'r') as file:
+                    cookies = json.load(file)
+        else:
+            print("[!] Invalid type for cookies_data.")
+            return
 
         # We must be on the domain before adding cookies
         driver.get("https://mbasic.facebook.com")
