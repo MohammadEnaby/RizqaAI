@@ -8,4 +8,4 @@ pydantic
 fastapi
 uvicorn
 python-multipart
-logging
+
