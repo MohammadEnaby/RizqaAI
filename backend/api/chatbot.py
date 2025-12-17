@@ -80,7 +80,7 @@ def get_db():
 def extract_search_filters(user_query: str) -> dict:
     """
     Uses Gemini to extract search filters from natural language.
-    Returns dict: {'keywords': str, 'location': str, 'intent': 'search'|'general'}
+    Returns dict: {'keywords': List[str], 'location': str, 'intent': 'search'|'general'}
     """
     if not GEMINI_API_KEY:
         return {"intent": "general"}
@@ -95,8 +95,9 @@ def extract_search_filters(user_query: str) -> dict:
         
         Keys:
         - intent: "search" if user is looking for a job, else "general"
-        - keywords: job titles/skills. IMPORTANT: Include Hebrew and Arabic translations to ensure matching. (e.g. "waiter מלצר نادل")
-        - location: city or region. Include Hebrew/Arabic names if applicable. (e.g. "Jerusalem ירושלים القدس")
+        - keywords: List of strings. Include the exact term, plus SYNONYMS, RELATED ROLES, and TRANSLATIONS (Hebrew/Arabic). 
+          Example: "Food" -> ["food", "waiter", "chef", "cook", "restaurant", "מלצר", "טבח", "מסעדה"]
+        - location: city or region. Include Hebrew/Arabic names.
         
         JSON:
         """
@@ -116,11 +117,15 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
     jobs_ref = database.collection("jobs")
     
     # optimize: fetch last 100 jobs (most recent)
-    # Ideally we'd use a composite index, but to avoid setup issues we fetch and filter.
-    docs = jobs_ref.order_by("post_time", direction=firestore.Query.DESCENDING).limit(50).stream()
+    docs = jobs_ref.order_by("post_time", direction=firestore.Query.DESCENDING).limit(100).stream()
     
     found_jobs = []
-    keywords = filters.get("keywords", "").lower()
+    # Keywords is now a list
+    keyword_list = filters.get("keywords", [])
+    if isinstance(keyword_list, str): keyword_list = [keyword_list]
+    # Normalize list
+    keyword_list = [k.lower() for k in keyword_list if k]
+    
     location = filters.get("location", "").lower()
     
     for doc in docs:
@@ -128,31 +133,47 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
         title = data.get("job_title", "").lower()
         if not title: continue
         
-        # Simple match logic
+        # Smart match logic
         match_score = 0
-        if keywords and keywords in title:
-            match_score += 2
-        elif keywords and any(k in title for k in keywords.split()):
-            match_score += 1
+        
+        # Check against ALL related keywords
+        for k in keyword_list:
+            if k in title:
+                match_score += 2
+                break # Matched one keyword, good enough for keyword score
             
         if location and location in data.get("location", "").lower():
             match_score += 1
             
-        # If no specific filters, maybe show recent? No, only show if match or if intent is vague but asking for jobs.
-        # Strict mode: must match at least one if filters exist
-        if (keywords and match_score == 0) and (location and location not in data.get("location", "").lower()):
+        # Strict mode: must match at least one if keywords exist
+        # If user gave keywords but we found none of them -> skip
+        if keyword_list and match_score == 0:
+            # If location matched but no keyword, maybe skip or give low score? 
+            # Let's stricter: must match keyword or location if both present?
+            # User wants "smart". If only location matches, it's irrelevant job in right place.
+            # If only keyword matches, it's right job in wrong place (fallback).
+            # So: if keyword_list exists, we MUST match at least one keyword.
             continue
+            
+        # If only location was asked (no keywords), then location match is enough
+        if not keyword_list and location and match_score > 0:
+            pass # Keep it
+        elif keyword_list and match_score == 0:
+             continue
 
-        if match_score > 0 or (not keywords and not location):
-            # Map to JobResult structure
-            found_jobs.append({
-                "id": doc.id,
-                "title": data.get("job_title"),
-                "company": data.get("company", "Unknown"), # Schema might not have company, use Source/Group?
-                "location": data.get("location", "Not specified"),
-                "salary": data.get("wage_per_hour", "Not specified"),
-                "link": data.get("post_link") or data.get("contact_info")
-            })
+        # Map to JobResult structure
+        found_jobs.append({
+            "score": match_score,
+            "id": doc.id,
+            "title": data.get("job_title"),
+            "company": data.get("company", "Unknown"), 
+            "location": data.get("location", "Not specified"),
+            "salary": data.get("wage_per_hour", "Not specified"),
+            "link": data.get("post_link") or data.get("contact_info")
+        })
+            
+    # Sort by score descending
+    found_jobs.sort(key=lambda x: x["score"], reverse=True)
             
     return found_jobs[:5] # Return top 5
 
@@ -354,10 +375,11 @@ async def chat_query(request: ChatMessage):
         
         Instructions:
         1. If jobs were found, present them enthusiastically. Summarize why they match.
-        2. If NO jobs were found but intent was search, explain that you checked but couldn't find exact matches. Suggest how to search better (e.g. "Try saying 'Waiter in Jerusalem' or 'Python Developer'").
-        3. If intent is 'general', answer the user's question helpfully.
-        4. Always be encouraging and brief.
-        5. remind the user that he can ask for a specific job title or location.
+        2. If jobs found do NOT match the requested location, say: "I couldn't find matches in [Location], but here are some in other locations:".
+        3. If NO jobs were found but intent was search, explain that you checked but couldn't find exact matches. Suggest how to search better.
+        4. If intent is 'general', answer the user's question helpfully.
+        5. Always be encouraging and brief.
+        6. remind the user that he can ask for a specific job title or location.
         """
         
         response = model.generate_content(system_prompt)
