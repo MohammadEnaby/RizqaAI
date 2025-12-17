@@ -1,8 +1,11 @@
+
 from google.cloud.firestore_v1.base_query import FieldFilter
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 import google.generativeai as genai
 import os
+import re  # Added for robust JSON extraction
+import json # Added for robust JSON extraction
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 import firebase_admin
@@ -102,7 +105,13 @@ def extract_search_filters(user_query: str) -> dict:
         JSON:
         """
         response = model.generate_content(prompt)
-        text = response.text.replace('```json', '').replace('```', '').strip()
+        text = response.text
+        
+        # Robust JSON extraction
+        match = re.search(r'\{.*\}', text, re.DOTALL)
+        if match:
+            text = match.group(0)
+            
         result = json.loads(text)
         
         # Aggressive fallback: If keywords exist, force search intent
@@ -112,6 +121,7 @@ def extract_search_filters(user_query: str) -> dict:
         return result
     except Exception as e:
         print(f"Filter extraction failed: {e}")
+        # print(f"Raw Gemini Output: {response.text if 'response' in locals() else 'No response'}") 
         return {"intent": "general"}
 
 def search_jobs_in_db(filters: dict) -> List[dict]:
@@ -122,8 +132,8 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
     database = get_db()
     jobs_ref = database.collection("jobs")
     
-    # optimize: fetch last 100 jobs (most recent)
-    docs = jobs_ref.order_by("post_time", direction=firestore.Query.DESCENDING).limit(100).stream()
+    # optimize: fetch last 500 jobs (increased from 100 to catch more results)
+    docs = jobs_ref.order_by("post_time", direction=firestore.Query.DESCENDING).limit(500).stream()
     
     found_jobs = []
     # Keywords is now a list
@@ -163,22 +173,31 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
         #    If no sales jobs in JLM, showing "Waiter in JLM" is better than nothing? 
         #    Let's stick to: Must match Keyword OR Location.
         
+        # Decision Logic:
+        # Match Score Logic:
+        # - Keyword Match: +2
+        # - Location Match: +1
+        
+        # 1. User provided Keywords AND Location
         if keyword_list and location:
-             # If user asked for specific thing + specific place
-             # Show if EITHER matches (because sorting prioritizes both).
+             # If neither matched, skip.
              if match_score == 0: continue
-             
+             # If at least one matched (score >= 1), we keep it. 
+             # (Allows "Waiter in Holon" to show "Waiter in Jerusalem" [score 2] or "Job in Holon" [score 1])
+
+        # 2. User provided ONLY Keywords (e.g. "Selling")
         elif keyword_list and not location:
-             # Only asked for keyword (e.g. "Selling")
              if match_score == 0: continue
-             
+
+        # 3. User provided ONLY Location (e.g. "Holon")
         elif location and not keyword_list:
-             # Only asked for location (e.g. "Jobs in Jerusalem")
+             # Critical Fix: match_score must be > 0 (which means location matched, since k-list matches gave 0)
              if match_score == 0: continue
-             
-        else: # No specific filters (e.g. "I want a job")
-             # Show everything (match_score is 0 but we fallback to recent)
-             pass
+
+        # 4. User provided NOTHING (e.g. "I want a job")
+        else:
+             pass # Return all (recent)
+
 
         # Map to JobResult structure
         found_jobs.append({
