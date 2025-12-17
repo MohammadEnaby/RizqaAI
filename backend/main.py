@@ -30,7 +30,7 @@ from api.siri import router as siri_router
 app.include_router(siri_router, prefix="/api", tags=["siri"])
 
 # Import scheduler
-from autoFill import scheduler_loop
+from scripts.autoFill import scheduler_loop
 
 # Configure CORS
 app.add_middleware(
