@@ -29,15 +29,10 @@ if backend_root not in sys.path:
     sys.path.insert(0, backend_root)
 
 
-    # Try getting from environment variable
-env_cookies = os.getenv("facebook_cookies")
-if env_cookies:
-    # If it looks like a JSON string, use it. Otherwise assume it's a path.
-    if env_cookies.strip().startswith("["):
-        facebook_cookies = env_cookies
-    else:
-        facebook_cookies = env_cookies
-else:
+try:
+    from core.secrets import facebook_cookies
+    print("[*] Loaded facebook_cookies from core.secrets")
+except ImportError:
     facebook_cookies = None
     print("[!] Warning: Could not import core.secrets and no 'facebook_cookies' env var found.")
 
