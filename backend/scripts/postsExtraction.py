@@ -177,7 +177,34 @@ def setup_driver():
     # Use a standard User Agent so FB thinks we are a normal laptop
     chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36")
 
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+    # Check for system-installed Chromium (common in Railway/Nixpacks)
+    chromium_path = None
+    possible_paths = ["/usr/bin/chromium", "/usr/bin/chromium-browser", "/usr/bin/google-chrome"]
+    for path in possible_paths:
+        if os.path.exists(path):
+            chromium_path = path
+            break
+
+    if chromium_path:
+        print(f"[*] Using system Chromium binary at: {chromium_path}")
+        chrome_options.binary_location = chromium_path
+
+    # Check for system-installed ChromeDriver
+    chromedriver_path = None
+    if os.path.exists("/usr/bin/chromedriver"):
+        chromedriver_path = "/usr/bin/chromedriver"
+    elif os.path.exists("/usr/local/bin/chromedriver"):
+        chromedriver_path = "/usr/local/bin/chromedriver"
+
+    if chromedriver_path and chromium_path:
+        print(f"[*] Using system ChromeDriver at: {chromedriver_path}")
+        service = Service(chromedriver_path)
+    else:
+        # Fallback to webdriver_manager if system binaries are not found
+        print("[*] System binaries not found. Attempting to use webdriver_manager...")
+        service = Service(ChromeDriverManager().install())
+
+    driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
 
 def load_cookies(driver, cookies_data):
