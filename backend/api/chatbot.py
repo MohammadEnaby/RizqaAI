@@ -390,36 +390,27 @@ async def chat_query(request: ChatMessage):
             print(f"DEBUG: Found {len(found_jobs)} jobs for query '{request.message}'")
 
         # 2. Generate AI Response with Context
-        model = genai.GenerativeModel('gemini-2.0-flash')
+        model = genai.GenerativeModel('gemini-1.5-flash')
         
         jobs_context = ""
         if found_jobs:
-            jobs_context = "I found these relevant jobs in the database:\n"
+            jobs_context = f"Found {len(found_jobs)} matches:\n"
             for job in found_jobs:
-                jobs_context += f"- {job['title']} at {job['location']} (Pay: {job['salary']})\n"
+                jobs_context += f"- Job: {job['title']}\n  Location: {job['location']}\n  Pay: {job['salary']}\n  Link: {job['link']}\n"
         elif intent == "search":
-            keywords = analysis.get("keywords", [])
-            location = analysis.get("location", "Any")
-            jobs_context = f"SEARCH RESULT: 0 matches found.\nI specifically searched for keywords: {keywords} \nIn location: {location}\nNo exact matches in the database."
+             jobs_context = f"NO MATCHES FOUND. The user searched for: {analysis}. I checked the database but found nothing."
 
+        # Simplify System Prompt to prevent "Thinking out loud"
         system_prompt = f"""
-        You are an intelligent job assistant for JobScout.
-        
-        User Query: "{request.message}"
-        
-        Search Intent: {intent}
-        Search Filters Extracted: {analysis}
-        
-        Database Results:
+        Result of database search:
         {jobs_context}
-        
-        Instructions:
-        1. If jobs were found, present them enthusiastically. Summarize why they match.
-        2. If jobs found do NOT match the requested location, say: "I couldn't find matches in [Location], but here are some in other locations:".
-        3. If NO jobs were found but intent was search, DO NOT give generic advice. State clearly: "I searched our database for [Keywords] in [Location] but found no active listings right now." Then suggest trying a different keyword.
-        4. If intent is 'general', answer the user's question helpfully.
-        5. Always be encouraging and brief.
-        6. remind the user that he can ask for a specific job title or location.
+
+        User Query: "{request.message}"
+
+        Task: Answer the user.
+        - If jobs are listed above, show them to the user nicely.
+        - If NO jobs are listed, apologize and suggest they try a different keyword or location.
+        - Do NOT say "Okay I understand instructions". Just answer the user directly.
         """
         
         response = model.generate_content(system_prompt)
