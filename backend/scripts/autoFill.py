@@ -1,8 +1,7 @@
 
 import os
 import sys
-import asyncio
-import logging
+import json
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
@@ -21,6 +20,7 @@ except ImportError as e:
     db = None
 
 from core.pipeline import pipeline_generator
+from core.reporting import send_email_report
 
 # Configure logging
 logging.basicConfig(
@@ -28,6 +28,7 @@ logging.basicConfig(
     format='[%(asctime)s] %(levelname)s: %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S'
 )
+
 
 async def process_pipeline_background(doc_id: str, config: dict) -> tuple[bool, str]:
     """
@@ -64,6 +65,32 @@ async def process_pipeline_background(doc_id: str, config: dict) -> tuple[bool, 
         return False, str(e)
 
     full_log = "".join(output_log)
+
+    if success:
+        # Read the structured jobs file to generate report
+        # The path should be consistent with where JobExtraction.py saves it.
+        # JobExtraction.py uses: os.path.join(backend_root, "Data", "structuered_jobs.json")
+        jobs_file_path = os.path.join(backend_dir, "Data", "structuered_jobs.json")
+        
+        if os.path.exists(jobs_file_path):
+            try:
+                with open(jobs_file_path, 'r', encoding='utf-8') as f:
+                    jobs_data = json.load(f)
+                    
+                if isinstance(jobs_data, list):
+                    job_count = len(jobs_data)
+                    job_titles = [job.get("job_title", "Unknown Title") for job in jobs_data]
+                    
+                    # Send the email
+                    send_email_report(job_count, job_titles)
+                else:
+                    logging.warning(f"structured_jobs.json has invalid format: {type(jobs_data)}")
+
+            except Exception as e:
+                logging.error(f"Failed to read jobs file for reporting: {e}")
+        else:
+            logging.warning(f"structured_jobs.json not found at {jobs_file_path}. Skipping report.")
+
     return success, full_log[-1000:] # Return last 1000 chars of log
 
 async def check_schedules():

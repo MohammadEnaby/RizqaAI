@@ -11,6 +11,7 @@ if current_dir not in sys.path:
     sys.path.insert(0, current_dir)
 
 from core.firebase import db, firestore # Assuming firestore is exported or available via firebase-admin
+from core.reporting import send_email_report # Import the shared reporting function
 
 router = APIRouter()
 
@@ -77,28 +78,24 @@ async def siri_add_group(request: SiriAddGroupRequest):
 
 
 @router.post("/siri/trigger-automation", dependencies=[Depends(verify_siri_key)])
-async def siri_trigger_automation(request: SiriAutomationRequest, background_tasks: BackgroundTasks):
+async def siri_trigger_automation(request: SiriAutomationRequest):
     """
-    Triggers the automation pipeline for a specific group.
-    Resolves name to ID if needed.
+    Triggers the automation pipeline for a specific group synchronously.
+    Returns a detailed report of the jobs found.
     """
     if not db:
         raise HTTPException(status_code=503, detail="Database not initialized")
 
     target_id = request.group_name_or_id
     
-    # Check if it's a name, if so find ID
-    # This is a simple exact match or "contains" search could be better for voice
-    # For now, let's try direct ID fetch, then search by name
-    
-    doc = db.collection("platformGroups").document(target_id).get()
+    # 1. Resolve Group ID
+    doc_ref = db.collection("platformGroups").document(target_id)
+    doc = doc_ref.get()
     
     found_group_name = target_id
     
     if not doc.exists:
         # Search by name
-        # Note: Firestore doesn't do "contains" easily without external engines, 
-        # but we can do exact match on 'name' field
         query = db.collection("platformGroups").where(field_path="name", op_string="==", value=target_id).limit(1).stream()
         found = list(query)
         if found:
@@ -110,26 +107,67 @@ async def siri_trigger_automation(request: SiriAutomationRequest, background_tas
     else:
         found_group_name = doc.to_dict().get("name", target_id)
 
-    # Import pipeline_generator here to avoid circular imports if possible, 
-    # or rely on main importing this router.
-    # Actually, importing pipeline_generator from main might cause circular import since main imports this router on init.
-    # To avoid this, we should move pipeline_generator to a separate file (e.g. backend/core/pipeline.py)
-    # OR, we can import it inside the function.
-    # Import pipeline_generator from core directory
+    # 2. Run Pipeline Synchronously (Wait for it)
     try:
         from core.pipeline import pipeline_generator
     except ImportError:
          raise HTTPException(status_code=500, detail="Cannot access pipeline logic")
 
-    # Run in background
-    # We need to wrap the async generator in an awaitable function
-    async def run_in_bg():
-        async for _ in pipeline_generator(target_id, request.max_scrolls):
-            pass # We just consume it so it runs
+    # Limit scrolls for Siri to avoid timeouts if not specified
+    # User can override, but we default to a safe low number for voice interactions
+    safe_scrolls = request.max_scrolls if request.max_scrolls < 10 else 5 
+    print(f"[*] Siri Trigger: Running for {found_group_name} with {safe_scrolls} scrolls...")
 
-    background_tasks.add_task(run_in_bg)
+    logs = []
+    async for line in pipeline_generator(target_id, safe_scrolls):
+        logs.append(line) # Capture logs if needed for debug
+
+    # 3. Analyze Results
+    # Read the structured jobs file to see what was found
+    import json
+    from collections import Counter
+
+    data_dir = os.path.join(current_dir, "Data")
+    results_path = os.path.join(data_dir, "structuered_jobs.json")
+    
+    jobs_summary = "No jobs found."
+    
+    if os.path.exists(results_path):
+        try:
+            with open(results_path, 'r', encoding='utf-8') as f:
+                jobs_data = json.load(f)
+            
+            if jobs_data:
+                total_jobs = len(jobs_data)
+                # Count by titles
+                titles = [j.get("job_title", "Unknown") for j in jobs_data]
+                title_counts = Counter(titles)
+                
+                # Format: "1 Cashier, 2 Drivers"
+                # Get top 3 common titles to keep it brief for Siri
+                details = []
+                for title, count in title_counts.most_common(3):
+                    details.append(f"{count} {title}")
+                
+                detail_str = ", ".join(details)
+                if len(title_counts) > 3:
+                     detail_str += ", and more"
+
+                jobs_summary = f"Added {total_jobs} new jobs: {detail_str}."
+                
+                # Send email report
+                send_email_report(total_jobs, titles)
+                
+            else:
+                jobs_summary = "Pipeline finished, but found 0 new valid job offers."
+                
+        except Exception as e:
+            jobs_summary = f"Pipeline finished, but could not read report: {str(e)}"
+    else:
+        jobs_summary = "Pipeline run complete (Report file missing)."
 
     return {
-        "message": f"Started automation for '{found_group_name}'!",
-        "details": f"ID: {target_id}, Scrolls: {request.max_scrolls}"
+        "message": f"{jobs_summary}",
+        "group": found_group_name,
+        "detail": jobs_summary # Alias for clarity if needed
     }
