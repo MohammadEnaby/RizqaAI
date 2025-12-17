@@ -105,7 +105,7 @@ def extract_job_data(raw_text: str) -> dict:
         return None
 
 def main():
-    jobs_path = os.path.join(parent_dir, "Data", "jobs.json")
+    jobs_path = os.path.join(backend_root, "Data", "jobs.json")
     print(f"[DEBUG] jobs_path = {jobs_path}")
 
     if not os.path.exists(jobs_path):
@@ -173,7 +173,7 @@ def main():
             print("Failed to get result. Will retry next time.")
 
     # Write all structured job offers as a proper JSON array to structuered_jobs.json
-    output_path = os.path.join(parent_dir, "Data", "structuered_jobs.json")
+    output_path = os.path.join(backend_root, "Data", "structuered_jobs.json")
     with open(output_path, 'w', encoding='utf-8') as fw:
         json.dump(structured_results, fw, ensure_ascii=False, indent=4)
 

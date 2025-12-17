@@ -31,7 +31,8 @@ async def run_script(script_name: str, env_vars: dict) -> AsyncGenerator[str, No
     # Define allowed log prefixes
     ALLOWED_PREFIXES = (
         ">>>", "---", "[*]", "[!]", "[+]", "[~]", "[>]", "[OK]", 
-        "[DEBUG]", "[ERROR]", "[SUCCESS]", "[EXCEPTION]"
+        "[DEBUG]", "[ERROR]", "[SUCCESS]", "[EXCEPTION]",
+        "Traceback", "File", "During handling"
     )
 
     try:

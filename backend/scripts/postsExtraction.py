@@ -43,8 +43,8 @@ except ImportError:
 GROUP_ID = os.getenv("FB_GROUP_ID", "1942419502675158")
 
 COOKIES_FILE = facebook_cookies
-OUTPUT_FILE = os.path.join(parent_dir, "Data", "jobs.json")
-SEEN_POSTS_FILE = os.path.join(parent_dir, "Data", "last_post_seen.py")
+OUTPUT_FILE = os.path.join(backend_root, "Data", "jobs.json")
+SEEN_POSTS_FILE = os.path.join(backend_root, "Data", "last_post_seen.py")
 
 
 def normalize_post_text(text: str) -> str:
@@ -177,6 +177,10 @@ def setup_driver():
 
 def load_cookies(driver, cookies_data):
     """Injects the saved cookies to bypass login."""
+    if not cookies_data:
+        print("[!] No cookies data provided. Skipping login.")
+        return
+
     try:
         # If cookies_data is a list, use it directly.
         # If it's a string (path), load it from file (backward compatibility or if changed back).
