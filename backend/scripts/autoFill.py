@@ -3,6 +3,7 @@ import sys
 import json
 import asyncio
 import logging
+from collections import Counter
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
@@ -31,20 +32,22 @@ logging.basicConfig(
 )
 
 
-async def process_pipeline_background(doc_id: str, config: dict) -> tuple[bool, str]:
+async def process_pipeline_background(doc_id: str, config: dict) -> tuple[bool, str, dict]:
     """
     Runs the pipeline for a scheduled task and captures output.
+    Returns: (success, log_snippet, run_stats_dict)
     """
     group_id = config.get("groupID")
     max_scrolls = config.get("maxScrolls", 100)
     
     if not group_id:
-        return False, "Missing groupID"
+        return False, "Missing groupID", {}
 
     logging.info(f"Starting pipeline for Group: {group_id} (Doc ID: {doc_id})")
     
     output_log = []
     success = True
+    stats = {"totalJobs": 0, "breakdown": {}}
     
     try:
         async for line in pipeline_generator(group_id, max_scrolls):
@@ -63,7 +66,7 @@ async def process_pipeline_background(doc_id: str, config: dict) -> tuple[bool, 
                 
     except Exception as e:
         logging.error(f"Exception in pipeline {doc_id}: {e}")
-        return False, str(e)
+        return False, str(e), {}
 
     full_log = "".join(output_log)
 
@@ -82,6 +85,13 @@ async def process_pipeline_background(doc_id: str, config: dict) -> tuple[bool, 
                     job_count = len(jobs_data)
                     job_titles = [job.get("job_title", "Unknown Title") for job in jobs_data]
                     
+                    # Update stats
+                    stats["totalJobs"] = job_count
+                    if job_titles:
+                         # Top 5 most common titles
+                         counts = Counter(job_titles)
+                         stats["breakdown"] = dict(counts.most_common(5))
+
                     # Send the email
                     send_email_report(job_count, job_titles)
                 else:
@@ -92,7 +102,7 @@ async def process_pipeline_background(doc_id: str, config: dict) -> tuple[bool, 
         else:
             logging.warning(f"structured_jobs.json not found at {jobs_file_path}. Skipping report.")
 
-    return success, full_log[-1000:] # Return last 1000 chars of log
+    return success, full_log[-1000:], stats # Return last 1000 chars of log and stats
 
 async def check_schedules():
     """
@@ -141,7 +151,7 @@ async def check_schedules():
 
             if should_run:
                 start_time = datetime.now(timezone.utc)
-                success, message = await process_pipeline_background(doc.id, data)
+                success, message, run_stats = await process_pipeline_background(doc.id, data)
                 end_time = datetime.now(timezone.utc)
                 duration = (end_time - start_time).total_seconds()
                 
@@ -151,7 +161,9 @@ async def check_schedules():
                         "timestamp": firestore.SERVER_TIMESTAMP,
                         "success": success,
                         "message": message,
-                        "durationSeconds": duration
+                        "durationSeconds": duration,
+                        "totalJobs": run_stats.get("totalJobs", 0),
+                        "breakdown": run_stats.get("breakdown", {})
                     }
                 })
                 logging.info(f"Pipeline {doc.id} finished. Success: {success}")
