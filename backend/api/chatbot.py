@@ -83,7 +83,7 @@ async def list_sessions(userId: str):
         # Query sessions for user, ordered by updatedAt desc
         sessions_ref = database.collection("chatSessions")
         try:
-            query = sessions_ref.where(filter=FieldFilter("userId", "==", userId)).order_by("updatedAt", direction=firestore.Query.DESCENDING)
+            query = sessions_ref.where(filter=FieldFilter("userId", "==", userId))
             docs = query.stream()
             
             sessions = []
@@ -95,10 +95,14 @@ async def list_sessions(userId: str):
                     createdAt=data.get("createdAt"),
                     updatedAt=data.get("updatedAt")
                 ))
+            
+            # Sort in memory (descending by updatedAt)
+            sessions.sort(key=lambda x: x.updatedAt or x.createdAt, reverse=True)
+            
             print(f"DEBUG: Found {len(sessions)} sessions for user {userId}")
             return sessions
         except Exception as query_error:
-            print(f"DEBUG: Query error (index missing?): {query_error}")
+            print(f"DEBUG: Query error: {query_error}")
             return []
     except Exception as e:
         print(f"Error listing sessions: {e}")
