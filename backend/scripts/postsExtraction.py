@@ -329,6 +329,8 @@ def scrape_group(driver, group_id):
     else:
         print("[*] No last post ID found; full scan until 1-day marker.")
 
+    stop_reason = None
+
     while scroll_count <= max_scrolls and not stop_scraping:
         # Try to expand "show more" / "عرض المزيد" buttons before extracting
         try:
@@ -400,8 +402,9 @@ def scrape_group(driver, group_id):
 
             # Stop if we reached the last processed post ID
             if last_seen_post_id and post_id and post_id == last_seen_post_id:
-                print(f"[*] Reached last processed post ID {last_seen_post_id}. Stopping.")
+                print(f"[INFO] Reached last processed post ID {last_seen_post_id}. Stopping.")
                 stop_scraping = True
+                stop_reason = "last_seen"
                 break
 
             # Simple filter: Ignore short posts or system messages
@@ -424,16 +427,19 @@ def scrape_group(driver, group_id):
 
                 # Stop once we reach posts that are ~1 day old
                 if is_one_day_marker(post_time):
-                    print(f"[*] Reached a post with time marker '{post_time}'. Stopping.")
+                    print(f"[INFO] Reached a post with time marker '{post_time}'. Stopping.")
                     stop_scraping = True
+                    stop_reason = "one_day"
                     break
 
         if stop_scraping:
+            print("[INFO] Stopping scraping.")
             break
 
         scroll_count += 1
         if scroll_count > max_scrolls:
             print("[!] Reached maximum scroll limit.")
+            stop_reason = "max_scrolls"
             break
 
         print(f"[*] Smooth scrolling down... (scroll {scroll_count}/{max_scrolls})")
@@ -447,7 +453,7 @@ def scrape_group(driver, group_id):
             )
             time.sleep(random.uniform(0.8, 1.4))
             
-    return posts_data
+    return posts_data, stop_reason
 
 
 def save_data(posts):
@@ -482,7 +488,7 @@ if __name__ == "__main__":
         load_cookies(driver, COOKIES_FILE)
         
         print(f"[*] Starting scrape for group {GROUP_ID}...")
-        new_jobs = scrape_group(driver, GROUP_ID)
+        new_jobs, stop_reason = scrape_group(driver, GROUP_ID)
         
         if new_jobs:
             save_data(new_jobs)
@@ -501,8 +507,13 @@ if __name__ == "__main__":
             else:
                 print("[!] Could not determine a new post ID to save.")
         else:
-            print("[*] No posts collected.")
-            sys.exit(1)
+            if stop_reason in ["last_seen", "one_day"]:
+                 print(f"[INFO] No new posts found (Stop Reason: {stop_reason}). Up to date.")
+                 # Exit with 0 to indicate success to the pipeline
+                 sys.exit(0)
+            else:
+                print("[*] No posts collected.")
+                sys.exit(1)
 
     except Exception as e:
         print(f"[!] Critical Error: {e}")
