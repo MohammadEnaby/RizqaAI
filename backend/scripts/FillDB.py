@@ -89,6 +89,14 @@ def clear_data_files() -> None:
 
 
 def main():
+    # Clean up old data to ensure fresh start
+    if os.path.exists(JOBS_PATH):
+        try:
+            os.remove(JOBS_PATH)
+            print(f"[~] Removed old '{JOBS_PATH}'")
+        except OSError as e:
+            print(f"[!] Warning: Could not remove old jobs file: {e}")
+
     if not run_script("postsExtraction.py", "Scrape Posts"):
         return
 

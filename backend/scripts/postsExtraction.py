@@ -203,9 +203,24 @@ def setup_driver():
     return driver
 
 def save_cookies(driver, path):
-    """Saves current cookies to a file."""
+    """Saves current cookies to a file, if we are NOT on a login page."""
     try:
+        current_url = driver.current_url.lower()
+        if "login" in current_url or "facebook.com/home.php" not in current_url and "facebook.com/groups" not in current_url and "mbasic.facebook.com" not in current_url:
+             # Basic heuristic: If we are effectively redirected to login or a checkpoint, don't save.
+             # But 'mbasic.facebook.com' is our target.
+             if "login" in current_url:
+                 print("[!] On login page; NOT saving cookies to prevent overwriting with invalid state.")
+                 return
+
         cookies = driver.get_cookies()
+        
+        # Verify c_user is present
+        has_c_user = any(c.get('name') == 'c_user' for c in cookies)
+        if not has_c_user:
+            print("[!] 'c_user' cookie missing; NOT saving to prevent invalid state.")
+            return
+
         with open(path, 'w') as file:
             json.dump(cookies, file, indent=4)
         print(f"[+] Cookies saved to {path}")
@@ -293,7 +308,7 @@ def scrape_group(driver, group_id):
     if "login" in driver.current_url.lower():
         print(f"[!] Critical: Redirected to login page ({driver.current_url}).")
         print("[!] Your cookies are likely expired or invalid. Please populate 'facebook_cookies' with fresh cookies.")
-        return []
+        sys.exit(1)
 
     posts_data = []
     seen_post_keys = set()
@@ -487,6 +502,7 @@ if __name__ == "__main__":
                 print("[!] Could not determine a new post ID to save.")
         else:
             print("[*] No posts collected.")
+            sys.exit(1)
 
     except Exception as e:
         print(f"[!] Critical Error: {e}")

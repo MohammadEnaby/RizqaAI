@@ -86,14 +86,30 @@ async def pipeline_generator(group_id: str, max_scrolls: int) -> AsyncGenerator[
 
     # Step 1: Scraping
     yield ">>> Step 1: Scraping Posts (postsExtraction.py)...\n"
+    step1_success = True
     async for line in run_script("postsExtraction.py", env):
         yield line
+        if "[ERROR]" in line and "failed with return code" in line:
+            step1_success = False
+
+    if not step1_success:
+        yield "\n[!] Scraping failed. Aborting pipeline.\n"
+        return
+
     yield "\n"
 
     # Step 2: Extraction
     yield ">>> Step 2: Extracting Job Data (JobExtraction.py)...\n"
+    step2_success = True
     async for line in run_script("JobExtraction.py", env):
         yield line
+        if "[ERROR]" in line and "failed with return code" in line:
+            step2_success = False
+    
+    if not step2_success:
+        yield "\n[!] Extraction failed. Aborting pipeline.\n"
+        return
+
     yield "\n"
 
     # Step 3: Upload
