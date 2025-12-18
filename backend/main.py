@@ -4,6 +4,7 @@ import subprocess
 import asyncio
 from typing import AsyncGenerator, Optional, List, Dict, Any
 from fastapi import FastAPI, HTTPException
+from firebase_admin import firestore
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from fastapi.responses import StreamingResponse
