@@ -416,7 +416,7 @@ def scrape_group(driver, group_id):
 
             # Stop if we reached the last processed post ID
             if last_seen_post_id and post_id and post_id == last_seen_post_id:
-                print(f"[INFO] Reached last processed post ID {last_seen_post_id}. Stopping.")
+                print(f"[*] Reached last processed post ID {last_seen_post_id}. Stopping.")
                 stop_scraping = True
                 stop_reason = "last_seen"
                 break
@@ -441,13 +441,13 @@ def scrape_group(driver, group_id):
 
                 # Stop once we reach posts that are ~1 day old
                 if is_one_day_marker(post_time):
-                    print(f"[INFO] Reached a post with time marker '{post_time}'. Stopping.")
+                    print(f"[*] Reached a post with time marker '{post_time}'. Stopping.")
                     stop_scraping = True
                     stop_reason = "one_day"
                     break
 
         if stop_scraping:
-            print("[INFO] Stopping scraping.")
+            print("[*] Stopping scraping.")
             break
 
         scroll_count += 1
