@@ -92,8 +92,18 @@ async def process_pipeline_background(doc_id: str, config: dict) -> tuple[bool, 
                          counts = Counter(job_titles)
                          stats["breakdown"] = dict(counts.most_common(5))
 
+                    # Fetch group name for better reporting
+                    group_name = None
+                    if db and group_id:
+                        try:
+                            group_doc = db.collection("platformGroups").document(str(group_id)).get()
+                            if group_doc.exists:
+                                group_name = group_doc.to_dict().get("name")
+                        except Exception as e:
+                            logging.warning(f"Could not fetch group name for {group_id}: {e}")
+
                     # Send the email
-                    send_email_report(job_count, job_titles)
+                    send_email_report(job_count, job_titles, group_name=group_name)
                 else:
                     logging.warning(f"structured_jobs.json has invalid format: {type(jobs_data)}")
 

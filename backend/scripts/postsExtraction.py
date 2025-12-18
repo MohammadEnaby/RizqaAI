@@ -64,6 +64,12 @@ except ImportError:
     print("[!] Warning: Could not import core.firebase. Firestore features will fail.")
     db = None
 
+try:
+    from core.reporting import send_alert_email
+except ImportError:
+    print("[!] Warning: Could not import core.reporting. Email alerts will fail.")
+    send_alert_email = None
+
 def load_seen_posts(group_id: str):
     """Load the last seen post ID for the given group from Firestore (platformGroups collection)."""
     if not db:
@@ -307,7 +313,15 @@ def scrape_group(driver, group_id):
     # [Check] Validate if we are logged in
     if "login" in driver.current_url.lower():
         print(f"[!] Critical: Redirected to login page ({driver.current_url}).")
-        print("[!] Your cookies are likely expired or invalid. Please populate 'facebook_cookies' with fresh cookies.")
+        error_msg = "[!] Your cookies are likely expired or invalid. Please populate 'facebook_cookies' with fresh cookies."
+        print(error_msg)
+        
+        if send_alert_email:
+            send_alert_email(
+                subject="RizqaAI Alert: Cookies Expired",
+                body=f"The scraper was redirected to the login page for group {GROUP_ID}. \n\n{error_msg}\n\nPlease update cookies.json."
+            )
+            
         sys.exit(1)
 
     posts_data = []
