@@ -34,9 +34,9 @@ def send_email_report(job_count: int, job_titles: list, receiver_email: str = "y
     else:
         body += "No titles found.\n"
 
-    # Use a default sender if not configured. 
-    # Note: Resend requires a verified domain or use of onboarding@resend.dev for testing.
-    sender_email = os.getenv("EMAIL_USER", "onboarding@resend.dev")
+    # Use a specific RESEND_FROM variable, or default to the testing domain.
+    # Do NOT use EMAIL_USER as it likely contains a gmail address which Resend blocks.
+    sender_email = os.getenv("RESEND_FROM_EMAIL", "onboarding@resend.dev")
 
     params = {
         "from": f"RizqaAI <{sender_email}>",
