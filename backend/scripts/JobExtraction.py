@@ -142,33 +142,44 @@ def main():
         result = extract_job_data(raw_text + post_time)
 
         if result:
-            # Inject post_link
-            result['post_link'] = post_link
-            
-            # Inject groupID (from source_id)
-            source_id = job.get('source_id')
-            if source_id:
-                result['groupID'] = source_id
-
-            # Fallback for contact_info
-            if not result.get('contact_info'):
-                result['contact_info'] = post_link
-
-            # Default: mark as processed so we don't handle it again (unless logic below stops this)
-            # Originally we only marked it at the end, but 'continue' skipped that.
-            # Now we mark it as processed if we successfully got a result from Gemini.
-            # Whether we decide to SAVE it (append to structured_results) is a separate check.
-            processed_indices.append(i)
-
-            if not result.get("job_title"):
-                print("[*] Skipped: job_title is missing.")
-                continue
-
-            # Only keep entries that are actual job offers
-            if result.get("is_job_offer", False):
-                structured_results.append(result)
+            # Handle both single dict and list of dicts
+            if isinstance(result, list):
+                extracted_items = result
+            elif isinstance(result, dict):
+                extracted_items = [result]
             else:
-                print("[*] Skipped: model marked this as not a job offer.")
+                print(f"[!] Warning: Unexpected return type from extraction: {type(result)}")
+                extracted_items = []
+
+            # Check if we have valid items to mark as processed
+            if extracted_items:
+                processed_indices.append(i)
+
+            for item in extracted_items:
+                if not isinstance(item, dict):
+                    continue
+
+                # Inject post_link
+                item['post_link'] = post_link
+                
+                # Inject groupID (from source_id)
+                source_id = job.get('source_id')
+                if source_id:
+                    item['groupID'] = source_id
+
+                # Fallback for contact_info
+                if not item.get('contact_info'):
+                    item['contact_info'] = post_link
+
+                if not item.get("job_title"):
+                    print("[*] Skipped: job_title is missing.")
+                    continue
+
+                # Only keep entries that are actual job offers
+                if item.get("is_job_offer", False):
+                    structured_results.append(item)
+                else:
+                    print("[*] Skipped: model marked this as not a job offer.")
         else:
             print("Failed to get result. Will retry next time.")
 
