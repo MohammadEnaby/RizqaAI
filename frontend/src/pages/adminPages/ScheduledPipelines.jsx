@@ -190,16 +190,21 @@ const ScheduledPipelines = () => {
                                         <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Last Run Results</span>
                                     </div>
 
-                                    {schedule.lastRunStats ? (
+                                    {(schedule.lastRunStats !== undefined || schedule.lastRunMetadata) ? (
                                         <div>
                                             <div className="flex justify-between items-center mb-2">
                                                 <span className="text-sm font-medium text-gray-600">Total Jobs Found</span>
-                                                <span className="text-lg font-bold text-[#134e4a]">{schedule.lastRunStats.totalJobs || 0}</span>
+                                                <span className="text-lg font-bold text-[#134e4a]">
+                                                    {typeof schedule.lastRunStats === 'object'
+                                                        ? (schedule.lastRunStats?.totalJobs || 0)
+                                                        : (schedule.lastRunStats || 0)}
+                                                </span>
                                             </div>
 
-                                            {schedule.lastRunStats.breakdown && (
+                                            {/* Support new metadata location or fallback to old */}
+                                            {(schedule.lastRunMetadata?.breakdown || schedule.lastRunStats?.breakdown) && (
                                                 <div className="space-y-1.5 max-h-32 overflow-y-auto custom-scrollbar pr-1">
-                                                    {Object.entries(schedule.lastRunStats.breakdown).map(([title, count]) => (
+                                                    {Object.entries(schedule.lastRunMetadata?.breakdown || schedule.lastRunStats.breakdown).map(([title, count]) => (
                                                         <div key={title} className="flex justify-between items-center text-xs">
                                                             <span className="text-gray-500 truncate max-w-[150px]" title={title}>{title}</span>
                                                             <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md font-medium">{count}</span>
@@ -208,7 +213,13 @@ const ScheduledPipelines = () => {
                                                 </div>
                                             )}
                                             <div className="mt-3 text-[10px] text-right text-gray-400">
-                                                {schedule.lastRunStats.timestamp ? new Date(schedule.lastRunStats.timestamp).toLocaleString() : 'Just now'}
+                                                {(() => {
+                                                    const ts = schedule.lastRunMetadata?.timestamp || schedule.lastRunStats?.timestamp;
+                                                    if (!ts) return 'Just now';
+                                                    if (ts?.toDate) return ts.toDate().toLocaleString();
+                                                    if (ts?.seconds) return new Date(ts.seconds * 1000).toLocaleString();
+                                                    return new Date(ts).toLocaleString();
+                                                })()}
                                             </div>
                                         </div>
                                     ) : (

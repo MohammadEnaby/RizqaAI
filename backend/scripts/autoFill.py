@@ -126,11 +126,20 @@ async def check_schedules():
             
             should_run = False
             
-            if not last_run_stats:
-                logging.info(f"Pipeline {doc.id} never ran. Scheduling now.")
+            # Check for timestamp in new location first, then old
+            last_run_metadata = data.get("lastRunMetadata")
+            last_ts = None
+            
+            if last_run_metadata:
+                 last_ts = last_run_metadata.get("timestamp")
+            elif isinstance(last_run_stats, dict):
+                 # Fallback for old format
+                 last_ts = last_run_stats.get("timestamp")
+
+            if not last_ts:
+                logging.info(f"Pipeline {doc.id} never ran (or no timestamp found). Scheduling now.")
                 should_run = True
             else:
-                last_ts = last_run_stats.get("timestamp")
                 if last_ts:
                     # Ensure timezone awareness
                     last_run_dt = last_ts
@@ -157,12 +166,12 @@ async def check_schedules():
                 
                 # Update Firestore with run results
                 db.collection("schedulingPipelines").document(doc.id).update({
-                    "lastRunStats": {
+                    "lastRunStats": run_stats.get("totalJobs", 0),  # Now just an integer
+                    "lastRunMetadata": {
                         "timestamp": firestore.SERVER_TIMESTAMP,
                         "success": success,
                         "message": message,
                         "durationSeconds": duration,
-                        "totalJobs": run_stats.get("totalJobs", 0),
                         "breakdown": run_stats.get("breakdown", {})
                     }
                 })
