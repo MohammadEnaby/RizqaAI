@@ -29,12 +29,16 @@ if backend_root not in sys.path:
     sys.path.insert(0, backend_root)
 
 
-try:
-    from core.secrets import facebook_cookies
-    print("[*] Loaded facebook_cookies from core.secrets")
-except ImportError:
-    facebook_cookies = None
-    print("[!] Warning: Could not import core.secrets and no 'facebook_cookies' env var found.")
+import pyotp
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
+
+# Add backend root to sys.path to allow imports from core
+current_dir = os.path.dirname(os.path.abspath(__file__))
+backend_root = os.path.dirname(current_dir)
+if backend_root not in sys.path:
+    sys.path.insert(0, backend_root)
 
 
 # --- CONFIGURATION ---
@@ -43,10 +47,11 @@ except ImportError:
 
 GROUP_ID = os.getenv("FB_GROUP_ID", "1942419502675158")
 
-COOKIES_FILE = facebook_cookies
+GROUP_ID = os.getenv("FB_GROUP_ID", "1942419502675158")
+
 OUTPUT_FILE = os.path.join(backend_root, "Data", "jobs.json")
 SEEN_POSTS_FILE = os.path.join(backend_root, "Data", "last_post_seen.py")
-LOCAL_COOKIES_PATH = os.path.join(backend_root, "Data", "cookies.json")
+# Cookies file path removed
 
 
 def normalize_post_text(text: str) -> str:
@@ -166,19 +171,29 @@ def extract_post_id(post_href: str) -> str:
     return ""
 
 def setup_driver():
-    """Sets up the Chrome Browser to look like a real user."""
+    """Sets up the Chrome Browser with authorized headers and options."""
     chrome_options = Options()
     
-    # Check for HEADLESS environment variable (common in CI/CD and Cloud)
-    if os.getenv("HEADLESS", "false").lower() == "true":
+    # Check for HEADLESS environment variable or Linux OS
+    is_headless = os.getenv("HEADLESS", "false").lower() == "true"
+    is_headless = False
+    if is_headless:
         print("[*] Running in Headless Mode")
-        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--headless=new")
     
     chrome_options.add_argument("--disable-notifications")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
-    # Use a standard User Agent so FB thinks we are a normal laptop
-    chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--window-size=1920,1080")
+    
+    # Anti-Detection
+    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    chrome_options.add_experimental_option("useAutomationExtension", False)
+    
+    # Realistic User Agent
+    chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 
     # Debug: Print PATH to see where things might be
     print(f"[DEBUG] PATH: {os.environ.get('PATH')}")
@@ -206,102 +221,126 @@ def setup_driver():
             raise
 
     driver = webdriver.Chrome(service=service, options=chrome_options)
+    
+    # Additional anti-detection property removal
+    driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+    
     return driver
 
-def save_cookies(driver, path):
-    """Saves current cookies to a file, if we are NOT on a login page."""
+def handle_popups(driver):
+    """Closes common Facebook popups like 'Allow Notifications' or 'Save Info'."""
     try:
-        current_url = driver.current_url.lower()
-        if "login" in current_url or "facebook.com/home.php" not in current_url and "facebook.com/groups" not in current_url and "mbasic.facebook.com" not in current_url:
-             # Basic heuristic: If we are effectively redirected to login or a checkpoint, don't save.
-             # But 'mbasic.facebook.com' is our target.
-             if "login" in current_url:
-                 print("[!] On login page; NOT saving cookies to prevent overwriting with invalid state.")
-                 return
-
-        cookies = driver.get_cookies()
+        # Basic approach: Press Escape to close active modals
+        webdriver.ActionChains(driver).send_keys(Keys.ESCAPE).perform()
+        time.sleep(1)
         
-        # Verify c_user is present
-        has_c_user = any(c.get('name') == 'c_user' for c in cookies)
-        if not has_c_user:
-            print("[!] 'c_user' cookie missing; NOT saving to prevent invalid state.")
-            return
+        # Look for 'Allow' or 'Block' notification buttons by text (Arabic/English)
+        # Using a very generic catch-all click for specific known selectors if needed
+        # But usually ESC works for modals.
+        pass
+    except Exception:
+        pass
 
-        with open(path, 'w') as file:
-            json.dump(cookies, file, indent=4)
-        print(f"[+] Cookies saved to {path}")
-    except Exception as e:
-        print(f"[!] Error saving cookies: {e}")
-
-def load_cookies(driver, cookies_data_env):
-    """Injects cookies. Prioritizes local file, falls back to env var."""
-    cookies = None
-    used_local = False
+def login_securely(driver):
+    """Logs in using Email/Password + 2FA (TOTP) from environment variables."""
+    email = os.getenv("FB_EMAIL")
+    password = os.getenv("FB_PASSWORD")
+    totp_secret = os.getenv("FB_2FA_SECRET")
     
-    # 1. Try local file first
-    if os.path.exists(LOCAL_COOKIES_PATH):
-        print(f"[*] Found local cookies at {LOCAL_COOKIES_PATH}. Using them.")
-        try:
-            with open(LOCAL_COOKIES_PATH, 'r') as file:
-                cookies = json.load(file)
-            used_local = True
-        except Exception as e:
-            print(f"[!] Error reading local cookies: {e}")
+    if not email or not password:
+        print("[!] FB_EMAIL or FB_PASSWORD not set. Cannot login.")
+        sys.exit(1)
+        
+    print("[*] Navigating to Facebook Login...")
+    driver.get("https://www.facebook.com/")
+    time.sleep(random.uniform(2, 4))
     
-    # 2. Fallback to Env / Argument
-    if not cookies and cookies_data_env:
-        print("[*] Using cookies from environment/argument.")
-        try:
-            # If cookies_data_env is a list, use it directly.
-            if isinstance(cookies_data_env, list):
-                cookies = cookies_data_env
-            # If it's a string, checks if it is a JSON string or a file path.
-            elif isinstance(cookies_data_env, str):
-                if cookies_data_env.strip().startswith("["):
-                    cookies = json.loads(cookies_data_env)
-                else:
-                    if os.path.exists(cookies_data_env):
-                        with open(cookies_data_env, 'r') as file:
-                            cookies = json.load(file)
-                    else:
-                        print("[!] Env cookie file not found.")
-        except Exception as e:
-             print(f"[!] Error parsing env cookies: {e}")
-
-    if not cookies:
-        print("[!] No cookies available (Local or Env). Skipping login.")
-        return
-
+    handle_popups(driver)
+    
     try:
-        # We must be on the domain before adding cookies
-        driver.get("https://mbasic.facebook.com")
-
-        for cookie in cookies:
-            if "sameSite" in cookie:
-                if cookie["sameSite"] not in ["Strict", "Lax", "None"]:
-                    cookie["sameSite"] = "Lax"
+        # 1. Fill Email
+        email_field = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.NAME, "email"))
+        )
+        email_field.clear()
+        email_field.send_keys(email)
+        time.sleep(random.uniform(1, 2))
+        
+        # 2. Fill Password
+        pass_field = driver.find_element(By.NAME, "pass")
+        pass_field.send_keys(password)
+        time.sleep(random.uniform(0.5, 1.5))
+        
+        # 3. Click Login
+        try:
+            login_btn = driver.find_element(By.NAME, "login")
+        except:
+            login_btn = driver.find_element(By.CSS_SELECTOR, "button[type='submit']")
             
-            if "expirationDate" in cookie and "expiry" not in cookie:
-                cookie["expiry"] = int(cookie["expirationDate"])
-                del cookie["expirationDate"]
-
+        login_btn.click()
+        print("[*] Credentials submitted. Waiting for next step...")
+        time.sleep(random.uniform(4, 6))
+        
+        # 4. Check for 2FA / Checkpoint
+        current_url = driver.current_url.lower()
+        if "checkpoint" in current_url or "two_step_verification" in current_url:
+            print("[*] 2FA Checkpoint detected.")
+            
+            if not totp_secret:
+                print("[!] 2FA required but FB_2FA_SECRET not set.")
+                sys.exit(1)
+                
+            # Generate code
+            totp = pyotp.TOTP(totp_secret.replace(" ", ""))
+            code = totp.now()
+            print(f"[*] Generated 2FA Code: {code}")
+            
+            # Find input field for code. Usually it has specific IDs/names
+            # Common structure: input[type="number"] or input[type="text"] inside the form
             try:
-                driver.add_cookie(cookie)
+                code_field = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.TAG_NAME, "input"))
+                )
+                
+                # Sometimes there's more than one input. We need the one for the code.
+                # Facebook often uses inputs like 'approvals_code', 'codes', etc.
+                inputs = driver.find_elements(By.TAG_NAME, "input")
+                target_input = None
+                for inp in inputs:
+                     if inp.get_attribute("type") in ["text", "number", "tel"]:
+                         target_input = inp
+                         break
+                
+                if target_input:
+                    target_input.send_keys(code)
+                    time.sleep(1)
+                    
+                    # Submit 2FA
+                    # Keep hitting Enter or find the continue button
+                    target_input.send_keys(Keys.ENTER)
+                    
+                    # Alternatively look for 'Continue' button
+                    # driver.find_element(By.ID, "checkpointSubmitButton").click()
+                    
+                    print("[*] 2FA Code submitted.")
+                    time.sleep(random.uniform(5, 8))
+                else:
+                    print("[!] Could not find 2FA input field.")
+                    
             except Exception as e:
-                pass
-                # print(f"[!] Warning: Failed to add cookie {cookie.get('name')}: {e}")
-
-        print("[+] Cookies injected successfully.")
-        driver.refresh() # Refresh to apply login
-        
-        # Save fresh cookies immediately after successful injection + refresh
-        save_cookies(driver, LOCAL_COOKIES_PATH)
-        
+                print(f"[!] Error entering 2FA code: {e}")
+                
+        # 5. Verify Login Success
+        handle_popups(driver)
+        if "login" not in driver.current_url.lower():
+            print("[+] Login successful!")
+        else:
+            print("[!] Login might have failed. Current URL:", driver.current_url)
+            
     except Exception as e:
-        print(f"[!] Error loading cookies: {e}")
-        # If we failed with local cookies, and we have env cookies, maybe we should try those?
-        # For simplicity, we just exit or return here.
-        exit()
+        print(f"[!] Error during login process: {e}")
+        # Capture screenshot if needed in future
+        sys.exit(1)
 
 def scrape_group(driver, group_id):
     """Navigates to group and extracts posts."""
@@ -312,14 +351,12 @@ def scrape_group(driver, group_id):
 
     # [Check] Validate if we are logged in
     if "login" in driver.current_url.lower():
-        print(f"[!] Critical: Redirected to login page ({driver.current_url}).")
-        error_msg = "[!] Your cookies are likely expired or invalid. Please populate 'facebook_cookies' with fresh cookies."
-        print(error_msg)
+        print(f"[!] Critical: Redirected to login page ({driver.current_url}). Login must have failed.")
         
         if send_alert_email:
             send_alert_email(
-                subject="RizqaAI Alert: Cookies Expired",
-                body=f"The scraper was redirected to the login page for group {GROUP_ID}. \n\n{error_msg}\n\nPlease update cookies.json."
+                subject="RizqaAI Alert: Login Failed",
+                body=f"The scraper was redirected to the login page for group {GROUP_ID}. \n\nCheck credentials and 2FA secrets."
             )
             
         sys.exit(1)
@@ -499,7 +536,7 @@ def save_data(posts):
 if __name__ == "__main__":
     driver = setup_driver()
     try:
-        load_cookies(driver, COOKIES_FILE)
+        login_securely(driver)
         
         print(f"[*] Starting scrape for group {GROUP_ID}...")
         new_jobs, stop_reason = scrape_group(driver, GROUP_ID)
@@ -537,8 +574,6 @@ if __name__ == "__main__":
         print("[~] Closing driver...")
         if 'driver' in locals():
             try:
-                # Save cookies one last time before quitting
-                save_cookies(driver, LOCAL_COOKIES_PATH)
                 driver.quit()
             except Exception as e:
                 print(f"[!] Warning: Error closing driver: {e}")
