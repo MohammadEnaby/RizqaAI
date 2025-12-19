@@ -1,26 +1,8 @@
-
-NOISE_PHRASES_LIST = [
-    "see translation", "see more", "view insights", "write a comment",
-    "like", "comment", "share", "sponsored", "reply",
-    "عرض الترجمة", "أعجبني", "تعليق", "مشاركة", 
-    "أرسل تعليقك الأول...", "تمت المشاركة مع مجموعة عامة", 
-    "תגובה", "שתף", "אהבתי", "דקות", "تمت ال  مع مجموعة عامة", "أرسل  ك الأول...", "كل التفاعلات"
-]
-
 import os
 import json
-import time
-import random
-import re
-import shutil
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.common.exceptions import ElementClickInterceptedException, StaleElementReferenceException
-from webdriver_manager.chrome import ChromeDriverManager
-from bs4 import BeautifulSoup
 import sys
+import time
+from apify_client import ApifyClient
 
 # Add backend root to sys.path to allow imports from core
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -28,33 +10,12 @@ backend_root = os.path.dirname(current_dir)
 if backend_root not in sys.path:
     sys.path.insert(0, backend_root)
 
-
-try:
-    from core.secrets import facebook_cookies
-    print("[*] Loaded facebook_cookies from core.secrets")
-except ImportError:
-    facebook_cookies = None
-    print("[!] Warning: Could not import core.secrets and no 'facebook_cookies' env var found.")
-
-
 # --- CONFIGURATION ---
-# Replace with the Group ID (found in the URL of the group)
-# Example: https://www.facebook.com/groups/123456789 -> ID is 123456789
-
 GROUP_ID = os.getenv("FB_GROUP_ID", "1942419502675158")
+# Construct the full URL for the group
+GROUP_URL = f"https://www.facebook.com/groups/{GROUP_ID}/"
 
-COOKIES_FILE = facebook_cookies
 OUTPUT_FILE = os.path.join(backend_root, "Data", "jobs.json")
-SEEN_POSTS_FILE = os.path.join(backend_root, "Data", "last_post_seen.py")
-LOCAL_COOKIES_PATH = os.path.join(backend_root, "Data", "cookies.json")
-
-
-def normalize_post_text(text: str) -> str:
-    """Normalize whitespace so comparisons are consistent."""
-    if not text:
-        return ""
-    return " ".join(text.split())
-
 
 # Import Firestore DB
 try:
@@ -86,6 +47,27 @@ def load_seen_posts(group_id: str):
         print(f"[!] Error loading seen posts from DB: {e}")
         return None
 
+def get_group_api_token(group_id: str):
+    """
+    Fetches the 'APIFI_API_TOKEN' (or 'APIFY_API_TOKEN') from the group's Firestore document.
+    """
+    if not db:
+        print("[!] DB not initialized, cannot fetch API token.")
+        return None
+    
+    try:
+        doc_ref = db.collection("platformGroups").document(str(group_id))
+        doc = doc_ref.get()
+        if doc.exists:
+            data = doc.to_dict()
+            # User mentioned 'APIFI_API_TOKEN', checking that first, then correct spelling, then env fallback
+            token = data.get("APIFY_API_TOKEN") or data.get("APIFI_API_TOKEN")
+            if token:
+                return token
+        return None
+    except Exception as e:
+        print(f"[!] Error fetching API token from DB: {e}")
+        return None
 
 def save_last_seen_post(group_id: str, post_id: str):
     """Persist the newest post ID for the group to Firestore (platformGroups collection)."""
@@ -106,369 +88,105 @@ def save_last_seen_post(group_id: str, post_id: str):
         print(f"[!] Error saving seen post to DB: {e}")
 
 
-def is_one_day_marker(post_time: str) -> bool:
-    """Returns True if the time label indicates ~1 day old (e.g., '1d', '1 D', '١ د')."""
-    if not post_time:
-        return False
-
-    lowered = post_time.strip().lower()
-    lowered_no_space = lowered.replace(" ", "")
-    lowered_no_space = lowered_no_space.replace("١", "1")  # normalize Arabic numeral
-
-    direct_markers = {
-        "1d",
-        "1day",
-        "1יום",
-        "1يوم",
-    }
-
-    if lowered_no_space in direct_markers:
-        return True
-
-    arabic_variants = {"١د", "١يوم"}
-    if lowered_no_space in arabic_variants:
-        return True
-
-    patterns = [
-        r"^1\s*d$",
-        r"^1\s*day$",
-        r"^1\s*יום$",
-        r"^1\s*يوم$",
-    ]
-
-    for pattern in patterns:
-        if re.match(pattern, lowered):
-            return True
-
-    return False
-
-
-def extract_post_id(post_href: str) -> str:
-    """Extract the numeric post ID from common Facebook href formats."""
-    if not post_href:
+def extract_post_id_from_url(post_url: str) -> str:
+    """
+    Attempts to extract a numeric ID from the post URL.
+    This is a helper to maintain compatibility with the 'last seen' logic.
+    """
+    if not post_url:
         return ""
-
-    # Direct /posts/{id}/ structure
-    match = re.search(r"/posts/(\d+)", post_href)
+    # Simple extraction: look for consecutive digits
+    import re
+    # Match /posts/12345/ or ?id=12345 or similar
+    # Facebook URLs vary, commonly: /groups/ID/posts/POST_ID/ or /permalink/POST_ID/
+    
+    # Try /posts/(\d+)
+    match = re.search(r"/posts/(\d+)", post_url)
     if match:
         return match.group(1)
-
-    # story.php?story_fbid=...&id=...
-    match = re.search(r"story_fbid=(\d+)", post_href)
+        
+    # Try /permalink/(\d+)
+    match = re.search(r"/permalink/(\d+)", post_url)
     if match:
         return match.group(1)
-
-    # Permalink style ?id=...&story_fbid=...
-    match = re.search(r"id=(\d+)", post_href)
-    if match:
-        return match.group(1)
-
+        
     return ""
 
-def setup_driver():
-    """Sets up the Chrome Browser to look like a real user."""
-    chrome_options = Options()
+
+def scrape_group_posts(group_url: str, api_token: str):
+    """
+    Uses Apify to scrape posts from the Facebook Group URL.
+    """
+    if not api_token:
+        raise ValueError("No Apify API Token provided.")
+
+    print(f"[*] Initializing ApifyClient with token...")
+    client = ApifyClient(api_token)
+
+    # Prepare the Actor input
+    # apify/facebook-groups-scraper options
+    run_input = {
+        "startUrls": [{"url": group_url}],
+        "resultsLimit": 10,
+        "viewPort": {"width": 1920, "height": 1080},
+    }
+
+    print(f"[*] Calling Apify Actor (apify/facebook-groups-scraper) for URL: {group_url}")
     
-    # Check for HEADLESS environment variable (common in CI/CD and Cloud)
-    if os.getenv("HEADLESS", "false").lower() == "true":
-        print("[*] Running in Headless Mode")
-        chrome_options.add_argument("--headless")
-    
-    chrome_options.add_argument("--disable-notifications")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    # Use a standard User Agent so FB thinks we are a normal laptop
-    chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36")
-
-    # Debug: Print PATH to see where things might be
-    print(f"[DEBUG] PATH: {os.environ.get('PATH')}")
-
-    # Check for system-installed Chromium (Dynamic lookup with shutil.which)
-    chromium_path = shutil.which("chromium") or shutil.which("chromium-browser") or shutil.which("google-chrome")
-
-    if chromium_path:
-        print(f"[*] Found system Chromium binary at: {chromium_path}")
-        chrome_options.binary_location = chromium_path
-
-    # Check for system-installed ChromeDriver
-    chromedriver_path = shutil.which("chromedriver")
-
-    if chromedriver_path and chromium_path:
-        print(f"[*] Found system ChromeDriver at: {chromedriver_path}")
-        service = Service(chromedriver_path)
-    else:
-        # Fallback to webdriver_manager if system binaries are not found
-        print(f"[*] System binaries not found (Chromium={chromium_path}, Driver={chromedriver_path}). Attempting to use webdriver_manager...")
-        try:
-            service = Service(ChromeDriverManager().install())
-        except Exception as e:
-            print(f"[!] webdriver_manager failed: {e}")
-            raise
-
-    driver = webdriver.Chrome(service=service, options=chrome_options)
-    return driver
-
-def save_cookies(driver, path):
-    """Saves current cookies to a file, if we are NOT on a login page."""
     try:
-        current_url = driver.current_url.lower()
-        if "login" in current_url or "facebook.com/home.php" not in current_url and "facebook.com/groups" not in current_url and "mbasic.facebook.com" not in current_url:
-             # Basic heuristic: If we are effectively redirected to login or a checkpoint, don't save.
-             # But 'mbasic.facebook.com' is our target.
-             if "login" in current_url:
-                 print("[!] On login page; NOT saving cookies to prevent overwriting with invalid state.")
-                 return
-
-        cookies = driver.get_cookies()
-        
-        # Verify c_user is present
-        has_c_user = any(c.get('name') == 'c_user' for c in cookies)
-        if not has_c_user:
-            print("[!] 'c_user' cookie missing; NOT saving to prevent invalid state.")
-            return
-
-        with open(path, 'w') as file:
-            json.dump(cookies, file, indent=4)
-        print(f"[+] Cookies saved to {path}")
+        # Run the actor and wait for it to finish
+        run = client.actor("apify/facebook-groups-scraper").call(run_input=run_input)
     except Exception as e:
-        print(f"[!] Error saving cookies: {e}")
-
-def load_cookies(driver, cookies_data_env):
-    """Injects cookies. Prioritizes local file, falls back to env var."""
-    cookies = None
-    used_local = False
-    
-    # 1. Try local file first
-    if os.path.exists(LOCAL_COOKIES_PATH):
-        print(f"[*] Found local cookies at {LOCAL_COOKIES_PATH}. Using them.")
-        try:
-            with open(LOCAL_COOKIES_PATH, 'r') as file:
-                cookies = json.load(file)
-            used_local = True
-        except Exception as e:
-            print(f"[!] Error reading local cookies: {e}")
-    
-    # 2. Fallback to Env / Argument
-    if not cookies and cookies_data_env:
-        print("[*] Using cookies from environment/argument.")
-        try:
-            # If cookies_data_env is a list, use it directly.
-            if isinstance(cookies_data_env, list):
-                cookies = cookies_data_env
-            # If it's a string, checks if it is a JSON string or a file path.
-            elif isinstance(cookies_data_env, str):
-                if cookies_data_env.strip().startswith("["):
-                    cookies = json.loads(cookies_data_env)
-                else:
-                    if os.path.exists(cookies_data_env):
-                        with open(cookies_data_env, 'r') as file:
-                            cookies = json.load(file)
-                    else:
-                        print("[!] Env cookie file not found.")
-        except Exception as e:
-             print(f"[!] Error parsing env cookies: {e}")
-
-    if not cookies:
-        print("[!] No cookies available (Local or Env). Skipping login.")
-        return
-
-    try:
-        # We must be on the domain before adding cookies
-        driver.get("https://mbasic.facebook.com")
-
-        for cookie in cookies:
-            if "sameSite" in cookie:
-                if cookie["sameSite"] not in ["Strict", "Lax", "None"]:
-                    cookie["sameSite"] = "Lax"
-            
-            if "expirationDate" in cookie and "expiry" not in cookie:
-                cookie["expiry"] = int(cookie["expirationDate"])
-                del cookie["expirationDate"]
-
-            try:
-                driver.add_cookie(cookie)
-            except Exception as e:
-                pass
-                # print(f"[!] Warning: Failed to add cookie {cookie.get('name')}: {e}")
-
-        print("[+] Cookies injected successfully.")
-        driver.refresh() # Refresh to apply login
-        
-        # Save fresh cookies immediately after successful injection + refresh
-        save_cookies(driver, LOCAL_COOKIES_PATH)
-        
-    except Exception as e:
-        print(f"[!] Error loading cookies: {e}")
-        # If we failed with local cookies, and we have env cookies, maybe we should try those?
-        # For simplicity, we just exit or return here.
-        exit()
-
-def scrape_group(driver, group_id):
-    """Navigates to group and extracts posts."""
-    url = f"https://mbasic.facebook.com/groups/{group_id}"
-    print(f"[DEBUG] Navigating to: {url}")
-    driver.get(url)
-    time.sleep(random.uniform(3, 5))  # Random sleep to act human
-
-    # [Check] Validate if we are logged in
-    if "login" in driver.current_url.lower():
-        print(f"[!] Critical: Redirected to login page ({driver.current_url}).")
-        error_msg = "[!] Your cookies are likely expired or invalid. Please populate 'facebook_cookies' with fresh cookies."
-        print(error_msg)
-        
+        print(f"[!] Apify Actor Call Failed: {e}")
         if send_alert_email:
-            send_alert_email(
-                subject="RizqaAI Alert: Cookies Expired",
-                body=f"The scraper was redirected to the login page for group {GROUP_ID}. \n\n{error_msg}\n\nPlease update cookies.json."
+             send_alert_email(
+                subject="RizqaAI Alert: Apify Scraping Failed",
+                body=f"Apify scraping failed for group {group_url}.\nError: {e}"
             )
-            
-        sys.exit(1)
+        return []
 
-    posts_data = []
-    seen_post_keys = set()
-    # Read max_scrolls from env, default to 100 if not set or invalid
-    try:
-        max_scrolls = int(os.getenv("MAX_SCROLLS", "100"))
-    except ValueError:
-        max_scrolls = 100
+    print(f"[*] Actor finished. Fetching results from dataset {run['defaultDatasetId']}...")
     
-    print(f"[*] Max scrolls set to: {max_scrolls}")
-    scroll_count = 0
-    last_seen_post_id = load_seen_posts(group_id)
-    stop_scraping = False
-    newest_post_id_this_run = None
-
-    if last_seen_post_id:
-        print(f"[*] Last processed post ID: {last_seen_post_id}")
-    else:
-        print("[*] No last post ID found; full scan until 1-day marker.")
-
-    stop_reason = None
-
-    while scroll_count <= max_scrolls and not stop_scraping:
-        # Try to expand "show more" / "عرض المزيد" buttons before extracting
-        try:
-            show_more_buttons = driver.find_elements(
-                By.XPATH,
-                "//div[@role='button' and (contains(., 'عرض المزيد') or contains(., 'See more') or contains(., 'see more'))]"
-            )
-            for btn in show_more_buttons:
-                try:
-                    driver.execute_script("arguments[0].click();", btn)
-                    time.sleep(random.uniform(0.5, 1.0))
-                except (ElementClickInterceptedException, StaleElementReferenceException):
-                    continue
-        except Exception as e:
-            print(f"[!] Could not click 'show more' buttons: {e}")
-
-        # Parse the page content
-        soup = BeautifulSoup(driver.page_source, 'html.parser')
-
-        # --- EXTRACTION LOGIC (The 'mbasic' structure) ---
-        # In mbasic, posts are usually inside <article> or specific <div> tags
-        potential_posts = soup.find_all('div', role='article')
-
-        if not potential_posts:
-            # Fallback for mbasic structure if 'article' role isn't found
-            potential_posts = soup.select('div[data-ft]')
-        
-        
-        for post in potential_posts:
-            # Prefer the main text span (like the one you showed: <span dir="auto"> ... )
-            main_text_container = post.select_one('span[dir="auto"]') or post
-
-            # Join all text nodes with spaces so every line/part of the post is kept
-            text_content = main_text_container.get_text(separator=" ", strip=True)
-
-            # Clean control characters but keep spaces for readability
-            for ch in ["\n", "\t", "\r", "\f", "\v", "\b", "\a", "\0"]:
-                text_content = text_content.replace(ch, " ")
-
-            for noise_phrase in NOISE_PHRASES_LIST:
-                text_content = text_content.replace(noise_phrase, " ")
-
-            # Try to extract the post time (e.g. '٥٩ د', '1 h', etc.)
-            post_time = None
-            post_href = ""
-            try:
-                time_link = post.find("a", href=lambda h: h and "/posts/" in h)
-                if time_link:
-                    post_time = time_link.get_text(strip=True)
-                    post_href = time_link.get("href") or ""
-            except Exception:
-                post_time = None
-
-            if post_time is not None: 
-                text_content = text_content.replace(post_time, " ")
-
-            normalized_text = normalize_post_text(text_content)
-            post_id = extract_post_id(post_href)
-
-            if not newest_post_id_this_run and post_id:
-                newest_post_id_this_run = post_id
-
-            # Build a strong de-duplication key:
-            # combine the (possibly empty) href with the full cleaned text.
-            post_key = f"{post_href}|{normalized_text}"
-
-            if post_key in seen_post_keys:
+    # Fetch results
+    clean_posts = []
+    
+    try:
+        for item in client.dataset(run["defaultDatasetId"]).iterate_items():
+            # Map raw item to clean dictionary
+            # Fields vary by actor, but commonly: text, url, timestamp, likes, imageUrl
+            
+            # Robust extraction with fallbacks
+            post_text = item.get("text") or item.get("postText") or item.get("content", "")
+            post_url = item.get("url") or item.get("postUrl") or item.get("link", "")
+            timestamp = item.get("time") or item.get("timestamp") or item.get("date", "")
+            likes_count = item.get("likes") or item.get("likesCount") or 0
+            
+            # Image URL: check 'imageUrl', 'images' list, or 'attachments'
+            image_url = item.get("imageUrl")
+            if not image_url and item.get("images") and isinstance(item.get("images"), list):
+                 if len(item["images"]) > 0:
+                     image_url = item["images"][0]
+            
+            if not post_text and not image_url:
+                # If there's absolutely no content, skip
                 continue
 
-            # Stop if we reached the last processed post ID
-            if last_seen_post_id and post_id and post_id == last_seen_post_id:
-                print(f"[*] Reached last processed post ID {last_seen_post_id}. Stopping.")
-                stop_scraping = True
-                stop_reason = "last_seen"
-                break
-
-            # Simple filter: Ignore short posts or system messages
-            if len(normalized_text) > 30:
-                seen_post_keys.add(post_key)
-                
-                # Normalize post_link
-                full_post_link = post_href
-                if post_href and not post_href.startswith("http"):
-                    full_post_link = f"https://www.facebook.com{post_href}"
-
-                job_entry = {
-                    "source_id": group_id,
-                    "raw_text": normalized_text,
-                    "post_time": post_time,
-                    "post_link": full_post_link,
-                    "scraped_at": time.strftime("%Y-%m-%d %H:%M:%S")
-                }
-                posts_data.append(job_entry)
-
-                # Stop once we reach posts that are ~1 day old
-                if is_one_day_marker(post_time):
-                    print(f"[*] Reached a post with time marker '{post_time}'. Stopping.")
-                    stop_scraping = True
-                    stop_reason = "one_day"
-                    break
-
-        if stop_scraping:
-            print("[*] Stopping scraping.")
-            break
-
-        scroll_count += 1
-        if scroll_count > max_scrolls:
-            print("[!] Reached maximum scroll limit.")
-            stop_reason = "max_scrolls"
-            break
-
-        print(f"[*] Smooth scrolling down... (scroll {scroll_count}/{max_scrolls})")
-
-        # Perform several small scroll steps instead of one big jump,
-        # to avoid skipping posts that load progressively.
-        small_steps = 3
-        for _ in range(small_steps):
-            driver.execute_script(
-                "window.scrollBy(0, Math.max(window.innerHeight * 0.5, 300));"
-            )
-            time.sleep(random.uniform(0.8, 1.4))
+            entry = {
+                "post_text": post_text,
+                "post_url": post_url,
+                "image_url": image_url,
+                "timestamp": timestamp,
+                "likes_count": likes_count,
+                # Add extra fields to match previous logic expected by 'save_data' or pipeline
+                "source_id": GROUP_ID,
+                "scraped_at": time.strftime("%Y-%m-%d %H:%M:%S")
+            }
+            clean_posts.append(entry)
             
-    return posts_data, stop_reason
+    except Exception as e:
+        print(f"[!] Error processing dataset items: {e}")
 
+    return clean_posts
 
 def save_data(posts):
     """Saves the scraped posts to the JSON file."""
@@ -486,61 +204,72 @@ def save_data(posts):
     else:
         existing_data = []
 
-    # Append new data
+    # Simple append. 
     existing_data.extend(posts)
 
-    # Write back to file
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         json.dump(existing_data, f, indent=4, ensure_ascii=False)
     
     print(f"[+] Saved {len(posts)} new posts to {OUTPUT_FILE}")
 
-
-if __name__ == "__main__":
-    driver = setup_driver()
+def main():
     try:
-        load_cookies(driver, COOKIES_FILE)
+        # 1. Get API Token from Firestore or Env
+        db_token = get_group_api_token(GROUP_ID)
+        # Fallback to Env if not in DB, as a safety net, or raise error if user strictly wants DB only.
+        # User said "scheduled pipelines will work according to this new field", but didn't explicitly forbid env fallback.
+        # I'll keep env fallback for local testing ease unless strictly empty.
+        api_token = db_token or os.getenv("APIFY_API_TOKEN") 
         
-        print(f"[*] Starting scrape for group {GROUP_ID}...")
-        new_jobs, stop_reason = scrape_group(driver, GROUP_ID)
+        if not api_token:
+            print("[!] No API Token found in Firestore (platformGroups) or Environment (APIFY_API_TOKEN).")
+            # We exit nicely or raise error?
+            sys.exit(1)
+            
+        # 2. Load the last seen post ID
+        last_seen_id = load_seen_posts(GROUP_ID)
+        if last_seen_id:
+            print(f"[*] Last seen Post ID from DB: {last_seen_id}")
         
-        if new_jobs:
-            save_data(new_jobs)
-            
-            # Find the newest post ID to update the marker
-            newest_id = None
-            for job in new_jobs:
-                pid = extract_post_id(job.get('post_link', ''))
-                if pid:
-                    newest_id = pid
-                    break
-            
-            if newest_id:
-                print(f"[*] Updating last seen post ID to: {newest_id}")
-                save_last_seen_post(GROUP_ID, newest_id)
-            else:
-                print("[!] Could not determine a new post ID to save.")
-        else:
-            if stop_reason in ["last_seen", "one_day"]:
-                 print(f"[INFO] No new posts found (Stop Reason: {stop_reason}). Up to date.")
-                 # Exit with 0 to indicate success to the pipeline
-                 sys.exit(0)
-            else:
-                print("[*] No posts collected.")
-                sys.exit(1)
+        # 3. Scrape
+        posts = scrape_group_posts(GROUP_URL, api_token)
+        
+        if not posts:
+            print("[*] No posts found by Apify.")
+            return
 
+        # 4. Filter / Deduplicate
+        new_posts_to_save = []
+        newest_post_id = None
+        
+        for p in posts:
+            p_id = extract_post_id_from_url(p["post_url"])
+            
+            if last_seen_id and p_id == last_seen_id:
+                print(f"[INFO] Encountered last seen post {p_id}. Skipping older/duplicate.")
+                continue
+                
+            new_posts_to_save.append(p)
+            
+            if not newest_post_id and p_id:
+                newest_post_id = p_id
+
+        if new_posts_to_save:
+            save_data(new_posts_to_save)
+            
+            if newest_post_id:
+                save_last_seen_post(GROUP_ID, newest_post_id)
+        else:
+            print("[*] All scraped posts were already seen.")
+
+    except ValueError as ve:
+        print(f"[!] Configuration Error: {ve}")
+        sys.exit(1)
     except Exception as e:
-        print(f"[!] Critical Error: {e}")
+        print(f"[!] Unexpected Error: {e}")
         import traceback
         traceback.print_exc()
-    finally:
-        print("[~] Closing driver...")
-        if 'driver' in locals():
-            try:
-                # Save cookies one last time before quitting
-                save_cookies(driver, LOCAL_COOKIES_PATH)
-                driver.quit()
-            except Exception as e:
-                print(f"[!] Warning: Error closing driver: {e}")
-            except KeyboardInterrupt:
-                print("[!] Warning: Driver close interrupted.")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()

@@ -7,7 +7,6 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const Admin = () => {
     const [groupId, setGroupId] = useState('');
-    const [maxScrolls, setMaxScrolls] = useState('');
     const [isRunning, setIsRunning] = useState(false);
     const [logs, setLogs] = useState([]);
     const [activeStep, setActiveStep] = useState(0); // 0: Idle, 1: Scraping, 2: Extraction, 3: Upload
@@ -37,7 +36,7 @@ const Admin = () => {
     }, [logs]);
 
     const handleRunPipeline = async (mode = 'manual') => {
-        if (!groupId || !maxScrolls) {
+        if (!groupId) {
             alert("Please fill in all fields");
             return;
         }
@@ -46,7 +45,6 @@ const Admin = () => {
             try {
                 await addDoc(collection(db, "schedulingPipelines"), {
                     groupID: groupId,
-                    maxScrolls: parseInt(maxScrolls),
                     interval: parseInt(timeInterval),
                     createdAt: serverTimestamp(),
                     lastRunStats: null // Initialize with null stats
@@ -74,7 +72,6 @@ const Admin = () => {
                 },
                 body: JSON.stringify({
                     groupID: groupId,
-                    maxScrolls: parseInt(maxScrolls),
                     timeInterval: parseInt(timeInterval) // Send both, backend can ignore if manual
                 }),
             });
@@ -152,8 +149,6 @@ const Admin = () => {
                 <AdminHeader
                     groupId={groupId}
                     setGroupId={setGroupId}
-                    maxScrolls={maxScrolls}
-                    setMaxScrolls={setMaxScrolls}
                     timeInterval={timeInterval}
                     setTimeInterval={setTimeInterval}
                     handleRunPipeline={handleRunPipeline}

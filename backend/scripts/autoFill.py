@@ -38,7 +38,6 @@ async def process_pipeline_background(doc_id: str, config: dict) -> tuple[bool, 
     Returns: (success, log_snippet, run_stats_dict)
     """
     group_id = config.get("groupID")
-    max_scrolls = config.get("maxScrolls", 100)
     
     if not group_id:
         return False, "Missing groupID", {}
@@ -50,7 +49,7 @@ async def process_pipeline_background(doc_id: str, config: dict) -> tuple[bool, 
     stats = {"totalJobs": 0, "breakdown": {}}
     
     try:
-        async for line in pipeline_generator(group_id, max_scrolls):
+        async for line in pipeline_generator(group_id):
             # Log significant lines or errors
             if "[ERROR]" in line or "[EXCEPTION]" in line:
                 logging.error(f"Pipeline {doc_id}: {line.strip()}")

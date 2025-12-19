@@ -173,18 +173,10 @@ const ScheduledPipelines = () => {
                                             </div>
                                         )}
                                     </div>
-
-                                    <div className="bg-white/50 p-3 rounded-xl border border-gray-100">
-                                        <div className="flex items-center gap-2 text-gray-400 mb-1">
-                                            <FaLayerGroup size={10} />
-                                            <span className="text-[10px] uppercase font-bold tracking-wider">Max Scrolls</span>
-                                        </div>
-                                        <p className="font-semibold text-gray-700">{schedule.maxScrolls}</p>
-                                    </div>
                                 </div>
 
                                 {/* Results Section */}
-                                <div className="pt-4 border-t border-gray-100">
+                                < div className="pt-4 border-t border-gray-100" >
                                     <div className="flex items-center gap-2 mb-3">
                                         <FaHistory className="text-[#107884]" size={12} />
                                         <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Last Run Results</span>
@@ -232,9 +224,10 @@ const ScheduledPipelines = () => {
                             </div>
                         ))}
                     </div>
-                )}
-            </div>
-        </div>
+                )
+                }
+            </div >
+        </div >
     );
 };
 

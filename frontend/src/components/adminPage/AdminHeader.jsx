@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaPlay, FaSpinner } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
-const AdminHeader = ({ groupId, setGroupId, maxScrolls, setMaxScrolls, timeInterval, setTimeInterval, handleRunPipeline, isRunning }) => {
+const AdminHeader = ({ groupId, setGroupId, timeInterval, setTimeInterval, handleRunPipeline, isRunning }) => {
     const [pastGroups, setPastGroups] = useState([]);
     const [showDropdown, setShowDropdown] = useState(false);
     const [activeMode, setActiveMode] = useState(null); // 'auto', 'manual', or null
@@ -101,17 +101,6 @@ const AdminHeader = ({ groupId, setGroupId, maxScrolls, setMaxScrolls, timeInter
                                 </div>
                             </div>
                         )}
-                    </div>
-
-                    <div className="flex flex-col space-y-1 w-full sm:w-auto">
-                        <label className="text-[10px] font-bold text-[#134e4a] uppercase tracking-widest">Max Scrolls</label>
-                        <input
-                            type="number"
-                            placeholder="Count"
-                            value={maxScrolls}
-                            onChange={(e) => setMaxScrolls(e.target.value)}
-                            className="theme-input rounded-xl px-4 py-2.5 text-sm font-medium w-full sm:w-32 border border-gray-200 focus:border-[#107884] transition-colors outline-none text-[#134e4a]"
-                        />
                     </div>
 
                     {activeMode === 'auto' && (

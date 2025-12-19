@@ -72,17 +72,15 @@ async def run_script(script_name: str, env_vars: dict) -> AsyncGenerator[str, No
         yield f"[EXCEPTION] Failed to run {script_name}: {str(e)}\n"
         yield f"[DEBUG] Traceback: {traceback.format_exc()}\n"
 
-async def pipeline_generator(group_id: str, max_scrolls: int) -> AsyncGenerator[str, None]:
+async def pipeline_generator(group_id: str) -> AsyncGenerator[str, None]:
     """
     Generator that runs the pipeline steps sequentially and streams output.
     """
     env = os.environ.copy()
     env["FB_GROUP_ID"] = group_id
-    env["MAX_SCROLLS"] = str(max_scrolls)
 
     yield "--- Starting Pipeline ---\n"
-    yield f"Target Group ID: {group_id}\n"
-    yield f"Max Scrolls: {max_scrolls}\n\n"
+    yield f"Target Group ID: {group_id}\n\n"
 
     # Step 1: Scraping
     yield ">>> Step 1: Scraping Posts (postsExtraction.py)...\n"

@@ -72,7 +72,7 @@ async def startup_event():
 @app.post("/api/run-pipeline")
 async def run_pipeline(request: PipelineRequest):
     return StreamingResponse(
-        pipeline_generator(request.groupID, request.maxScrolls),
+        pipeline_generator(request.groupID),
         media_type="text/plain"
     )
 
