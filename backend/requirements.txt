@@ -8,7 +8,7 @@ pydantic
 fastapi
 uvicorn
 python-multipart
-
+apify-client
 
 resend
 grpcio==1.62.2

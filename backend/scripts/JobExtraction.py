@@ -133,9 +133,9 @@ def main():
             print("Waiting 5 seconds to respect API rate limit...")
             time.sleep(1)
             
-        raw_text = job.get('raw_text', '')
-        post_time = job.get('post_time', '')
-        post_link = job.get('post_link', '')
+        raw_text = job.get('post_text', '')
+        post_time = job.get('timestamp', '')
+        post_link = job.get('post_url', '')
         print(f"[DEBUG] Processing job {i+1}/{len(jobs)}")
         # print(raw_text)
 
