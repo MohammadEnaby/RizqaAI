@@ -11,9 +11,17 @@ const AdminHeader = ({ groupId, setGroupId, timeInterval, setTimeInterval, handl
         const fetchPastGroups = async () => {
             try {
                 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-                const response = await fetch(`${apiUrl}/api/last-seen-groups`);
+                const response = await fetch(`${apiUrl}/api/platform-groups`);
                 const data = await response.json();
-                if (data.groups) {
+                if (Array.isArray(data)) {
+                    // Map groupID to id for compatibility
+                    const mappedGroups = data.map(g => ({
+                        ...g,
+                        id: g.groupID || g.id
+                    }));
+                    setPastGroups(mappedGroups);
+                } else if (data.groups) {
+                    // Fallback for old structure if ever needed
                     setPastGroups(data.groups);
                 }
             } catch (error) {
