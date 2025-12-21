@@ -38,7 +38,9 @@ const Datasources = () => {
         groupID: '',
         name: '',
         platformType: 'Facebook Group',
-        lastPostId: ''
+        groupID: '',
+        name: '',
+        platformType: 'Facebook Group'
     });
 
     // Define apiUrl helper or variable
@@ -78,7 +80,8 @@ const Datasources = () => {
             if (response.ok) {
                 fetchGroups();
                 setIsAddModalOpen(false);
-                setFormData({ groupID: '', name: '', platformType: 'Facebook Group', lastPostId: '' });
+                setIsAddModalOpen(false);
+                setFormData({ groupID: '', name: '', platformType: 'Facebook Group' });
             } else {
                 alert("Failed to create group. ID might already exist.");
             }
@@ -93,7 +96,7 @@ const Datasources = () => {
             groupID: group.groupID,
             name: group.name,
             platformType: group.platformType || 'Facebook Group',
-            lastPostId: group.lastPostId || ''
+            platformType: group.platformType || 'Facebook Group'
         });
         setIsEditModalOpen(true);
     };
@@ -107,7 +110,7 @@ const Datasources = () => {
                 body: JSON.stringify({
                     name: formData.name,
                     platformType: formData.platformType,
-                    lastPostId: formData.lastPostId
+                    platformType: formData.platformType
                 })
             });
             if (response.ok) {
@@ -190,7 +193,7 @@ const Datasources = () => {
                                     <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Group Name</th>
                                     <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Platform</th>
                                     <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Group ID</th>
-                                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Last Post ID</th>
+
                                     <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Actions</th>
                                 </tr>
                             </thead>
@@ -210,7 +213,6 @@ const Datasources = () => {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 font-mono text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded w-fit">{group.groupID}</td>
-                                            <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{group.lastPostId || "-"}</td>
                                             <td className="px-6 py-4 text-right">
                                                 <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                                     <button onClick={() => handleEditClick(group)} className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors">
@@ -274,10 +276,7 @@ const Datasources = () => {
                                 <option>Website</option>
                             </select>
                         </div>
-                        <div>
-                            <label className="block text-sm font-bold text-gray-600 mb-1">Last Post ID (Manual Override)</label>
-                            <input name="lastPostId" value={formData.lastPostId} onChange={handleInputChange} className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-transparent focus:bg-white focus:border-green-500/30 focus:ring-4 focus:ring-green-500/10 transition-all outline-none text-sm font-medium font-mono" />
-                        </div>
+
                         <div className="pt-4 flex gap-3">
                             <button type="button" onClick={() => setIsEditModalOpen(false)} className="flex-1 px-4 py-3 rounded-xl font-bold text-gray-500 hover:bg-gray-100 transition-colors">Cancel</button>
                             <button type="submit" className="flex-1 px-4 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-green-600 to-teal-600 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">Save Changes</button>
@@ -286,7 +285,7 @@ const Datasources = () => {
                 </Modal>
 
             </div>
-        </div>
+        </div >
     );
 };
 

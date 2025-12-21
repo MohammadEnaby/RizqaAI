@@ -31,22 +31,6 @@ except ImportError:
     print("[!] Warning: Could not import core.reporting. Email alerts will fail.")
     send_alert_email = None
 
-def load_seen_posts(group_id: str):
-    """Load the last seen post ID for the given group from Firestore (platformGroups collection)."""
-    if not db:
-        print("[!] DB not initialized, cannot load seen posts.")
-        return None
-        
-    try:
-        doc_ref = db.collection("platformGroups").document(str(group_id))
-        doc = doc_ref.get()
-        if doc.exists:
-            return doc.to_dict().get("lastPostId")
-        return None
-    except Exception as e:
-        print(f"[!] Error loading seen posts from DB: {e}")
-        return None
-
 def get_group_api_token(group_id: str):
     """
     Fetches the 'APIFI_API_TOKEN' (or 'APIFY_API_TOKEN') from the group's Firestore document.
@@ -69,50 +53,6 @@ def get_group_api_token(group_id: str):
         print(f"[!] Error fetching API token from DB: {e}")
         return None
 
-def save_last_seen_post(group_id: str, post_id: str):
-    """Persist the newest post ID for the group to Firestore (platformGroups collection)."""
-    if not post_id:
-        return
-    if not db:
-        print("[!] DB not initialized, cannot save seen posts.")
-        return
-    
-    try:
-        doc_ref = db.collection("platformGroups").document(str(group_id))
-        doc_ref.set({
-            "lastPostId": str(post_id),
-            "updatedAt": firestore.SERVER_TIMESTAMP
-        }, merge=True)
-        print(f"[+] Updated last seen post for {group_id} in DB.")
-    except Exception as e:
-        print(f"[!] Error saving seen post to DB: {e}")
-
-
-def extract_post_id_from_url(post_url: str) -> str:
-    """
-    Attempts to extract a numeric ID from the post URL.
-    This is a helper to maintain compatibility with the 'last seen' logic.
-    """
-    if not post_url:
-        return ""
-    # Simple extraction: look for consecutive digits
-    import re
-    # Match /posts/12345/ or ?id=12345 or similar
-    # Facebook URLs vary, commonly: /groups/ID/posts/POST_ID/ or /permalink/POST_ID/
-    
-    # Try /posts/(\d+)
-    match = re.search(r"/posts/(\d+)", post_url)
-    if match:
-        return match.group(1)
-        
-    # Try /permalink/(\d+)
-    match = re.search(r"/permalink/(\d+)", post_url)
-    if match:
-        return match.group(1)
-        
-    return ""
-
-
 def scrape_group_posts(group_url: str, api_token: str):
     """
     Uses Apify to scrape posts from the Facebook Group URL.
@@ -127,6 +67,7 @@ def scrape_group_posts(group_url: str, api_token: str):
     # apify/facebook-groups-scraper options
     run_input = {
         "startUrls": [{"url": group_url}],
+        "maxItems": 10,
         "resultsLimit": 10,
         "viewPort": {"width": 1920, "height": 1080},
     }
@@ -186,7 +127,7 @@ def scrape_group_posts(group_url: str, api_token: str):
     except Exception as e:
         print(f"[!] Error processing dataset items: {e}")
 
-    return clean_posts
+    return clean_posts[:10]
 
 def save_data(posts):
     """Saves the scraped posts to the JSON file."""
@@ -216,51 +157,22 @@ def main():
     try:
         # 1. Get API Token from Firestore or Env
         db_token = get_group_api_token(GROUP_ID)
-        # Fallback to Env if not in DB, as a safety net, or raise error if user strictly wants DB only.
-        # User said "scheduled pipelines will work according to this new field", but didn't explicitly forbid env fallback.
-        # I'll keep env fallback for local testing ease unless strictly empty.
+        # Fallback to Env if not in DB
         api_token = db_token or os.getenv("APIFY_API_TOKEN") 
         
         if not api_token:
             print("[!] No API Token found in Firestore (platformGroups) or Environment (APIFY_API_TOKEN).")
-            # We exit nicely or raise error?
             sys.exit(1)
             
-        # 2. Load the last seen post ID
-        last_seen_id = load_seen_posts(GROUP_ID)
-        if last_seen_id:
-            print(f"[*] Last seen Post ID from DB: {last_seen_id}")
-        
-        # 3. Scrape
+        # 2. Scrape
         posts = scrape_group_posts(GROUP_URL, api_token)
         
         if not posts:
             print("[*] No posts found by Apify.")
             return
 
-        # 4. Filter / Deduplicate
-        new_posts_to_save = []
-        newest_post_id = None
-        
-        for p in posts:
-            p_id = extract_post_id_from_url(p["post_url"])
-            
-            if last_seen_id and p_id == last_seen_id:
-                print(f"[INFO] Encountered last seen post {p_id}. Skipping older/duplicate.")
-                continue
-                
-            new_posts_to_save.append(p)
-            
-            if not newest_post_id and p_id:
-                newest_post_id = p_id
-
-        if new_posts_to_save:
-            save_data(new_posts_to_save)
-            
-            if newest_post_id:
-                save_last_seen_post(GROUP_ID, newest_post_id)
-        else:
-            print("[*] All scraped posts were already seen.")
+        # 3. Save
+        save_data(posts)
 
     except ValueError as ve:
         print(f"[!] Configuration Error: {ve}")

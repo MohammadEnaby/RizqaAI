@@ -48,6 +48,25 @@ class JobOffer(BaseModel):
     is_job_offer: bool
     post_link: Optional[str]
 
+def extract_post_id_from_url(post_url: str) -> str:
+    """
+    Attempts to extract a numeric ID from the post URL.
+    """
+    if not post_url:
+        return ""
+    import re
+    # Try /posts/(\d+)
+    match = re.search(r"/posts/(\d+)", post_url)
+    if match:
+        return match.group(1)
+        
+    # Try /permalink/(\d+)
+    match = re.search(r"/permalink/(\d+)", post_url)
+    if match:
+        return match.group(1)
+        
+    return ""
+
 def extract_job_data(raw_text: str) -> dict:
     """
     Takes unstructured text and uses Google Gemini to extract structured JSON data.
@@ -136,6 +155,7 @@ def main():
         raw_text = job.get('post_text', '')
         post_time = job.get('timestamp', '')
         post_link = job.get('post_url', '')
+        post_id = extract_post_id_from_url(post_link)
         print(f"[DEBUG] Processing job {i+1}/{len(jobs)}")
         # print(raw_text)
 
@@ -161,6 +181,9 @@ def main():
 
                 # Inject post_link
                 item['post_link'] = post_link
+
+                if post_id:
+                    item['id'] = post_id
                 
                 # Inject groupID (from source_id)
                 source_id = job.get('source_id')

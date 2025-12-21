@@ -51,7 +51,6 @@ class PlatformGroupBase(BaseModel):
     groupID: str
     name: str
     platformType: str
-    lastPostId: Optional[str] = None
     metadata: Optional[Dict[str, Any]] = {}
 
 class PlatformGroupCreate(PlatformGroupBase):
@@ -60,7 +59,6 @@ class PlatformGroupCreate(PlatformGroupBase):
 class PlatformGroupUpdate(BaseModel):
     name: Optional[str] = None
     platformType: Optional[str] = None
-    lastPostId: Optional[str] = None
     metadata: Optional[Dict[str, Any]] = None
 
 @app.on_event("startup")
@@ -85,26 +83,6 @@ try:
     from core.firebase import db
 except ImportError:
     db = None
-
-@app.get("/api/last-seen-groups")
-async def get_last_seen_groups():
-    """
-    Legacy endpoint updated to fetch from platformGroups.
-    Returns simplified list for Dashboard/Grid view.
-    """
-    if not db:
-        print("[!] DB not initialized.")
-        return {"groups": []}
-        
-    try:
-        # Fetch all documents from 'platformGroups' collection
-        docs = db.collection("platformGroups").stream()
-        # Return list of objects {id, name}
-        groups = [{"id": doc.id, "name": doc.to_dict().get("name", doc.id)} for doc in docs]
-        return {"groups": groups}
-    except Exception as e:
-        print(f"Error reading platform groups from DB: {e}")
-        return {"groups": []}
 
 # --- CRUD Endpoints for Platform Groups ---
 
