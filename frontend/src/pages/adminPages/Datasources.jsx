@@ -38,9 +38,7 @@ const Datasources = () => {
         groupID: '',
         name: '',
         platformType: 'Facebook Group',
-        groupID: '',
-        name: '',
-        platformType: 'Facebook Group'
+        APIFY_API_TOKEN: ''
     });
 
     // Define apiUrl helper or variable
@@ -81,7 +79,7 @@ const Datasources = () => {
                 fetchGroups();
                 setIsAddModalOpen(false);
                 setIsAddModalOpen(false);
-                setFormData({ groupID: '', name: '', platformType: 'Facebook Group' });
+                setFormData({ groupID: '', name: '', platformType: 'Facebook Group', APIFY_API_TOKEN: '' });
             } else {
                 alert("Failed to create group. ID might already exist.");
             }
@@ -95,8 +93,9 @@ const Datasources = () => {
         setFormData({
             groupID: group.groupID,
             name: group.name,
+            name: group.name,
             platformType: group.platformType || 'Facebook Group',
-            platformType: group.platformType || 'Facebook Group'
+            APIFY_API_TOKEN: group.APIFY_API_TOKEN || ''
         });
         setIsEditModalOpen(true);
     };
@@ -109,8 +108,9 @@ const Datasources = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     name: formData.name,
+                    name: formData.name,
                     platformType: formData.platformType,
-                    platformType: formData.platformType
+                    APIFY_API_TOKEN: formData.APIFY_API_TOKEN
                 })
             });
             if (response.ok) {
@@ -250,6 +250,10 @@ const Datasources = () => {
                                 <option>Website</option>
                             </select>
                         </div>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-600 mb-1">Apify API Token</label>
+                            <input name="APIFY_API_TOKEN" value={formData.APIFY_API_TOKEN} onChange={handleInputChange} className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-transparent focus:bg-white focus:border-green-500/30 focus:ring-4 focus:ring-green-500/10 transition-all outline-none text-sm font-medium" placeholder="Optional: Override global token" />
+                        </div>
                         <div className="pt-4 flex gap-3">
                             <button type="button" onClick={() => setIsAddModalOpen(false)} className="flex-1 px-4 py-3 rounded-xl font-bold text-gray-500 hover:bg-gray-100 transition-colors">Cancel</button>
                             <button type="submit" className="flex-1 px-4 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-[#0f172a] to-[#334155] shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">Create Source</button>
@@ -275,6 +279,10 @@ const Datasources = () => {
                                 <option>LinkedIn</option>
                                 <option>Website</option>
                             </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-600 mb-1">Apify API Token</label>
+                            <input name="APIFY_API_TOKEN" value={formData.APIFY_API_TOKEN} onChange={handleInputChange} className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-transparent focus:bg-white focus:border-green-500/30 focus:ring-4 focus:ring-green-500/10 transition-all outline-none text-sm font-medium" placeholder="Optional: Override global token" />
                         </div>
 
                         <div className="pt-4 flex gap-3">

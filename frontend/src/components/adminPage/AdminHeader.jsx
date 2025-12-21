@@ -97,7 +97,8 @@ const AdminHeader = ({ groupId, setGroupId, timeInterval, setTimeInterval, handl
                                         <div
                                             key={group.id}
                                             className="px-3 py-2 hover:bg-[#dcfce7] rounded-lg cursor-pointer text-sm text-[#134e4a] font-medium transition-colors border-b border-gray-50 last:border-0"
-                                            onClick={() => {
+                                            onMouseDown={(e) => {
+                                                e.preventDefault(); // Prevent input blur
                                                 setGroupId(group.id);
                                                 setShowDropdown(false);
                                             }}

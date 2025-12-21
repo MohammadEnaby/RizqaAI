@@ -51,6 +51,7 @@ class PlatformGroupBase(BaseModel):
     groupID: str
     name: str
     platformType: str
+    APIFY_API_TOKEN: Optional[str] = None
     metadata: Optional[Dict[str, Any]] = {}
 
 class PlatformGroupCreate(PlatformGroupBase):
@@ -59,6 +60,7 @@ class PlatformGroupCreate(PlatformGroupBase):
 class PlatformGroupUpdate(BaseModel):
     name: Optional[str] = None
     platformType: Optional[str] = None
+    APIFY_API_TOKEN: Optional[str] = None
     metadata: Optional[Dict[str, Any]] = None
 
 @app.on_event("startup")
