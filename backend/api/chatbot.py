@@ -143,7 +143,13 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
     noise_words = {"job", "jobs", "work", "working", "looking", "seek", "seeking", "position", "role", "career"}
     keyword_list = [k.lower() for k in keyword_list if k and k.lower() not in noise_words]
     
-    location = filters.get("location", "").lower()
+    raw_location = filters.get("location")
+    if isinstance(raw_location, list):
+        location = " ".join([str(l) for l in raw_location if l]).lower()
+    elif isinstance(raw_location, str):
+        location = raw_location.lower()
+    else:
+        location = ""
     
     for doc in docs:
         data = doc.to_dict()
