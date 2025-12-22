@@ -229,7 +229,7 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
     # Sort by score descending
     found_jobs.sort(key=lambda x: x["score"], reverse=True)
             
-    return found_jobs[:5] # Return top 5
+    return found_jobs  # Return all matching jobs
 
 # --- Endpoints ---
 
