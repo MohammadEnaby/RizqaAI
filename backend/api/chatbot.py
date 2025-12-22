@@ -89,7 +89,7 @@ def extract_search_filters(user_query: str) -> dict:
         return {"intent": "general"}
     
     try:
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-2.5-flash-preview-09-2025')
         prompt = f"""
         Analyze this job search query and extract structured filters.
         Output ONLY valid JSON.
@@ -390,7 +390,7 @@ async def chat_query(request: ChatMessage):
             print(f"DEBUG: Found {len(found_jobs)} jobs for query '{request.message}'")
 
         # 2. Generate AI Response with Context
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-2.5-flash-preview-09-2025')
         
         jobs_context = ""
         if found_jobs:
