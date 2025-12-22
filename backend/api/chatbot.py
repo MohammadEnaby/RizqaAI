@@ -97,7 +97,7 @@ def extract_search_filters(user_query: str) -> dict:
         Query: "{user_query}"
         
         Keys:
-        - intent: "search" if user mentions a job role, looking for work, or job related keywords. Default to "search" if unsure.
+        - intent: "search" if user mentions a job role, looking for work, or job related keywords. Default to "general" if it is just a greeting, a question not about jobs, or unclear.
         - keywords: List of strings. Include the exact term, plus SYNONYMS, RELATED ROLES, and TRANSLATIONS (Hebrew/Arabic). 
           Example: "Food" -> ["food", "waiter", "chef", "cook", "restaurant", "מלצר", "טבח", "מסעדה"]
         - location: city or region. Include Hebrew/Arabic names.
