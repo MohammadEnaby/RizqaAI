@@ -100,7 +100,9 @@ def extract_search_filters(user_query: str) -> dict:
         - intent: "search" if user mentions a job role, looking for work, or job related keywords. Default to "general" if it is just a greeting, a question not about jobs, or unclear.
         - keywords: List of strings. Include the exact term, plus SYNONYMS, RELATED ROLES, and TRANSLATIONS (Hebrew/Arabic). 
           Example: "Food" -> ["food", "waiter", "chef", "cook", "restaurant", "מלצר", "טבח", "מסעדה"]
-        - location: city or region. Include Hebrew/Arabic names.
+        - location: String or List. The main city/region. If a major city is mentioned, also include nearby cities in the same district.
+          Example: "Jerusalem" -> ["Jerusalem", "ירושלים", "القدس", "Mevaseret", "Abu Ghosh", "Ma'ale Adumim"]
+          Example: "Tel Aviv" -> ["Tel Aviv", "תל אביב", "Ramat Gan", "Givatayim", "Holon", "Bat Yam"]
         
         JSON:
         """
@@ -114,10 +116,7 @@ def extract_search_filters(user_query: str) -> dict:
             
         result = json.loads(text)
         
-        # Aggressive fallback: If keywords exist, force search intent
-        if result.get("keywords") or result.get("location"):
-             result["intent"] = "search"
-             
+        # Trust Gemini's intent detection
         return result
     except Exception as e:
         print(f"Filter extraction failed: {e}")
@@ -143,13 +142,13 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
     noise_words = {"job", "jobs", "work", "working", "looking", "seek", "seeking", "position", "role", "career"}
     keyword_list = [k.lower() for k in keyword_list if k and k.lower() not in noise_words]
     
+    # Handle location as string or list
     raw_location = filters.get("location")
+    location_list = []
     if isinstance(raw_location, list):
-        location = " ".join([str(l) for l in raw_location if l]).lower()
+        location_list = [str(l).lower() for l in raw_location if l]
     elif isinstance(raw_location, str):
-        location = raw_location.lower()
-    else:
-        location = ""
+        location_list = [raw_location.lower()]
     
     for doc in docs:
         data = doc.to_dict()
@@ -166,12 +165,14 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
                     match_score += 2
                     break # Matched one keyword, good enough for keyword score
         
-        if location:
-            # Flexible location match
+        if location_list:
+            # Flexible location match - check against all locations in the list
             doc_loc = data.get("location") or ""
             doc_loc = doc_loc.lower() if doc_loc else ""
-            if location in doc_loc or doc_loc in location:
-                match_score += 1
+            for loc in location_list:
+                if loc in doc_loc or doc_loc in loc:
+                    match_score += 1
+                    break  # One match is enough
             
         # Decision Logic:
         # 1. If we have keywords, we ideally want a keyword match.
@@ -186,18 +187,18 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
         # - Location Match: +1
         
         # 1. User provided Keywords AND Location
-        if keyword_list and location:
+        if keyword_list and location_list:
              # If neither matched, skip.
              if match_score == 0: continue
              # If at least one matched (score >= 1), we keep it. 
              # (Allows "Waiter in Holon" to show "Waiter in Jerusalem" [score 2] or "Job in Holon" [score 1])
 
         # 2. User provided ONLY Keywords (e.g. "Selling")
-        elif keyword_list and not location:
+        elif keyword_list and not location_list:
              if match_score == 0: continue
 
         # 3. User provided ONLY Location (e.g. "Holon")
-        elif location and not keyword_list:
+        elif location_list and not keyword_list:
              # Critical Fix: match_score must be > 0 (which means location matched, since k-list matches gave 0)
              if match_score == 0: continue
 
@@ -407,17 +408,25 @@ async def chat_query(request: ChatMessage):
         elif intent == "search":
              jobs_context = f"NO MATCHES FOUND. The user searched for: {analysis}. I checked the database but found nothing."
 
-        # Simplify System Prompt to prevent "Thinking out loud"
+        # System Prompt for natural, helpful responses
         system_prompt = f"""
         Result of database search:
         {jobs_context}
 
         User Query: "{request.message}"
 
-        Task: Answer the user.
-        - If jobs are listed above, show them to the user nicely.
-        - If NO jobs are listed, apologize and suggest they try a different keyword or location.
-        - Do NOT say "Okay I understand instructions". Just answer the user directly.
+        Task: Answer the user naturally and helpfully.
+        - If this is a GREETING (like "hi", "hello"), respond warmly and ask how you can help them find a job.
+        - If jobs are listed above, present them clearly with:
+          * Job title and company
+          * Location
+          * Salary (if available)
+          * A brief note about how to apply
+        - If NO jobs were found for a search, apologize and suggest:
+          * Trying different keywords
+          * Expanding the location
+          * Checking back later for new postings
+        - Be conversational and friendly. Respond in the same language as the user's query.
         """
         
         response = model.generate_content(system_prompt)
