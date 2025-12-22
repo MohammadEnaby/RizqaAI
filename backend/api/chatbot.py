@@ -168,7 +168,8 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
         
         if location:
             # Flexible location match
-            doc_loc = data.get("location", "").lower()
+            doc_loc = data.get("location") or ""
+            doc_loc = doc_loc.lower() if doc_loc else ""
             if location in doc_loc or doc_loc in location:
                 match_score += 1
             
