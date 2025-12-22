@@ -15,6 +15,7 @@ export default function ChatBot() {
     const [inputValue, setInputValue] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Mobile sidebar toggle
+    const [selectedJob, setSelectedJob] = useState(null); // For job details modal
     const messagesEndRef = useRef(null);
 
     // Initial greeting message
@@ -341,15 +342,12 @@ export default function ChatBot() {
                                                             </div>
                                                         </div>
                                                         {job.link && (
-                                                            <a
-                                                                href={job.link}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
+                                                            <button
+                                                                onClick={() => setSelectedJob(job)}
                                                                 className="shrink-0 px-3 py-2 bg-gradient-to-r from-green-500 to-teal-600 text-white text-xs font-semibold rounded-lg hover:from-green-600 hover:to-teal-700 transition-all shadow-sm hover:shadow-md"
-                                                                onClick={(e) => e.stopPropagation()}
                                                             >
-                                                                Apply →
-                                                            </a>
+                                                                View Details
+                                                            </button>
                                                         )}
                                                     </div>
                                                 </div>
@@ -426,6 +424,81 @@ export default function ChatBot() {
                     </div>
                 </div>
             </div>
+
+            {/* Job Details Modal */}
+            {selectedJob && (
+                <div
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                    onClick={() => setSelectedJob(null)}
+                >
+                    <div
+                        className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Modal Header */}
+                        <div className="sticky top-0 bg-gradient-to-r from-green-500 to-teal-600 text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
+                            <h2 className="text-xl font-bold">Job Details</h2>
+                            <button
+                                onClick={() => setSelectedJob(null)}
+                                className="text-2xl hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center transition-all"
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        {/* Modal Body */}
+                        <div className="p-6 space-y-6">
+                            {/* Job Title */}
+                            <div>
+                                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                                    {selectedJob.title}
+                                </h3>
+                            </div>
+
+                            {/* Job Details Grid */}
+                            <div className="space-y-4">
+                                <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">
+                                    <span className="text-2xl">🏢</span>
+                                    <div>
+                                        <div className="text-xs text-gray-500 uppercase font-semibold mb-1">Company</div>
+                                        <div className="text-base font-medium text-gray-900">{selectedJob.company}</div>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">
+                                    <span className="text-2xl">📍</span>
+                                    <div>
+                                        <div className="text-xs text-gray-500 uppercase font-semibold mb-1">Location</div>
+                                        <div className="text-base font-medium text-gray-900">{selectedJob.location}</div>
+                                    </div>
+                                </div>
+
+                                {selectedJob.salary && selectedJob.salary !== 'Not specified' && (
+                                    <div className="flex items-start gap-3 p-4 bg-green-50 rounded-xl border border-green-200">
+                                        <span className="text-2xl">💰</span>
+                                        <div>
+                                            <div className="text-xs text-green-700 uppercase font-semibold mb-1">Salary</div>
+                                            <div className="text-base font-bold text-green-600">{selectedJob.salary}</div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Apply Button */}
+                            <div className="pt-4 border-t border-gray-200">
+                                <a
+                                    href={selectedJob.link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="block w-full text-center px-6 py-4 bg-gradient-to-r from-green-500 to-teal-600 text-white font-bold rounded-xl hover:from-green-600 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
+                                >
+                                    Apply Now →
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

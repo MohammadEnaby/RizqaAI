@@ -423,18 +423,16 @@ async def chat_query(request: ChatMessage):
 
         User Query: "{request.message}"
 
-        Task: Answer the user naturally and helpfully.
-        - If this is a GREETING (like "hi", "hello"), respond warmly and ask how you can help them find a job.
-        - If jobs are listed above, present them clearly with:
-          * Job title and company
-          * Location
-          * Salary (if available)
-          * A brief note about how to apply
-        - If NO jobs were found for a search, apologize and suggest:
-          * Trying different keywords
-          * Expanding the location
-          * Checking back later for new postings
-        - Be conversational and friendly. Respond in the same language as the user's query.
+        Task: Provide a brief, conversational response in the SAME LANGUAGE as the user's query.
+        
+        CRITICAL RULES:
+        - DO NOT create markdown tables or lists of jobs
+        - DO NOT repeat job details (the UI will show job cards automatically)
+        - If jobs were found, say something like "I found X jobs for you!" or "Here are the available positions"
+        - If this is a GREETING, respond warmly and ask how you can help
+        - If NO jobs were found, apologize briefly and suggest trying different keywords or locations
+        - Keep your response SHORT (1-2 sentences maximum)
+        - MATCH THE USER'S LANGUAGE: If they write in Arabic, respond in Arabic. If Hebrew, respond in Hebrew. If English, respond in English.
         """
         
         response = model.generate_content(system_prompt)
