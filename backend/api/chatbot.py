@@ -45,8 +45,8 @@ class ChatMessage(BaseModel):
 class JobResult(BaseModel):
     id: Optional[str] = None
     title: str
-    company: str
-    location: str
+    company: Optional[str] = "Unknown"
+    location: Optional[str] = "Not specified"
     salary: Optional[str] = None
     link: Optional[str] = None
 
@@ -204,8 +204,8 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
             "score": match_score,
             "id": doc.id,
             "title": data.get("job_title"),
-            "company": data.get("company", "Unknown"), 
-            "location": data.get("location", "Not specified"),
+            "company": data.get("company") or "Unknown", 
+            "location": data.get("location") or "Not specified",
             "salary": data.get("wage_per_hour", "Not specified"),
             "link": data.get("post_link") or data.get("contact_info")
         })
