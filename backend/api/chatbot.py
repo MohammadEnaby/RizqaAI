@@ -116,6 +116,10 @@ def extract_search_filters(user_query: str) -> dict:
             
         result = json.loads(text)
         
+        # Debug: Print extracted filters
+        print(f"DEBUG [extract_search_filters]: Query='{user_query}'")
+        print(f"DEBUG [extract_search_filters]: Extracted={result}")
+        
         # Trust Gemini's intent detection
         return result
     except Exception as e:
@@ -149,6 +153,10 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
         location_list = [str(l).lower() for l in raw_location if l]
     elif isinstance(raw_location, str):
         location_list = [raw_location.lower()]
+    
+    # Debug: Print search parameters
+    print(f"DEBUG [search_jobs_in_db]: keyword_list={keyword_list}")
+    print(f"DEBUG [search_jobs_in_db]: location_list={location_list}")
     
     for doc in docs:
         data = doc.to_dict()

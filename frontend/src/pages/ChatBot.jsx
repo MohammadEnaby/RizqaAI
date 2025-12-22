@@ -301,19 +301,57 @@ export default function ChatBot() {
                                 className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in-up`}
                             >
                                 <div
-                                    className={`max-w-[85%] sm:max-w-[70%] rounded-2xl px-4 py-3 sm:px-5 sm:py-4 ${message.sender === 'user'
-                                        ? 'bg-gradient-to-r from-green-500 to-teal-600 text-white shadow-lg'
-                                        : 'glass-panel border-2 border-teal-400/20 text-gray-800'
+                                    className={`max-w-[85%] sm:max-w-[70%] rounded-2xl px-4 py-3 sm:px-5 sm:py-4 shadow-md ${message.sender === 'user'
+                                        ? 'bg-gradient-to-r from-green-500 to-teal-600 text-white'
+                                        : 'bg-white border border-gray-200 text-gray-800'
                                         }`}
                                 >
                                     <p className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap">{message.text}</p>
 
                                     {message.jobs && message.jobs.length > 0 && (
-                                        <div className="mt-3 space-y-2">
+                                        <div className="mt-4 space-y-3">
+                                            <div className="text-xs font-semibold text-teal-700 uppercase tracking-wide mb-2">
+                                                📋 {message.jobs.length} Job{message.jobs.length > 1 ? 's' : ''} Found
+                                            </div>
                                             {message.jobs.map((job, idx) => (
-                                                <div key={idx} className="bg-white/10 rounded-lg p-3 text-sm">
-                                                    <div className="font-semibold">{job.title}</div>
-                                                    <div className="text-xs opacity-90">{job.company} • {job.location}</div>
+                                                <div
+                                                    key={idx}
+                                                    className="bg-white rounded-xl p-4 shadow-md border border-gray-200 hover:shadow-lg hover:border-teal-300 transition-all cursor-pointer group"
+                                                >
+                                                    <div className="flex items-start justify-between gap-3">
+                                                        <div className="flex-1 min-w-0">
+                                                            <h4 className="font-bold text-gray-900 text-sm sm:text-base mb-1 group-hover:text-teal-600 transition-colors">
+                                                                {job.title}
+                                                            </h4>
+                                                            <div className="space-y-1 text-xs sm:text-sm text-gray-600">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-gray-400">🏢</span>
+                                                                    <span className="font-medium">{job.company}</span>
+                                                                </div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-gray-400">📍</span>
+                                                                    <span>{job.location}</span>
+                                                                </div>
+                                                                {job.salary && job.salary !== 'Not specified' && (
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-gray-400">💰</span>
+                                                                        <span className="font-semibold text-green-600">{job.salary}</span>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        {job.link && (
+                                                            <a
+                                                                href={job.link}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="shrink-0 px-3 py-2 bg-gradient-to-r from-green-500 to-teal-600 text-white text-xs font-semibold rounded-lg hover:from-green-600 hover:to-teal-700 transition-all shadow-sm hover:shadow-md"
+                                                                onClick={(e) => e.stopPropagation()}
+                                                            >
+                                                                Apply →
+                                                            </a>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             ))}
                                         </div>
@@ -375,12 +413,12 @@ export default function ChatBot() {
                             onChange={(e) => setInputValue(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                             placeholder="Ask me anything about jobs..."
-                            className="flex-1 px-4 py-3 bg-white border-2 border-gray-300 rounded-xl text-sm sm:text-base focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100 transition-all"
+                            className="flex-1 px-4 sm:px-5 py-3 sm:py-3.5 bg-white border-2 border-gray-300 rounded-xl text-sm sm:text-base focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all shadow-sm"
                         />
                         <button
                             onClick={handleSend}
                             disabled={!inputValue.trim() || isTyping}
-                            className="px-5 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 transition-all transform hover:scale-105 active:scale-95 shadow-lg disabled:opacity-50"
+                            className="px-4 sm:px-6 py-3 sm:py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 transition-all transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         >
                             <span className="hidden sm:inline">Send</span>
                             <span className="sm:hidden text-xl">📤</span>
