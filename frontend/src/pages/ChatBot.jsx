@@ -15,6 +15,7 @@ export default function ChatBot() {
     const [inputValue, setInputValue] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Mobile sidebar toggle
+    const [selectedJob, setSelectedJob] = useState(null); // For job details modal
     const messagesEndRef = useRef(null);
 
     // Initial greeting message
@@ -301,19 +302,54 @@ export default function ChatBot() {
                                 className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in-up`}
                             >
                                 <div
-                                    className={`max-w-[85%] sm:max-w-[70%] rounded-2xl px-4 py-3 sm:px-5 sm:py-4 ${message.sender === 'user'
-                                        ? 'bg-gradient-to-r from-green-500 to-teal-600 text-white shadow-lg'
-                                        : 'glass-panel border-2 border-teal-400/20 text-gray-800'
+                                    className={`max-w-[85%] sm:max-w-[70%] rounded-2xl px-4 py-3 sm:px-5 sm:py-4 shadow-md ${message.sender === 'user'
+                                        ? 'bg-gradient-to-r from-green-500 to-teal-600 text-white'
+                                        : 'bg-white border border-gray-200 text-gray-800'
                                         }`}
                                 >
                                     <p className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap">{message.text}</p>
 
                                     {message.jobs && message.jobs.length > 0 && (
-                                        <div className="mt-3 space-y-2">
+                                        <div className="mt-4 space-y-3">
+                                            <div className="text-xs font-semibold text-teal-700 uppercase tracking-wide mb-2">
+                                                📋 {message.jobs.length} Job{message.jobs.length > 1 ? 's' : ''} Found
+                                            </div>
                                             {message.jobs.map((job, idx) => (
-                                                <div key={idx} className="bg-white/10 rounded-lg p-3 text-sm">
-                                                    <div className="font-semibold">{job.title}</div>
-                                                    <div className="text-xs opacity-90">{job.company} • {job.location}</div>
+                                                <div
+                                                    key={idx}
+                                                    className="bg-white rounded-xl p-4 shadow-md border border-gray-200 hover:shadow-lg hover:border-teal-300 transition-all cursor-pointer group"
+                                                >
+                                                    <div className="flex items-start justify-between gap-3">
+                                                        <div className="flex-1 min-w-0">
+                                                            <h4 className="font-bold text-gray-900 text-sm sm:text-base mb-1 group-hover:text-teal-600 transition-colors">
+                                                                {job.title}
+                                                            </h4>
+                                                            <div className="space-y-1 text-xs sm:text-sm text-gray-600">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-gray-400">🏢</span>
+                                                                    <span className="font-medium">{job.company}</span>
+                                                                </div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-gray-400">📍</span>
+                                                                    <span>{job.location}</span>
+                                                                </div>
+                                                                {job.salary && job.salary !== 'Not specified' && (
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-gray-400">💰</span>
+                                                                        <span className="font-semibold text-green-600">{job.salary}</span>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        {job.link && (
+                                                            <button
+                                                                onClick={() => setSelectedJob(job)}
+                                                                className="shrink-0 px-3 py-2 bg-gradient-to-r from-green-500 to-teal-600 text-white text-xs font-semibold rounded-lg hover:from-green-600 hover:to-teal-700 transition-all shadow-sm hover:shadow-md"
+                                                            >
+                                                                View Details
+                                                            </button>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             ))}
                                         </div>
@@ -375,12 +411,12 @@ export default function ChatBot() {
                             onChange={(e) => setInputValue(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                             placeholder="Ask me anything about jobs..."
-                            className="flex-1 px-4 py-3 bg-white border-2 border-gray-300 rounded-xl text-sm sm:text-base focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100 transition-all"
+                            className="flex-1 px-4 sm:px-5 py-3 sm:py-3.5 bg-white border-2 border-gray-300 rounded-xl text-sm sm:text-base focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all shadow-sm"
                         />
                         <button
                             onClick={handleSend}
                             disabled={!inputValue.trim() || isTyping}
-                            className="px-5 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 transition-all transform hover:scale-105 active:scale-95 shadow-lg disabled:opacity-50"
+                            className="px-4 sm:px-6 py-3 sm:py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 transition-all transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         >
                             <span className="hidden sm:inline">Send</span>
                             <span className="sm:hidden text-xl">📤</span>
@@ -388,6 +424,81 @@ export default function ChatBot() {
                     </div>
                 </div>
             </div>
+
+            {/* Job Details Modal */}
+            {selectedJob && (
+                <div
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                    onClick={() => setSelectedJob(null)}
+                >
+                    <div
+                        className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Modal Header */}
+                        <div className="sticky top-0 bg-gradient-to-r from-green-500 to-teal-600 text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
+                            <h2 className="text-xl font-bold">Job Details</h2>
+                            <button
+                                onClick={() => setSelectedJob(null)}
+                                className="text-2xl hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center transition-all"
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        {/* Modal Body */}
+                        <div className="p-6 space-y-6">
+                            {/* Job Title */}
+                            <div>
+                                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                                    {selectedJob.title}
+                                </h3>
+                            </div>
+
+                            {/* Job Details Grid */}
+                            <div className="space-y-4">
+                                <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">
+                                    <span className="text-2xl">🏢</span>
+                                    <div>
+                                        <div className="text-xs text-gray-500 uppercase font-semibold mb-1">Company</div>
+                                        <div className="text-base font-medium text-gray-900">{selectedJob.company}</div>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">
+                                    <span className="text-2xl">📍</span>
+                                    <div>
+                                        <div className="text-xs text-gray-500 uppercase font-semibold mb-1">Location</div>
+                                        <div className="text-base font-medium text-gray-900">{selectedJob.location}</div>
+                                    </div>
+                                </div>
+
+                                {selectedJob.salary && selectedJob.salary !== 'Not specified' && (
+                                    <div className="flex items-start gap-3 p-4 bg-green-50 rounded-xl border border-green-200">
+                                        <span className="text-2xl">💰</span>
+                                        <div>
+                                            <div className="text-xs text-green-700 uppercase font-semibold mb-1">Salary</div>
+                                            <div className="text-base font-bold text-green-600">{selectedJob.salary}</div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Apply Button */}
+                            <div className="pt-4 border-t border-gray-200">
+                                <a
+                                    href={selectedJob.link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="block w-full text-center px-6 py-4 bg-gradient-to-r from-green-500 to-teal-600 text-white font-bold rounded-xl hover:from-green-600 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
+                                >
+                                    Apply Now →
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

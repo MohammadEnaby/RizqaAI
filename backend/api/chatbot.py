@@ -45,8 +45,8 @@ class ChatMessage(BaseModel):
 class JobResult(BaseModel):
     id: Optional[str] = None
     title: str
-    company: str
-    location: str
+    company: Optional[str] = "Unknown"
+    location: Optional[str] = "Not specified"
     salary: Optional[str] = None
     link: Optional[str] = None
 
@@ -89,7 +89,7 @@ def extract_search_filters(user_query: str) -> dict:
         return {"intent": "general"}
     
     try:
-        model = genai.GenerativeModel('gemini-1.5-pro')
+        model = genai.GenerativeModel('gemini-2.5-flash-preview-09-2025')
         prompt = f"""
         Analyze this job search query and extract structured filters.
         Output ONLY valid JSON.
@@ -97,10 +97,12 @@ def extract_search_filters(user_query: str) -> dict:
         Query: "{user_query}"
         
         Keys:
-        - intent: "search" if user mentions a job role, looking for work, or job related keywords. Default to "search" if unsure.
+        - intent: "search" if user mentions a job role, looking for work, or job related keywords. Default to "general" if it is just a greeting, a question not about jobs, or unclear.
         - keywords: List of strings. Include the exact term, plus SYNONYMS, RELATED ROLES, and TRANSLATIONS (Hebrew/Arabic). 
           Example: "Food" -> ["food", "waiter", "chef", "cook", "restaurant", "מלצר", "טבח", "מסעדה"]
-        - location: city or region. Include Hebrew/Arabic names.
+        - location: String or List. The main city/region. If a major city is mentioned, also include nearby cities in the same district.
+          Example: "Jerusalem" -> ["Jerusalem", "ירושלים", "القدس", "Mevaseret", "Abu Ghosh", "Ma'ale Adumim"]
+          Example: "Tel Aviv" -> ["Tel Aviv", "תל אביב", "Ramat Gan", "Givatayim", "Holon", "Bat Yam"]
         
         JSON:
         """
@@ -114,10 +116,11 @@ def extract_search_filters(user_query: str) -> dict:
             
         result = json.loads(text)
         
-        # Aggressive fallback: If keywords exist, force search intent
-        if result.get("keywords") or result.get("location"):
-             result["intent"] = "search"
-             
+        # Debug: Print extracted filters
+        print(f"DEBUG [extract_search_filters]: Query='{user_query}'")
+        print(f"DEBUG [extract_search_filters]: Extracted={result}")
+        
+        # Trust Gemini's intent detection
         return result
     except Exception as e:
         print(f"Filter extraction failed: {e}")
@@ -143,7 +146,17 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
     noise_words = {"job", "jobs", "work", "working", "looking", "seek", "seeking", "position", "role", "career"}
     keyword_list = [k.lower() for k in keyword_list if k and k.lower() not in noise_words]
     
-    location = filters.get("location", "").lower()
+    # Handle location as string or list
+    raw_location = filters.get("location")
+    location_list = []
+    if isinstance(raw_location, list):
+        location_list = [str(l).lower() for l in raw_location if l]
+    elif isinstance(raw_location, str):
+        location_list = [raw_location.lower()]
+    
+    # Debug: Print search parameters
+    print(f"DEBUG [search_jobs_in_db]: keyword_list={keyword_list}")
+    print(f"DEBUG [search_jobs_in_db]: location_list={location_list}")
     
     for doc in docs:
         data = doc.to_dict()
@@ -160,11 +173,14 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
                     match_score += 2
                     break # Matched one keyword, good enough for keyword score
         
-        if location:
-            # Flexible location match
-            doc_loc = data.get("location", "").lower()
-            if location in doc_loc or doc_loc in location:
-                match_score += 1
+        if location_list:
+            # Flexible location match - check against all locations in the list
+            doc_loc = data.get("location") or ""
+            doc_loc = doc_loc.lower() if doc_loc else ""
+            for loc in location_list:
+                if loc in doc_loc or doc_loc in loc:
+                    match_score += 1
+                    break  # One match is enough
             
         # Decision Logic:
         # 1. If we have keywords, we ideally want a keyword match.
@@ -179,18 +195,18 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
         # - Location Match: +1
         
         # 1. User provided Keywords AND Location
-        if keyword_list and location:
+        if keyword_list and location_list:
              # If neither matched, skip.
              if match_score == 0: continue
              # If at least one matched (score >= 1), we keep it. 
              # (Allows "Waiter in Holon" to show "Waiter in Jerusalem" [score 2] or "Job in Holon" [score 1])
 
         # 2. User provided ONLY Keywords (e.g. "Selling")
-        elif keyword_list and not location:
+        elif keyword_list and not location_list:
              if match_score == 0: continue
 
         # 3. User provided ONLY Location (e.g. "Holon")
-        elif location and not keyword_list:
+        elif location_list and not keyword_list:
              # Critical Fix: match_score must be > 0 (which means location matched, since k-list matches gave 0)
              if match_score == 0: continue
 
@@ -204,8 +220,8 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
             "score": match_score,
             "id": doc.id,
             "title": data.get("job_title"),
-            "company": data.get("company", "Unknown"), 
-            "location": data.get("location", "Not specified"),
+            "company": data.get("company") or "Unknown", 
+            "location": data.get("location") or "Not specified",
             "salary": data.get("wage_per_hour", "Not specified"),
             "link": data.get("post_link") or data.get("contact_info")
         })
@@ -213,7 +229,7 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
     # Sort by score descending
     found_jobs.sort(key=lambda x: x["score"], reverse=True)
             
-    return found_jobs[:5] # Return top 5
+    return found_jobs  # Return all matching jobs
 
 # --- Endpoints ---
 
@@ -390,7 +406,7 @@ async def chat_query(request: ChatMessage):
             print(f"DEBUG: Found {len(found_jobs)} jobs for query '{request.message}'")
 
         # 2. Generate AI Response with Context
-        model = genai.GenerativeModel('gemini-1.5-pro')
+        model = genai.GenerativeModel('gemini-2.5-flash-preview-09-2025')
         
         jobs_context = ""
         if found_jobs:
@@ -400,17 +416,23 @@ async def chat_query(request: ChatMessage):
         elif intent == "search":
              jobs_context = f"NO MATCHES FOUND. The user searched for: {analysis}. I checked the database but found nothing."
 
-        # Simplify System Prompt to prevent "Thinking out loud"
+        # System Prompt for natural, helpful responses
         system_prompt = f"""
         Result of database search:
         {jobs_context}
 
         User Query: "{request.message}"
 
-        Task: Answer the user.
-        - If jobs are listed above, show them to the user nicely.
-        - If NO jobs are listed, apologize and suggest they try a different keyword or location.
-        - Do NOT say "Okay I understand instructions". Just answer the user directly.
+        Task: Provide a brief, conversational response in the SAME LANGUAGE as the user's query.
+        
+        CRITICAL RULES:
+        - DO NOT create markdown tables or lists of jobs
+        - DO NOT repeat job details (the UI will show job cards automatically)
+        - If jobs were found, say something like "I found X jobs for you!" or "Here are the available positions"
+        - If this is a GREETING, respond warmly and ask how you can help
+        - If NO jobs were found, apologize briefly and suggest trying different keywords or locations
+        - Keep your response SHORT (1-2 sentences maximum)
+        - MATCH THE USER'S LANGUAGE: If they write in Arabic, respond in Arabic. If Hebrew, respond in Hebrew. If English, respond in English.
         """
         
         response = model.generate_content(system_prompt)
