@@ -23,6 +23,7 @@ except ImportError as e:
 
 from core.pipeline import pipeline_generator
 from core.reporting import send_email_report
+from scripts.cleanup_jobs import delete_expired_jobs
 
 # Configure logging
 logging.basicConfig(
@@ -194,8 +195,20 @@ async def scheduler_loop():
     The main infinite loop for the scheduler.
     """
     logging.info("--- Starting AutoFill Scheduler (Async) ---")
+    
+    # Run cleanup on startup
+    delete_expired_jobs()
+    
     while True:
         await check_schedules()
+        
+        # Optional: Run cleanup periodically, e.g., every hour
+        # For simplicity, we can rely on startup + periodic restart, 
+        # or add a simple counter/timer here.
+        # Given the loop is 60s, checking every 60 mins:
+        if datetime.now().minute == 0:
+             delete_expired_jobs()
+             
         await asyncio.sleep(60)
 
 if __name__ == "__main__":
