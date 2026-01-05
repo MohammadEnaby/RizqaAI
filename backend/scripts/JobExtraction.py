@@ -150,7 +150,7 @@ def main():
         # Rate limiting: 15 RPM = 1 request every 4 seconds. Using 5s to be safe.
         if i > 0 and len(jobs) > 15:
             print("Waiting 5 seconds to respect API rate limit...")
-            time.sleep(1)
+            time.sleep(5)
             
         raw_text = job.get('post_text', '')
         post_time = job.get('timestamp', '')
