@@ -29,7 +29,7 @@ genai.configure(api_key=API_KEY)
 
 # UPDATED: We use the model available in your specific environment list.
 # 'gemini-2.5-flash-preview-09-2025' is the current supported model for this environment.
-MODEL_NAME = 'gemini-2.5-flash-preview-09-2025'
+MODEL_NAME = 'gemini-2.5-flash-lite'
 
 model = genai.GenerativeModel(
     MODEL_NAME,
@@ -148,7 +148,7 @@ def main():
 
     for i, job in enumerate(jobs):
         # Rate limiting: 15 RPM = 1 request every 4 seconds. Using 5s to be safe.
-        if i > 0 and len(jobs) > 15:
+        if i > 0:
             print("Waiting 5 seconds to respect API rate limit...")
             time.sleep(5)
             
