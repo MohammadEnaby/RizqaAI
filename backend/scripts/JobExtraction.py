@@ -2,7 +2,7 @@ import os
 import json
 import google.generativeai as genai
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List, Dict, Any
 import time
 from datetime import datetime
 import sys
@@ -28,8 +28,7 @@ except ImportError:
 genai.configure(api_key=API_KEY)
 
 # UPDATED: We use the model available in your specific environment list.
-# 'gemini-2.5-flash-preview-09-2025' is the current supported model for this environment.
-MODEL_NAME = 'gemini-2.5-flash-lite'
+MODEL_NAME = 'gemini-2.5-flash'
 
 model = genai.GenerativeModel(
     MODEL_NAME,
@@ -67,17 +66,23 @@ def extract_post_id_from_url(post_url: str) -> str:
         
     return ""
 
-def extract_job_data(raw_text: str) -> dict:
+def extract_jobs_batch(posts_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """
-    Takes unstructured text and uses Google Gemini to extract structured JSON data.
+    Takes a list of post objects (id, content, created_at) and uses Google Gemini 
+    to extract structured JSON data for all of them in one request.
     """
     
-    # 3. Prompt Engineering
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    # 3. Prompt Engineering for Batch
     prompt = f"""
     You are an expert data extraction AI for the Israeli/Palestinian job market.
-    Extract structured job data from the following Arabic/Hebrew text.
+    I will provide a JSON list of posts. Each post has an 'id', 'content', and 'created_at'.
     
-    The Output MUST be a valid JSON object with these exact keys:
+    Your task is to analyze each post and extract structured job data.
+    
+    The Output MUST be a JSON LIST of objects. Each object must strictly follow this schema:
+    - id (integer): The same 'id' from the input post. THIS IS CRITICAL to map back to the original post.
     - job_title (string): e.g., 'Cashier'
     - location (string): e.g., 'Jerusalem'
     - wage_per_hour (string/null): e.g., '36-40'
@@ -85,32 +90,46 @@ def extract_job_data(raw_text: str) -> dict:
     - requirements (string/null): e.g., 'Experience', 'Education', 'Skills'
     - features (string/null): e.g., 'Transportation available', 'Food available'
     - contact_info (string/null): Phone numbers and names
-    - post_time (string): ISO 8601 format (YYYY-MM-DDTHH:MM:SS)
+    - post_time (string): ISO 8601 format (YYYY-MM-DDTHH:MM:SS). Use 'created_at' from input as reference.
     - is_job_offer (bool): true if it's a job, false if spam/question
-
-    Current Date and Time: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+    
+    Current Date and Time: {current_time}
 
     Important:
     - Handle Hebrew/Arabic slang (e.g., 'مشميروت' = shifts).
-    - post_time MUST be in ISO 8601 format (YYYY-MM-DDTHH:MM:SS). Convert relative times (e.g., '2 hours ago') to absolute timestamp based on the Current Date and Time provided above.
+    - post_time MUST be in ISO 8601 format.
     - If info is missing, use null.
+    - RETURN AN ENTRY FOR EVERY ID IN THE INPUT, even if it is not a job offer.
     
-    Text to analyze:
-    {raw_text}
+    Input Data:
+    {json.dumps(posts_data, ensure_ascii=False)}
     """
 
     try:
         # 4. Call Gemini
+        print(f"[DEBUG] Sending request to Gemini with {len(posts_data)} posts...")
         response = model.generate_content(prompt)
         
         # 5. Parse Result
         # Clean up potential markdown formatting if present (just in case)
         text_response = response.text.replace('```json', '').replace('```', '').strip()
         json_data = json.loads(text_response)
-        return json_data
+        
+        # Ensure we got a list
+        if isinstance(json_data, list):
+            return json_data
+        elif isinstance(json_data, dict):
+            # Try to find a list inside
+            for k, v in json_data.items():
+                if isinstance(v, list):
+                    return v
+            return [json_data]
+            
+        print(f"[!] Warning: Unexpected return structure: {type(json_data)}")
+        return []
 
     except Exception as e:
-        print(f"[ERROR] Gemini Extraction Error: {e}")
+        print(f"[ERROR] Gemini Batch Extraction Error: {e}")
         # If model is not found, list available models to help debug
         if "404" in str(e) or "not found" in str(e).lower():
             print("\n[!] Debug: Listing available models for your API Key...")
@@ -121,7 +140,7 @@ def extract_job_data(raw_text: str) -> dict:
             except Exception as list_err:
                 print(f"Could not list models: {list_err}")
                 
-        return None
+        return []
 
 def main():
     jobs_path = os.path.join(backend_root, "Data", "jobs.json")
@@ -135,76 +154,81 @@ def main():
         print(f"[!] '{jobs_path}' is empty. Waiting for scraper to populate it.")
         return
 
-    # if the result is not a job offer do not save it into the file.
     # Read scraped posts from jobs.json
-    # Use UTF-8 so Hebrew/Arabic characters load correctly on Windows
     with open(jobs_path, 'r', encoding='utf-8') as file:
         jobs = json.load(file)
     
     print(f"[DEBUG] Loaded {len(jobs)} jobs from {jobs_path}")
 
+    batch_input = []
+    job_map = {} # Map our temp ID to the original job index/object
+
+    for i, job in enumerate(jobs):
+        # Prepare lightweight object for LLM
+        # We use 'i' as the unique ID for this batch session
+        batch_input.append({
+            "id": i,
+            "content": job.get('post_text', ''),
+            "created_at": job.get('timestamp', '')
+        })
+        job_map[i] = job
+
+    if not batch_input:
+        print("No jobs to process.")
+        return
+
+    # Call Gemini with the batch
+    extracted_results = extract_jobs_batch(batch_input)
+    
+    print(f"[DEBUG] Received {len(extracted_results)} results from Gemini.")
+
     structured_results = []
     processed_indices = []
 
-    for i, job in enumerate(jobs):
-        # Rate limiting: 15 RPM = 1 request every 4 seconds. Using 5s to be safe.
-        if i > 0:
-            print("Waiting 5 seconds to respect API rate limit...")
-            time.sleep(5)
+    for item in extracted_results:
+        if not isinstance(item, dict):
+            continue
             
-        raw_text = job.get('post_text', '')
-        post_time = job.get('timestamp', '')
-        post_link = job.get('post_url', '')
+        # Match back to original job using ID
+        temp_id = item.get('id')
+        if temp_id is None or temp_id not in job_map:
+            print(f"[!] Warning: Result received with unknown ID: {temp_id}")
+            continue
+            
+        processed_indices.append(temp_id)
+        original_job = job_map[temp_id]
+        
+        # Only process if it's a valid job offer
+        if not item.get("is_job_offer", False):
+            # We still mark it as processed so we don't retry non-jobs forever
+            continue
+
+        # Inject Metadata from original job
+        post_link = original_job.get('post_url', '')
+        source_id = original_job.get('source_id')
         post_id = extract_post_id_from_url(post_link)
-        print(f"[DEBUG] Processing job {i+1}/{len(jobs)}")
-        # print(raw_text)
 
-        result = extract_job_data(raw_text + post_time)
-
-        if result:
-            # Handle both single dict and list of dicts
-            if isinstance(result, list):
-                extracted_items = result
-            elif isinstance(result, dict):
-                extracted_items = [result]
-            else:
-                print(f"[!] Warning: Unexpected return type from extraction: {type(result)}")
-                extracted_items = []
-
-            # Check if we have valid items to mark as processed
-            if extracted_items:
-                processed_indices.append(i)
-
-            for item in extracted_items:
-                if not isinstance(item, dict):
-                    continue
-
-                # Inject post_link
-                item['post_link'] = post_link
-
-                if post_id:
-                    item['id'] = post_id
-                
-                # Inject groupID (from source_id)
-                source_id = job.get('source_id')
-                if source_id:
-                    item['groupID'] = source_id
-
-                # Fallback for contact_info
-                if not item.get('contact_info'):
-                    item['contact_info'] = post_link
-
-                if not item.get("job_title"):
-                    print("[*] Skipped: job_title is missing.")
-                    continue
-
-                # Only keep entries that are actual job offers
-                if item.get("is_job_offer", False):
-                    structured_results.append(item)
-                else:
-                    print("[*] Skipped: model marked this as not a job offer.")
+        item['post_link'] = post_link
+        
+        if post_id:
+            item['id'] = post_id # Use real post ID for final output
         else:
-            print("Failed to get result. Will retry next time.")
+            # If we don't have a real post ID, remove the temp ID to avoid confusion
+            if 'id' in item:
+                del item['id']
+        
+        if source_id:
+            item['groupID'] = source_id
+
+        # Fallback for contact_info
+        if not item.get('contact_info'):
+            item['contact_info'] = post_link
+
+        if not item.get("job_title"):
+            print(f"[*] Skipped job {temp_id}: job_title is missing.")
+            continue
+
+        structured_results.append(item)
 
     # Write all structured job offers as a proper JSON array to structuered_jobs.json
     output_path = os.path.join(backend_root, "Data", "structuered_jobs.json")
@@ -212,6 +236,7 @@ def main():
         json.dump(structured_results, fw, ensure_ascii=False, indent=4)
 
     # Update jobs.json to remove processed items
+    # processed_indices contains all IDs that the model returned a result for (even if not a job)
     remaining_jobs = [job for i, job in enumerate(jobs) if i not in processed_indices]
     
     with open(jobs_path, 'w', encoding='utf-8') as f:
