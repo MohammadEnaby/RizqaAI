@@ -129,10 +129,11 @@ const Admin = () => {
             setProgress(p => ({ ...p, scrape: 80 }));
         }
 
-        const jobMatch = line.match(/Processing job (\d+)\//);
-        if (jobMatch) {
-            setStats(prev => ({ ...prev, jobsExtracted: parseInt(jobMatch[1]) }));
-            setProgress(p => ({ ...p, structure: Math.min(90, p.structure + 5) }));
+
+        const batchMatch = line.match(/Received (\d+) results from Gemini/);
+        if (batchMatch) {
+            setStats(prev => ({ ...prev, jobsExtracted: parseInt(batchMatch[1]) }));
+            setProgress(p => ({ ...p, structure: 95 }));
         }
 
         const uploadMatch = line.match(/Uploading (\d+) jobs/);
