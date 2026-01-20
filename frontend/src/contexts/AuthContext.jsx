@@ -24,7 +24,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [configError, setConfigError] = useState(false);
 
-  async function signup(email, password, name, role, phone) {
+  async function signup(email, password, profileData) {
     if (!auth) throw new Error("Firebase not initialized");
 
     try {
@@ -32,9 +32,12 @@ export function AuthProvider({ children }) {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       console.log("✅ Account created successfully");
 
+      // Construct full name from first and last name
+      const fullName = `${profileData.firstName} ${profileData.lastName}`;
+
       // Update profile with display name
       await updateProfile(userCredential.user, {
-        displayName: name
+        displayName: fullName
       });
       console.log("✅ Display name updated");
 
@@ -42,10 +45,12 @@ export function AuthProvider({ children }) {
       if (db) {
         try {
           await setDoc(doc(db, "users", userCredential.user.uid), {
-            name: name,
+            name: fullName,
+            firstName: profileData.firstName,
+            lastName: profileData.lastName,
             email: email,
-            phone: phone,
-            role: role,
+            phone: profileData.phone,
+            role: profileData.role,
             createdAt: new Date().toISOString()
           });
           console.log("✅ User profile saved to Firestore");

@@ -8,8 +8,22 @@ export default function Signup() {
   const { signup, initiateGoogleSignIn } = useAuth();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
+
   const password = watch('password', '');
+  const confirmPassword = watch('confirmPassword', '');
+
+  // Password strength checks
+  const hasMinLength = password.length >= 8;
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+  const passwordStrength = [hasMinLength, hasUpperCase, hasLowerCase, hasNumber, hasSpecialChar].filter(Boolean).length;
+  const passwordsMatch = password && confirmPassword && password === confirmPassword;
 
   const onSubmit = async (data) => {
     if (data.password !== data.confirmPassword) {
@@ -31,6 +45,8 @@ export default function Signup() {
         setError('Email already in use.');
       } else if (err.code === 'auth/weak-password') {
         setError('Password should be at least 6 characters.');
+      } else if (err.code === 'auth/invalid-email') {
+        setError('Invalid email address.');
       } else {
         setError('Failed to create account. Please try again.');
       }
@@ -89,7 +105,7 @@ export default function Signup() {
           <button
             onClick={handleGoogleSignIn}
             disabled={loading}
-            className="fluid-button w-full bg-white border-2 border-gray-300 rounded-lg sm:rounded-xl px-3 sm:px-4 flex items-center justify-center gap-2 sm:gap-3 fluid-text-base font-semibold text-gray-700 hover:bg-gray-50 hover:border-teal-400 transition-all shrink-0 mb-2 sm:mb-3 md:mb-4 lg:mb-5"
+            className="fluid-button w-full bg-white border-2 border-gray-300 rounded-lg sm:rounded-xl px-3 sm:px-4 flex items-center justify-center gap-2 sm:gap-3 fluid-text-base font-semibold text-gray-700 hover:bg-gray-50 hover:border-teal-400 transition-all shrink-0 mb-2 sm:mb-3 md:mb-4 lg:mb-5 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style={{ width: 'clamp(1.25rem, 2vw, 1.75rem)', height: 'clamp(1.25rem, 2vw, 1.75rem)' }} />
             <span>Continue with Google</span>
@@ -116,7 +132,10 @@ export default function Signup() {
             <div className="grid grid-cols-2 fluid-gap">
               <div>
                 <input
-                  {...register("firstName", { required: "Required" })}
+                  {...register("firstName", {
+                    required: "First name required",
+                    minLength: { value: 2, message: "Min 2 chars" }
+                  })}
                   type="text"
                   className="fluid-input w-full px-3 bg-white border-2 border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 fluid-text-base focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-100 transition-all"
                   placeholder="First Name"
@@ -125,7 +144,10 @@ export default function Signup() {
               </div>
               <div>
                 <input
-                  {...register("lastName", { required: "Required" })}
+                  {...register("lastName", {
+                    required: "Last name required",
+                    minLength: { value: 2, message: "Min 2 chars" }
+                  })}
                   type="text"
                   className="fluid-input w-full px-3 bg-white border-2 border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 fluid-text-base focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-100 transition-all"
                   placeholder="Last Name"
@@ -139,47 +161,129 @@ export default function Signup() {
               <div className="relative">
                 <span className="absolute left-2 top-1/2 -translate-y-1/2 fluid-text-sm">📧</span>
                 <input
-                  {...register("email", { required: "Required" })}
+                  {...register("email", {
+                    required: "Email required",
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "Invalid email"
+                    }
+                  })}
                   type="email"
                   className="fluid-input w-full pl-8 pr-2 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 fluid-text-sm focus:outline-none focus:border-teal-500 transition-all"
                   placeholder="Email"
                 />
-                {errors.email && <p className="text-red-500 mt-0.5 ml-1 absolute right-0 top-0" style={{ fontSize: '0.7em' }}>⚠️</p>}
+                {errors.email && <p className="text-red-500 mt-0.5 ml-1 text-[0.7em]">⚠️ {errors.email.message}</p>}
               </div>
               <div className="relative">
                 <span className="absolute left-2 top-1/2 -translate-y-1/2 fluid-text-sm">📱</span>
                 <input
-                  {...register("phone", { required: "Required" })}
+                  {...register("phone", {
+                    required: "Phone required",
+                    pattern: {
+                      value: /^[0-9+\-\s()]+$/,
+                      message: "Invalid phone"
+                    },
+                    minLength: { value: 9, message: "Min 9 digits" }
+                  })}
                   type="tel"
                   className="fluid-input w-full pl-8 pr-2 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 fluid-text-sm focus:outline-none focus:border-teal-500 transition-all"
                   placeholder="Phone"
                 />
-                {errors.phone && <p className="text-red-500 mt-0.5 ml-1 absolute right-0 top-0" style={{ fontSize: '0.7em' }}>⚠️</p>}
+                {errors.phone && <p className="text-red-500 mt-0.5 ml-1 text-[0.7em]">⚠️ {errors.phone.message}</p>}
               </div>
             </div>
 
             {/* Password Fields */}
             <div className="grid grid-cols-2 fluid-gap">
-              <div>
+              <div className="relative">
                 <input
-                  {...register("password", { required: "Required", minLength: { value: 6, message: "Min 6" } })}
-                  type="password"
-                  className="fluid-input w-full px-3 bg-white border-2 border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 fluid-text-base focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-100 transition-all"
+                  {...register("password", {
+                    required: "Password required",
+                    minLength: { value: 8, message: "Min 8 chars" },
+                    validate: {
+                      hasUpperCase: v => /[A-Z]/.test(v) || "Need uppercase",
+                      hasLowerCase: v => /[a-z]/.test(v) || "Need lowercase",
+                      hasNumber: v => /[0-9]/.test(v) || "Need number",
+                      hasSpecialChar: v => /[!@#$%^&*(),.?":{}|<>]/.test(v) || "Need special char"
+                    }
+                  })}
+                  type={showPassword ? "text" : "password"}
+                  className="fluid-input w-full px-3 pr-10 bg-white border-2 border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 fluid-text-base focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-100 transition-all"
                   placeholder="Password"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                  style={{ fontSize: 'var(--fluid-text-sm)' }}
+                >
+                  {showPassword ? '🙈' : '👁️'}
+                </button>
                 {errors.password && <p className="text-red-500 mt-0.5 ml-1" style={{ fontSize: '0.7em' }}>⚠️ {errors.password.message}</p>}
               </div>
 
-              <div>
+              <div className="relative">
                 <input
-                  {...register("confirmPassword", { required: "Required" })}
-                  type="password"
-                  className="fluid-input w-full px-3 bg-white border-2 border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 fluid-text-base focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-100 transition-all"
+                  {...register("confirmPassword", {
+                    required: "Confirm password",
+                    validate: value => value === password || "Passwords don't match"
+                  })}
+                  type={showConfirmPassword ? "text" : "password"}
+                  className="fluid-input w-full px-3 pr-10 bg-white border-2 border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 fluid-text-base focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-100 transition-all"
                   placeholder="Confirm Password"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                  style={{ fontSize: 'var(--fluid-text-sm)' }}
+                >
+                  {showConfirmPassword ? '🙈' : '👁️'}
+                </button>
                 {errors.confirmPassword && <p className="text-red-500 mt-0.5 ml-1" style={{ fontSize: '0.7em' }}>⚠️ {errors.confirmPassword.message}</p>}
               </div>
             </div>
+
+            {/* Password Strength Indicator */}
+            {password && (
+              <div className="bg-gradient-to-r from-teal-50 to-green-50 border border-teal-200 rounded-lg p-2 sm:p-3">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="fluid-text-sm font-semibold text-gray-700">Password Strength</span>
+                  <span className={`fluid-text-sm font-bold ${passwordStrength >= 5 ? 'text-green-600' :
+                      passwordStrength >= 3 ? 'text-yellow-600' :
+                        'text-red-600'
+                    }`}>
+                    {passwordStrength >= 5 ? '💪 Strong' : passwordStrength >= 3 ? '👍 Medium' : '👎 Weak'}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-1 text-[0.65em] sm:text-[0.7em]">
+                  <div className="flex items-center gap-1">
+                    <span className={hasMinLength ? 'text-green-600' : 'text-gray-400'}>{hasMinLength ? '✓' : '○'}</span>
+                    <span className={hasMinLength ? 'text-green-700' : 'text-gray-500'}>8+ chars</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className={hasUpperCase ? 'text-green-600' : 'text-gray-400'}>{hasUpperCase ? '✓' : '○'}</span>
+                    <span className={hasUpperCase ? 'text-green-700' : 'text-gray-500'}>Uppercase</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className={hasLowerCase ? 'text-green-600' : 'text-gray-400'}>{hasLowerCase ? '✓' : '○'}</span>
+                    <span className={hasLowerCase ? 'text-green-700' : 'text-gray-500'}>Lowercase</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className={hasNumber ? 'text-green-600' : 'text-gray-400'}>{hasNumber ? '✓' : '○'}</span>
+                    <span className={hasNumber ? 'text-green-700' : 'text-gray-500'}>Number</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className={hasSpecialChar ? 'text-green-600' : 'text-gray-400'}>{hasSpecialChar ? '✓' : '○'}</span>
+                    <span className={hasSpecialChar ? 'text-green-700' : 'text-gray-500'}>Special (!@#...)</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className={passwordsMatch ? 'text-green-600' : 'text-gray-400'}>{passwordsMatch ? '✓' : '○'}</span>
+                    <span className={passwordsMatch ? 'text-green-700' : 'text-gray-500'}>Match</span>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Role Selection - Very compact */}
             <div className="grid grid-cols-2 fluid-gap">
@@ -188,6 +292,7 @@ export default function Signup() {
                   {...register("role", { required: true })}
                   type="radio"
                   value="user"
+                  defaultChecked
                   className="w-3 h-3 sm:w-4 sm:h-4 text-teal-600 focus:ring-teal-500"
                 />
                 <span className="fluid-text-sm font-semibold text-gray-700">Job Seeker</span>
@@ -208,9 +313,17 @@ export default function Signup() {
             <button
               type="submit"
               disabled={loading}
-              className="fluid-button w-full rounded-xl font-bold fluid-text-base text-white bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 transition-all transform hover:scale-[1.02] shadow-lg hover:shadow-xl disabled:opacity-50 mt-2"
+              className="fluid-button w-full rounded-xl font-bold fluid-text-base text-white bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 transition-all transform hover:scale-[1.02] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed mt-2"
             >
-              {loading ? 'Creating Account...' : 'Create Account'}
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Creating Account...
+                </span>
+              ) : 'Create Account'}
             </button>
           </form>
         </div>
