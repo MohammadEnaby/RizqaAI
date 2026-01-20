@@ -73,28 +73,27 @@ export default function Signup() {
     <div className="h-screen w-screen flex items-center justify-center app-bg overflow-hidden relative">
 
       {/* Main Card - strictly limited height, no scroll */}
-      <div className="auth-card w-[95vw] lg:w-[60vw] xl:w-[50vw] max-w-[1000px] h-auto max-h-[95vh] glass-panel rounded-3xl shadow-2xl fluid-p relative flex flex-col justify-center">
+      <div className="auth-card w-[95vw] lg:w-[60vw] xl:w-[50vw] max-w-[1000px] h-auto max-h-[95vh] glass-panel rounded-3xl shadow-2xl relative flex flex-col justify-center overflow-y-auto" style={{ padding: 'clamp(12px, 3vh, 40px)' }}>
 
         {/* Top decoration dot - hidden on very small screens */}
-        <div className="absolute top-2 sm:top-6 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-teal-500 rounded-full animate-pulse-custom hidden min-[375px]:block"></div>
+        <div className="absolute top-2 sm:top-4 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-teal-500 rounded-full animate-pulse-custom hidden min-[375px]:block"></div>
 
         {/* Login Link */}
-        <div className="absolute top-4 right-4 z-10">
+        <div className="absolute top-3 right-3 z-10">
           <Link
             to="/login"
-            className="flex items-center gap-1 px-3 py-1 bg-white/80 border border-teal-400 rounded-full text-teal-700 font-bold hover:bg-white transition-transform hover:scale-105"
-            style={{ fontSize: 'var(--fluid-text-sm)' }}
+            className="flex items-center gap-1 px-2 py-1 bg-white/80 border border-teal-400 rounded-full text-teal-700 font-bold hover:bg-white transition-transform hover:scale-105 text-[0.7em] sm:text-[0.75em]"
           >
             <span>🔓 Sign In</span>
           </Link>
         </div>
 
         {/* Header - Compact */}
-        <div className="text-center mt-2 sm:mt-2 mb-2 sm:mb-3 md:mb-4 lg:mb-6 shrink-0">
-          <div style={{ width: 'clamp(2.5rem, 8vw, 5rem)', height: 'clamp(2.5rem, 8vw, 5rem)' }} className="theme-green-blue rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-1.5 sm:mb-2 md:mb-3 lg:mb-4 shadow-lg">
+        <div className="text-center mb-2 sm:mb-3 shrink-0">
+          <div style={{ width: 'clamp(2rem, 6vw, 4rem)', height: 'clamp(2rem, 6vw, 4rem)' }} className="theme-green-blue rounded-xl flex items-center justify-center mx-auto mb-1 sm:mb-2 shadow-lg">
             <span className="fluid-h1 font-black text-white">JS</span>
           </div>
-          <h1 className="fluid-h1 font-bold title-color leading-tight mb-0.5 sm:mb-1 lg:mb-2">Create Account</h1>
+          <h1 className="fluid-h1 font-bold title-color leading-tight mb-0.5">Create Account</h1>
           <p className="fluid-h2 text-gray-600 font-medium leading-tight">Join Risqa today</p>
         </div>
 
@@ -105,14 +104,14 @@ export default function Signup() {
           <button
             onClick={handleGoogleSignIn}
             disabled={loading}
-            className="fluid-button w-full bg-white border-2 border-gray-300 rounded-lg sm:rounded-xl px-3 sm:px-4 flex items-center justify-center gap-2 sm:gap-3 fluid-text-base font-semibold text-gray-700 hover:bg-gray-50 hover:border-teal-400 transition-all shrink-0 mb-2 sm:mb-3 md:mb-4 lg:mb-5 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="fluid-button w-full bg-white border-2 border-gray-300 rounded-lg px-3 flex items-center justify-center gap-2 fluid-text-base font-semibold text-gray-700 hover:bg-gray-50 hover:border-teal-400 transition-all shrink-0 mb-2 sm:mb-3 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style={{ width: 'clamp(1.25rem, 2vw, 1.75rem)', height: 'clamp(1.25rem, 2vw, 1.75rem)' }} />
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style={{ width: 'clamp(1rem, 2vw, 1.5rem)', height: 'clamp(1rem, 2vw, 1.5rem)' }} />
             <span>Continue with Google</span>
           </button>
 
           {/* Divider */}
-          <div className="flex items-center gap-2 sm:gap-4 mb-2 sm:mb-3 md:mb-4 lg:mb-5 shrink-0">
+          <div className="flex items-center gap-2 mb-2 sm:mb-3 shrink-0">
             <div className="flex-1 h-px bg-gray-200"></div>
             <span className="fluid-text-sm text-gray-400 font-semibold">OR</span>
             <div className="flex-1 h-px bg-gray-200"></div>
@@ -120,16 +119,16 @@ export default function Signup() {
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-3 rounded-lg text-center font-semibold animate-shake shrink-0 fluid-mb fluid-text-sm flex items-center justify-center" style={{ height: 'var(--fluid-input-height)' }}>
+            <div className="bg-red-50 border border-red-200 text-red-700 px-3 rounded-lg text-center font-semibold shrink-0 mb-2 sm:mb-3 fluid-text-sm flex items-center justify-center" style={{ minHeight: 'var(--fluid-input-height)' }}>
               ⚠️ {error}
             </div>
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col fluid-gap w-full">
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col w-full" style={{ gap: 'clamp(6px, 1.5vh, 16px)' }}>
 
             {/* Name Fields */}
-            <div className="grid grid-cols-2 fluid-gap">
+            <div className="grid grid-cols-2 gap-2">
               <div>
                 <input
                   {...register("firstName", {
@@ -157,7 +156,7 @@ export default function Signup() {
             </div>
 
             {/* Email & Phone Grid */}
-            <div className="grid grid-cols-2 fluid-gap">
+            <div className="grid grid-cols-2 gap-2">
               <div className="relative">
                 <span className="absolute left-2 top-1/2 -translate-y-1/2 fluid-text-sm">📧</span>
                 <input
@@ -194,7 +193,7 @@ export default function Signup() {
             </div>
 
             {/* Password Fields */}
-            <div className="grid grid-cols-2 fluid-gap">
+            <div className="grid grid-cols-2 gap-2">
               <div className="relative">
                 <input
                   {...register("password", {
@@ -244,50 +243,26 @@ export default function Signup() {
               </div>
             </div>
 
-            {/* Password Strength Indicator */}
-            {password && (
-              <div className="bg-gradient-to-r from-teal-50 to-green-50 border border-teal-200 rounded-lg p-2 sm:p-3">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="fluid-text-sm font-semibold text-gray-700">Password Strength</span>
-                  <span className={`fluid-text-sm font-bold ${passwordStrength >= 5 ? 'text-green-600' :
-                      passwordStrength >= 3 ? 'text-yellow-600' :
-                        'text-red-600'
-                    }`}>
-                    {passwordStrength >= 5 ? '💪 Strong' : passwordStrength >= 3 ? '👍 Medium' : '👎 Weak'}
-                  </span>
-                </div>
-                <div className="grid grid-cols-2 gap-1 text-[0.65em] sm:text-[0.7em]">
-                  <div className="flex items-center gap-1">
-                    <span className={hasMinLength ? 'text-green-600' : 'text-gray-400'}>{hasMinLength ? '✓' : '○'}</span>
-                    <span className={hasMinLength ? 'text-green-700' : 'text-gray-500'}>8+ chars</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span className={hasUpperCase ? 'text-green-600' : 'text-gray-400'}>{hasUpperCase ? '✓' : '○'}</span>
-                    <span className={hasUpperCase ? 'text-green-700' : 'text-gray-500'}>Uppercase</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span className={hasLowerCase ? 'text-green-600' : 'text-gray-400'}>{hasLowerCase ? '✓' : '○'}</span>
-                    <span className={hasLowerCase ? 'text-green-700' : 'text-gray-500'}>Lowercase</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span className={hasNumber ? 'text-green-600' : 'text-gray-400'}>{hasNumber ? '✓' : '○'}</span>
-                    <span className={hasNumber ? 'text-green-700' : 'text-gray-500'}>Number</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span className={hasSpecialChar ? 'text-green-600' : 'text-gray-400'}>{hasSpecialChar ? '✓' : '○'}</span>
-                    <span className={hasSpecialChar ? 'text-green-700' : 'text-gray-500'}>Special (!@#...)</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span className={passwordsMatch ? 'text-green-600' : 'text-gray-400'}>{passwordsMatch ? '✓' : '○'}</span>
-                    <span className={passwordsMatch ? 'text-green-700' : 'text-gray-500'}>Match</span>
+            {/* Password Strength Indicator - Ultra Compact */}
+            {password && passwordStrength < 5 && (
+              <div className="bg-gradient-to-r from-teal-50 to-green-50 border border-teal-200 rounded-lg px-2 py-1">
+                <div className="flex items-center justify-between text-[0.6em] sm:text-[0.65em]">
+                  <span className="font-semibold text-gray-600">Strength:</span>
+                  <div className="flex gap-1.5">
+                    <span className={hasMinLength ? 'text-green-600' : 'text-gray-400'}>{hasMinLength ? '✓' : '○'}8+</span>
+                    <span className={hasUpperCase ? 'text-green-600' : 'text-gray-400'}>{hasUpperCase ? '✓' : '○'}A</span>
+                    <span className={hasLowerCase ? 'text-green-600' : 'text-gray-400'}>{hasLowerCase ? '✓' : '○'}a</span>
+                    <span className={hasNumber ? 'text-green-600' : 'text-gray-400'}>{hasNumber ? '✓' : '○'}#</span>
+                    <span className={hasSpecialChar ? 'text-green-600' : 'text-gray-400'}>{hasSpecialChar ? '✓' : '○'}!</span>
+                    <span className={passwordsMatch ? 'text-green-600' : 'text-gray-400'}>{passwordsMatch ? '✓' : '○'}=</span>
                   </div>
                 </div>
               </div>
             )}
 
             {/* Role Selection - Very compact */}
-            <div className="grid grid-cols-2 fluid-gap">
-              <label style={{ padding: 'var(--fluid-spacing-sm)' }} className="flex items-center gap-1.5 sm:gap-2 md:gap-3 bg-white border-2 border-gray-300 rounded-lg cursor-pointer hover:border-teal-400 transition-all justify-center">
+            <div className="grid grid-cols-2 gap-2">
+              <label className="flex items-center gap-2 bg-white border-2 border-gray-300 rounded-lg cursor-pointer hover:border-teal-400 transition-all justify-center py-2 px-2">
                 <input
                   {...register("role", { required: true })}
                   type="radio"
@@ -297,7 +272,7 @@ export default function Signup() {
                 />
                 <span className="fluid-text-sm font-semibold text-gray-700">Job Seeker</span>
               </label>
-              <label style={{ padding: 'var(--fluid-spacing-sm)' }} className="flex items-center gap-1.5 sm:gap-2 md:gap-3 bg-white border-2 border-gray-300 rounded-lg cursor-pointer hover:border-teal-400 transition-all justify-center">
+              <label className="flex items-center gap-2 bg-white border-2 border-gray-300 rounded-lg cursor-pointer hover:border-teal-400 transition-all justify-center py-2 px-2">
                 <input
                   {...register("role", { required: true })}
                   type="radio"
@@ -307,13 +282,13 @@ export default function Signup() {
                 <span className="fluid-text-sm font-semibold text-gray-700">Employer</span>
               </label>
             </div>
-            {errors.role && <p className="text-red-500 text-xs sm:text-xs text-center -mt-0.5">⚠️ Select a role</p>}
+            {errors.role && <p className="text-red-500 text-xs text-center -mt-1">⚠️ Select a role</p>}
 
             {/* Sign Up Button */}
             <button
               type="submit"
               disabled={loading}
-              className="fluid-button w-full rounded-xl font-bold fluid-text-base text-white bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 transition-all transform hover:scale-[1.02] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+              className="fluid-button w-full rounded-xl font-bold fluid-text-base text-white bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 transition-all transform hover:scale-[1.02] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
