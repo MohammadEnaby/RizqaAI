@@ -89,7 +89,7 @@ def extract_search_filters(user_query: str) -> dict:
         return {"intent": "general"}
     
     try:
-        model = genai.GenerativeModel('gemini-2.5-flash-preview-09-2025')
+        model = genai.GenerativeModel('gemini-2.5-flash-lite')
         prompt = f"""
         Analyze this job search query and extract structured filters.
         Output ONLY valid JSON.
