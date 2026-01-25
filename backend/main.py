@@ -36,12 +36,7 @@ from scripts.autoFill import scheduler_loop
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "https://rizqa-ai-v10.vercel.app",
-        "https://rizqa-ai-v10.vercel.app/",
-        "https://rizqa-ai.vercel.app", 
-    ],
+    allow_origins=["*"],  # In production, replace with specific origins
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
