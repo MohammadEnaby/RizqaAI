@@ -10,6 +10,7 @@ import Admin from './pages/adminPages/Pipeline';
 import Dashboard from './pages/adminPages/Dashboard';
 import Datasources from './pages/adminPages/Datasources';
 import ScheduledPipelines from './pages/adminPages/ScheduledPipelines';
+import UsersManagement from './pages/adminPages/UsersManagement';
 import Welcome from './pages/adminPages/Welcome';
 import Layout from './components/adminPage/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -72,6 +73,16 @@ function App() {
               <ProtectedRoute>
                 <Layout>
                   <Dashboard />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <UsersManagement />
                 </Layout>
               </ProtectedRoute>
             }

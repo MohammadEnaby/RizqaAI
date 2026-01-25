@@ -2,7 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { FaPlay, FaSpinner } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
-const AdminHeader = ({ groupId, setGroupId, timeInterval, setTimeInterval, handleRunPipeline, isRunning }) => {
+const AdminHeader = ({
+    title = "Pipeline Overview",
+    description = "Control center for automated job scraping, structuring, and database synchronization.",
+    groupId, setGroupId, timeInterval, setTimeInterval, handleRunPipeline, isRunning,
+    showControls = true
+}) => {
     const [pastGroups, setPastGroups] = useState([]);
     const [showDropdown, setShowDropdown] = useState(false);
     const [activeMode, setActiveMode] = useState(null); // 'auto', 'manual', or null
@@ -43,37 +48,39 @@ const AdminHeader = ({ groupId, setGroupId, timeInterval, setTimeInterval, handl
                 <div>
                     <div className="flex items-center space-x-3 mb-2">
                         <h1 className="text-[48px] font-extrabold title-color tracking-tight leading-none">
-                            Pipeline Overview
+                            {title}
                         </h1>
                     </div>
                     <p className="text-[#6b7280] text-[14px] max-w-lg">
-                        Control center for automated job scraping, structuring, and database synchronization.
+                        {description}
                     </p>
                 </div>
-                <div className="flex gap-4">
-                    <button
-                        onClick={() => toggleMode('auto')}
-                        className={`px-6 py-3 rounded-xl font-bold text-sm transition-all shadow-md ${activeMode === 'auto'
-                            ? 'theme-btn-primary shadow-lg scale-105'
-                            : 'bg-white/80 text-[#134e4a] hover:bg-white border border-gray-100'
-                            }`}
-                    >
-                        Run Automatically
-                    </button>
-                    <button
-                        onClick={() => toggleMode('manual')}
-                        className={`px-6 py-3 rounded-xl font-bold text-sm transition-all shadow-md ${activeMode === 'manual'
-                            ? 'theme-btn-primary shadow-lg scale-105'
-                            : 'bg-white/80 text-[#134e4a] hover:bg-white border border-gray-100'
-                            }`}
-                    >
-                        Run Manually
-                    </button>
-                </div>
+                {showControls && (
+                    <div className="flex gap-4">
+                        <button
+                            onClick={() => toggleMode('auto')}
+                            className={`px-6 py-3 rounded-xl font-bold text-sm transition-all shadow-md ${activeMode === 'auto'
+                                ? 'theme-btn-primary shadow-lg scale-105'
+                                : 'bg-white/80 text-[#134e4a] hover:bg-white border border-gray-100'
+                                }`}
+                        >
+                            Run Automatically
+                        </button>
+                        <button
+                            onClick={() => toggleMode('manual')}
+                            className={`px-6 py-3 rounded-xl font-bold text-sm transition-all shadow-md ${activeMode === 'manual'
+                                ? 'theme-btn-primary shadow-lg scale-105'
+                                : 'bg-white/80 text-[#134e4a] hover:bg-white border border-gray-100'
+                                }`}
+                        >
+                            Run Manually
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* Controls Panel */}
-            {activeMode && (
+            {showControls && activeMode && (
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
