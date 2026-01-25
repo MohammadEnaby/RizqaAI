@@ -3,8 +3,6 @@ FROM python:3.11-slim
 # Install system dependencies
 # We need chromium and chromium-driver for Selenium
 RUN apt-get update && apt-get install -y \
-    chromium \
-    chromium-driver \
     wget \
     gnupg \
     && rm -rf /var/lib/apt/lists/*

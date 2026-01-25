@@ -29,4 +29,12 @@ if not firebase_admin._apps:
     except Exception as e:
         print(f"[X] Failed to initialize Firebase: {e}")
 
-db = firestore.client()
+try:
+    if firebase_admin._apps:
+        db = firestore.client()
+    else:
+        print("[X] Firebase app not initialized. Firestore client cannot be created.")
+        db = None
+except Exception as e:
+    print(f"[X] Failed to create Firestore client: {e}")
+    db = None
