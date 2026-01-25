@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaHome, FaCogs, FaSignOutAlt, FaLeaf, FaDatabase, FaClock, FaUsers } from 'react-icons/fa';
+import { FaHome, FaCogs, FaSignOutAlt, FaLeaf, FaDatabase, FaClock, FaUsers, FaRobot } from 'react-icons/fa';
 import { useAuth } from '../../contexts/AuthContext';
 import { motion } from 'framer-motion';
 
@@ -133,6 +133,22 @@ const Sidebar = () => {
                             }`}
                     />
                     <span>Schedules</span>
+                </Link>
+
+                {/* ✅ CHATBOT */}
+                <Link
+                    to="/chatbot"
+                    className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
+            ${isActive('/chatbot')
+                            ? 'bg-gradient-to-r from-green-100 to-teal-100 text-[#134e4a] shadow-lg'
+                            : 'text-gray-500 hover:bg-white hover:shadow-md'
+                        }`}
+                >
+                    <FaRobot
+                        className={`${isActive('/chatbot') ? 'text-green-500' : 'text-gray-400'
+                            }`}
+                    />
+                    <span>Chatbot</span>
                 </Link>
 
                 {/* ✅ ACCOUNT */}
