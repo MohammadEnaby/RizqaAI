@@ -107,12 +107,14 @@ const UsersManagement = () => {
     };
 
     return (
-        <div className="flex flex-col h-full bg-slate-50/50">
-            <AdminHeader
-                title="Users Management"
-                description="Manage platform users, roles, and view their activity stats."
-                showControls={false}
-            />
+        <div className="flex flex-col h-full bg-transparent">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                <div>
+                    <h1 className="text-[42px] font-extrabold title-color tracking-tight leading-none mb-3">Users Management</h1>
+                    <p className="text-gray-500 font-medium">Manage platform users, roles, and view their activity stats.</p>
+                </div>
+            </div>
 
             <div className="flex-1 p-8 overflow-y-auto">
                 {/* Stats Cards Row */}

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -49,23 +49,66 @@ function App() {
               </ProtectedRoute>
             }
           />
-          {/* Admin Routes with Persistent Layout */}
           <Route
+            path="/admin"
             element={
               <ProtectedRoute>
                 <Layout>
-                  <Outlet />
+                  <Welcome />
                 </Layout>
               </ProtectedRoute>
             }
-          >
-            <Route path="/admin" element={<Welcome />} />
-            <Route path="/admin/dashboard" element={<Dashboard />} />
-            <Route path="/admin/pipeline" element={<Admin />} />
-            <Route path="/admin/datasources" element={<Datasources />} />
-            <Route path="/admin/schedules" element={<ScheduledPipelines />} />
-            <Route path="/admin/users" element={<UsersManagement />} />
-          </Route>
+          />
+          <Route
+            path="/admin/pipeline"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Admin />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Dashboard />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <UsersManagement />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/datasources"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Datasources />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/schedules"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <ScheduledPipelines />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </AuthProvider>

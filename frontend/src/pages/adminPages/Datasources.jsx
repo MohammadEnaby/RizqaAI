@@ -158,7 +158,7 @@ const Datasources = () => {
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <div>
-                        <h1 className="text-3xl font-extrabold text-[#0f172a] tracking-tight mb-2">Datasources</h1>
+                        <h1 className="text-[42px] font-extrabold title-color tracking-tight leading-none mb-3">Datasources</h1>
                         <p className="text-gray-500 font-medium">Manage your data extraction targets and configuration.</p>
                     </div>
                     <button
