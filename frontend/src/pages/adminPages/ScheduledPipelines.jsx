@@ -88,16 +88,13 @@ const ScheduledPipelines = () => {
 
     return (
         <div className="min-h-screen p-6 md:p-12 font-sans text-[#0f172a]">
-            <div className="max-w-7xl mx-auto">
-                <div className="mb-10">
-                    <h1 className="text-[42px] font-extrabold title-color tracking-tight leading-none mb-3">
-                        Scheduled Pipelines
-                    </h1>
-                    <p className="text-[#6b7280] text-[16px] max-w-2xl">
-                        Monitor and manage your automated job scraping schedules. Inspect results and track performance.
-                    </p>
+            {/* Header */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                <div>
+                    <h1 className="text-[42px] font-extrabold title-color tracking-tight leading-none mb-3">Scheduled Pipelines</h1>
+                    <p className="text-[#6b7280] text-[16px] max-w-2xl">Monitor and manage your automated job scraping schedules. Inspect results and track performance.</p>
                 </div>
-
+            </div>
                 {loading ? (
                     <div className="flex items-center justify-center py-20">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#134e4a]"></div>
@@ -226,7 +223,6 @@ const ScheduledPipelines = () => {
                     </div>
                 )
                 }
-            </div >
         </div >
     );
 };

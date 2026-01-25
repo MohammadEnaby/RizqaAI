@@ -153,7 +153,6 @@ const Datasources = () => {
 
     return (
         <div className="min-h-screen p-6 md:p-12 font-sans text-[#0f172a]">
-            <div className="max-w-7xl mx-auto">
 
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
@@ -292,7 +291,6 @@ const Datasources = () => {
                     </form>
                 </Modal>
 
-            </div>
         </div >
     );
 };

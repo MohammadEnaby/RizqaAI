@@ -145,7 +145,6 @@ const Admin = () => {
 
     return (
         <div className="min-h-screen p-6 md:p-12 font-sans text-[#0f172a]">
-            <div className="max-w-7xl mx-auto">
 
                 <AdminHeader
                     groupId={groupId}
@@ -167,7 +166,6 @@ const Admin = () => {
                     logsEndRef={logsEndRef}
                     isRunning={isRunning}
                 />
-            </div>
         </div>
     );
 };
