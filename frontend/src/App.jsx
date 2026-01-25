@@ -14,6 +14,7 @@ import UsersManagement from './pages/adminPages/UsersManagement';
 import Welcome from './pages/adminPages/Welcome';
 import Layout from './components/adminPage/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
+import MainPage from './pages/mainPage';
 
 
 function App() {
@@ -31,8 +32,9 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/" element={<MainPage />} />
           <Route
-            path="/"
+            path="/home"
             element={
               <ProtectedRoute>
                 <Home />
