@@ -18,6 +18,8 @@ export default function ChatBot() {
     const [selectedJob, setSelectedJob] = useState(null); // For job details modal
     const messagesEndRef = useRef(null);
 
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
     // Initial greeting message
     const initialMessage = {
         id: 1,
@@ -49,7 +51,7 @@ export default function ChatBot() {
 
     const fetchSessions = async () => {
         try {
-            const res = await fetch(`/api/chatbot/sessions?userId=${currentUser.uid}`);
+            const res = await fetch(`${apiUrl}/api/chatbot/sessions?userId=${currentUser.uid}`);
             if (res.ok) {
                 const data = await res.json();
                 setSessions(data);
@@ -64,7 +66,7 @@ export default function ChatBot() {
 
     const fetchMessages = async (sessionId) => {
         try {
-            const res = await fetch(`/api/chatbot/sessions/${sessionId}/messages?userId=${currentUser.uid}`);
+            const res = await fetch(`${apiUrl}/api/chatbot/sessions/${sessionId}/messages?userId=${currentUser.uid}`);
             if (res.ok) {
                 const data = await res.json();
                 // Convert timestamp strings/objects to Date objects
@@ -96,7 +98,7 @@ export default function ChatBot() {
         if (!window.confirm("Delete this chat history?")) return;
 
         try {
-            const res = await fetch(`/api/chatbot/sessions/${sessionId}?userId=${currentUser.uid}`, {
+            const res = await fetch(`${apiUrl}/api/chatbot/sessions/${sessionId}?userId=${currentUser.uid}`, {
                 method: 'DELETE'
             });
             if (res.ok) {
@@ -137,7 +139,7 @@ export default function ChatBot() {
 
             // Call backend API here
             // Call backend API here
-            const response = await fetch(`/api/chatbot/query`, {
+            const response = await fetch(`${apiUrl}/api/chatbot/query`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
