@@ -256,11 +256,11 @@ export default function ChatBot() {
                 <div className="p-4 border-t border-teal-400/20 bg-white/30">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-green-400 to-teal-500 flex items-center justify-center text-white font-bold shadow-sm">
-                            {userProfile?.fullName?.[0] || currentUser?.email?.[0] || <FaUser />}
+                            {(userProfile?.name || currentUser?.displayName || currentUser?.email || '?')[0].toUpperCase()}
                         </div>
                         <div className="flex-1 min-w-0">
                             <div className="text-sm font-semibold text-gray-900 truncate">
-                                {userProfile?.fullName || 'User'}
+                                {userProfile?.name || currentUser?.displayName || 'User'}
                             </div>
                             <div className="text-xs text-gray-600 truncate">
                                 {currentUser?.email}
