@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function ChatBot() {
-    const { userProfile, currentUser } = useAuth();
+    const { userProfile, currentUser, logout } = useAuth();
     const navigate = useNavigate();
 
     // Session State
@@ -107,6 +107,15 @@ export default function ChatBot() {
             }
         } catch (error) {
             console.error("Failed to delete session", error);
+        }
+    };
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+            navigate('/');
+        } catch (error) {
+            console.error("Failed to logout:", error);
         }
     };
 
@@ -269,28 +278,40 @@ export default function ChatBot() {
                         ☰
                     </button>
 
-                    <div className="w-10 h-10 rounded-full theme-green-blue flex items-center justify-center shadow-lg animate-pulse-custom shrink-0">
+                    <div className="w-10 h-10 rounded-full theme-green-blue flex items-center justify-center shadow-lg animate-pulse-custom shrink-0 cursor-pointer hover:scale-105 transition-transform" onClick={() => navigate('/')}>
                         <span className="text-xl">🤖</span>
                     </div>
 
                     <div className="flex-1 min-w-0">
-                        <h1 className="text-lg font-bold title-color truncate">AI Job Assistant</h1>
+                        <h1 onClick={() => navigate('/')} className="text-lg font-bold title-color truncate cursor-pointer hover:opacity-80 transition-opacity">AI Job Assistant</h1>
                         <div className="flex items-center gap-2 text-xs text-teal-600 font-medium">
                             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                             <span>Online</span>
                         </div>
                     </div>
 
-                    {/* Admin Dashboard Button */}
-                    {userProfile?.role === 'admin' && (
-                        <Link
-                            to="/admin"
-                            className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-xl text-xs sm:text-sm font-semibold hover:shadow-lg transform hover:scale-105 transition-all shrink-0"
+
+                    <div className="flex gap-2">
+                        {/* Admin Dashboard Button */}
+                        {userProfile?.role === 'admin' && (
+                            <Link
+                                to="/admin"
+                                className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-xl text-xs sm:text-sm font-semibold hover:shadow-lg transform hover:scale-105 transition-all shrink-0"
+                            >
+                                <span>⚙️</span>
+                                <span className="hidden sm:inline">Dashboard</span>
+                            </Link>
+                        )}
+
+                        <button
+                            onClick={handleLogout}
+                            className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white border-2 border-red-100 text-red-500 rounded-xl text-xs sm:text-sm font-semibold hover:bg-red-50 hover:border-red-200 hover:shadow-md transition-all shrink-0"
+                            title="Sign Out"
                         >
-                            <span>⚙️</span>
-                            <span className="hidden sm:inline">Dashboard</span>
-                        </Link>
-                    )}
+                            <span>🚪</span>
+                            <span className="hidden sm:inline">Logout</span>
+                        </button>
+                    </div>
                 </div>
 
                 {/* Messages List */}
