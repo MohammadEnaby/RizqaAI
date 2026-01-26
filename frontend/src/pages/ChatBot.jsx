@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { FaLeaf, FaRobot, FaBuilding, FaMapMarkerAlt, FaMoneyBillWave, FaPaperPlane, FaUser } from 'react-icons/fa';
+import { FiPlus, FiMessageSquare, FiTrash2, FiMenu, FiLogOut, FiSettings, FiX, FiMoreVertical, FiSearch, FiArrowUpRight } from 'react-icons/fi';
 
 export default function ChatBot() {
-    const { userProfile, currentUser } = useAuth();
+    const { userProfile, currentUser, logout } = useAuth();
     const navigate = useNavigate();
 
     // Session State
@@ -14,8 +16,8 @@ export default function ChatBot() {
     // UI State
     const [inputValue, setInputValue] = useState('');
     const [isTyping, setIsTyping] = useState(false);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Mobile sidebar toggle
-    const [selectedJob, setSelectedJob] = useState(null); // For job details modal
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [selectedJob, setSelectedJob] = useState(null);
     const messagesEndRef = useRef(null);
 
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -23,7 +25,7 @@ export default function ChatBot() {
     // Initial greeting message
     const initialMessage = {
         id: 1,
-        text: "👋 Hi! I'm your AI job assistant. I can search our live database for you.\n\nFor best results, tell me the **Job Title** and **Location** you want.\nExample: \"Find me a **Waiter** job in **Jerusalem**\" or \"Show **Python** jobs in **Tel Aviv**\".",
+        text: "Hello! I'm RizqaAI, your intelligent job assistant.\n\nI can help you find the perfect job from our live database. Try asking for specific roles and locations.\n\nExamples:\n• \"Find me a Waiter job in Jerusalem\"\n• \"Show Python developer roles in Tel Aviv\"",
         sender: 'bot',
         timestamp: new Date()
     };
@@ -55,9 +57,6 @@ export default function ChatBot() {
             if (res.ok) {
                 const data = await res.json();
                 setSessions(data);
-                // Optional: Auto-select most recent session? For now, let user choose or start fresh.
-                // If we want to restore last session:
-                // if (data.length > 0) setCurrentSessionId(data[0].id);
             }
         } catch (error) {
             console.error("Failed to fetch sessions:", error);
@@ -69,13 +68,10 @@ export default function ChatBot() {
             const res = await fetch(`${apiUrl}/api/chatbot/sessions/${sessionId}/messages?userId=${currentUser.uid}`);
             if (res.ok) {
                 const data = await res.json();
-                // Convert timestamp strings/objects to Date objects
                 const formatted = data.map(msg => ({
                     ...msg,
                     timestamp: new Date(msg.timestamp)
                 }));
-                // If history is empty (unlikely if session exists), show greeting? 
-                // Better to just show history.
                 if (formatted.length === 0) {
                     setMessages([initialMessage]);
                 } else {
@@ -90,12 +86,12 @@ export default function ChatBot() {
     const createNewSession = () => {
         setCurrentSessionId(null);
         setMessages([initialMessage]);
-        setIsSidebarOpen(false); // Close sidebar on mobile after selection
+        setIsSidebarOpen(false);
     };
 
     const deleteSession = async (e, sessionId) => {
-        e.stopPropagation(); // Prevent click from selecting the session
-        if (!window.confirm("Delete this chat history?")) return;
+        e.stopPropagation();
+        if (!window.confirm("Are you sure you want to delete this conversation?")) return;
 
         try {
             const res = await fetch(`${apiUrl}/api/chatbot/sessions/${sessionId}?userId=${currentUser.uid}`, {
@@ -112,13 +108,21 @@ export default function ChatBot() {
         }
     };
 
+    const handleLogout = async () => {
+        try {
+            await logout();
+            navigate('/');
+        } catch (error) {
+            console.error("Failed to logout:", error);
+        }
+    };
+
     const handleSend = async () => {
         if (!inputValue.trim()) return;
 
         const timestamp = new Date();
         const userText = inputValue;
 
-        // Optimistic UI update
         const userMessage = {
             id: Date.now(),
             text: userText,
@@ -134,7 +138,7 @@ export default function ChatBot() {
             const payload = {
                 message: userText,
                 userId: currentUser.uid,
-                sessionId: currentSessionId // Send current ID (or null/undefined)
+                sessionId: currentSessionId
             };
 
             // Call backend API here
@@ -147,19 +151,16 @@ export default function ChatBot() {
 
             const data = await response.json();
 
-            // If we didn't have a session ID, the backend created one. Update state.
             if (!currentSessionId && data.sessionId) {
                 setCurrentSessionId(data.sessionId);
-                // Refresh sessions list to show the new one
                 fetchSessions();
             } else if (currentSessionId) {
-                // Just move this session to top of list visually (or re-fetch)
                 fetchSessions();
             }
 
             const botMessage = {
                 id: Date.now() + 1,
-                text: data.response || "I'm sorry, I couldn't process that.",
+                text: data.response || "I apologize, but I encountered an error processing your request.",
                 sender: 'bot',
                 timestamp: new Date(),
                 jobs: data.jobs || []
@@ -169,7 +170,7 @@ export default function ChatBot() {
         } catch (error) {
             const errorMessage = {
                 id: Date.now() + 1,
-                text: "Oops! connection failed.",
+                text: "Connection failed. Please check your internet connection and try again.",
                 sender: 'bot',
                 timestamp: new Date()
             };
@@ -180,40 +181,44 @@ export default function ChatBot() {
     };
 
     const handleSuggestedClick = (query) => {
-        setInputValue(query.replace(/^[^\s]+\s/, '')); // Remove emoji
+        const cleanQuery = query.replace(/^[^a-zA-Z0-9]+/, '');
+        setInputValue(query);
     };
 
     return (
-        <div className="h-screen flex app-bg overflow-hidden relative">
+        <div className="h-screen flex app-bg overflow-hidden relative font-sans">
 
             {/* Mobile Sidebar Overlay */}
             {isSidebarOpen && (
                 <div
-                    className="fixed inset-0 bg-black/50 z-20 sm:hidden"
+                    className="fixed inset-0 bg-black/50 z-20 md:hidden"
                     onClick={() => setIsSidebarOpen(false)}
                 />
             )}
 
             {/* Sidebar Navigation */}
-            <div className={`
-                fixed sm:relative z-30 h-full w-64 glass-panel border-r border-teal-400/20 transform transition-transform duration-300 ease-in-out flex flex-col
-                ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full sm:translate-x-0'}
+            <aside className={`
+                fixed md:relative z-30 h-full w-80 glass-panel border-r border-teal-400/20 transform transition-transform duration-300 ease-in-out flex flex-col
+                ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
             `}>
                 {/* Sidebar Header */}
                 <div className="p-4 border-b border-teal-400/20">
                     <button
                         onClick={createNewSession}
-                        className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-xl font-semibold shadow-md hover:shadow-lg transition-all active:scale-95"
+                        className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-xl font-semibold shadow-md hover:shadow-lg transition-all active:scale-95 group"
                     >
-                        <span>➕</span> New Chat
+                        <FiPlus className="text-xl group-hover:rotate-90 transition-transform" />
+                        <span>New Conversation</span>
                     </button>
                 </div>
 
                 {/* Session List */}
-                <div className="flex-1 overflow-y-auto p-2 space-y-1">
+                <div className="flex-1 overflow-y-auto px-2 py-2 space-y-1 custom-scrollbar">
                     {sessions.length === 0 && (
-                        <div className="text-center text-gray-500 text-sm mt-4 italic p-4">
-                            No stored history yet. Start a conversation!
+                        <div className="flex flex-col items-center justify-center h-40 text-gray-500 text-sm px-8 text-center">
+                            <FiMessageSquare className="text-3xl mb-3 opacity-30" />
+                            <p>No chat history.</p>
+                            <p>Start a new conversation to begin.</p>
                         </div>
                     )}
                     {sessions.map(session => (
@@ -224,140 +229,181 @@ export default function ChatBot() {
                                 setIsSidebarOpen(false);
                             }}
                             className={`
-                                group flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all
+                                group flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all border
                                 ${currentSessionId === session.id
-                                    ? 'bg-white/60 border border-teal-400/30 text-teal-900 shadow-sm'
-                                    : 'hover:bg-white/30 text-gray-700'}
+                                    ? 'bg-white/60 border-teal-400/30 text-teal-900 shadow-sm'
+                                    : 'border-transparent hover:bg-white/30 text-gray-700'}
                             `}
                         >
                             <div className="flex items-center gap-3 min-w-0">
-                                <span className="text-lg shrink-0">💬</span>
-                                <div className="truncate">
+                                <FiMessageSquare className={`shrink-0 ${currentSessionId === session.id ? 'text-teal-600' : 'text-gray-400'}`} />
+                                <div className="truncate flex-1 min-w-0">
                                     <div className="font-medium text-sm truncate">{session.title}</div>
                                     <div className="text-[10px] text-gray-500">
-                                        {new Date(session.updatedAt).toLocaleDateString()}
+                                        {new Date(session.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                     </div>
                                 </div>
                             </div>
 
                             <button
                                 onClick={(e) => deleteSession(e, session.id)}
-                                className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-red-100 rounded-lg text-red-500 transition-all shrink-0"
+                                className="opacity-0 group-hover:opacity-100 p-2 hover:bg-red-100/50 text-gray-400 hover:text-red-500 rounded-lg transition-all"
                                 title="Delete Chat"
                             >
-                                🗑️
+                                <FiTrash2 size={14} />
                             </button>
                         </div>
                     ))}
                 </div>
 
-                {/* Admin Link (Desktop Sidebar Location or Top?) 
-                    User asked for a nav bar with past chats. 
-                    The Admin button was previously in the Top Header.
-                    I will keep it in the Top Header to separate concerns.
-                */}
-            </div>
+                {/* User Profile / Lower Sidebar */}
+                <div className="p-4 border-t border-teal-400/20 bg-white/30">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-green-400 to-teal-500 flex items-center justify-center text-white font-bold shadow-sm">
+                            {(userProfile?.name || currentUser?.displayName || currentUser?.email || '?')[0].toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <div className="text-sm font-semibold text-gray-900 truncate">
+                                {userProfile?.name || currentUser?.displayName || 'User'}
+                            </div>
+                            <div className="text-xs text-gray-600 truncate">
+                                {currentUser?.email}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
 
             {/* Main Chat Area */}
-            <div className="flex-1 flex flex-col h-full min-w-0 relative w-full">
+            <main className="flex-1 flex flex-col h-full min-w-0 relative w-full">
 
                 {/* Header */}
-                <div className="glass-panel border-b-2 border-teal-400/20 px-4 py-3 shrink-0 flex items-center gap-3">
-                    {/* Mobile Menu Toggle */}
-                    <button
-                        onClick={() => setIsSidebarOpen(true)}
-                        className="sm:hidden p-2 hover:bg-white/50 rounded-lg text-xl"
-                    >
-                        ☰
-                    </button>
+                <header className="glass-panel border-b-2 border-teal-400/20 px-4 py-3 flex items-center justify-between sticky top-0 z-10 shrink-0">
+                    <div className="flex items-center gap-3">
+                        {/* Mobile Menu Toggle */}
+                        <button
+                            onClick={() => setIsSidebarOpen(true)}
+                            className="md:hidden p-2 -ml-2 text-gray-700 hover:bg-white/50 rounded-lg transition-colors"
+                        >
+                            <FiMenu size={24} />
+                        </button>
 
-                    <div className="w-10 h-10 rounded-full theme-green-blue flex items-center justify-center shadow-lg animate-pulse-custom shrink-0">
-                        <span className="text-xl">🤖</span>
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                        <h1 className="text-lg font-bold title-color truncate">AI Job Assistant</h1>
-                        <div className="flex items-center gap-2 text-xs text-teal-600 font-medium">
-                            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                            <span>Online</span>
+                        <div
+                            className="flex items-center gap-3 cursor-pointer group"
+                            onClick={() => navigate('/')}
+                        >
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-green-500 to-teal-600 flex items-center justify-center text-white shadow-lg shadow-green-500/30 group-hover:scale-105 transition-transform duration-300">
+                                <FaLeaf size={20} />
+                            </div>
+                            <div>
+                                <h1 className="text-lg font-bold text-gray-900 leading-tight">
+                                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-teal-600">Rizqa</span>
+                                    <span className="text-gray-700">AI</span>
+                                </h1>
+                                <div className="flex items-center gap-1.5">
+                                    <span className="relative flex h-2 w-2">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                    </span>
+                                    <span className="text-[10px] font-medium text-teal-600 uppercase tracking-wider">Online</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Admin Dashboard Button */}
-                    {userProfile?.role === 'admin' && (
-                        <Link
-                            to="/admin"
-                            className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-xl text-xs sm:text-sm font-semibold hover:shadow-lg transform hover:scale-105 transition-all shrink-0"
+                    <div className="flex items-center gap-2">
+                        {/* Admin Dashboard Button */}
+                        {userProfile?.role === 'admin' && (
+                            <Link
+                                to="/admin"
+                                className="flex items-center gap-2 px-3 py-2 text-gray-700 hover:text-gray-900 hover:bg-white/50 rounded-lg text-sm font-medium transition-all"
+                            >
+                                <FiSettings className="text-lg" />
+                                <span className="hidden md:inline">Dashboard</span>
+                            </Link>
+                        )}
+
+                        <button
+                            onClick={handleLogout}
+                            className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white border-2 border-red-100 text-red-500 rounded-xl text-xs sm:text-sm font-semibold hover:bg-red-50 hover:border-red-200 hover:shadow-md transition-all shrink-0"
+                            title="Sign Out"
                         >
-                            <span>⚙️</span>
-                            <span className="hidden sm:inline">Dashboard</span>
-                        </Link>
-                    )}
-                </div>
+                            <FiLogOut className="text-lg" />
+                            <span className="hidden md:inline">Logout</span>
+                        </button>
+                    </div>
+                </header>
 
                 {/* Messages List */}
-                <div className="flex-1 overflow-y-auto px-2 sm:px-4 py-4 min-h-0">
-                    <div className="max-w-4xl mx-auto space-y-4">
+                <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 scroll-smooth min-h-0">
+                    <div className="w-full max-w-[95%] xl:max-w-[1600px] mx-auto space-y-6">
                         {messages.map((message) => (
                             <div
                                 key={message.id}
-                                className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in-up`}
+                                className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} group animate-fade-in-up`}
                             >
-                                <div
-                                    className={`max-w-[85%] sm:max-w-[70%] rounded-2xl px-4 py-3 sm:px-5 sm:py-4 shadow-md ${message.sender === 'user'
-                                        ? 'bg-gradient-to-r from-green-500 to-teal-600 text-white'
-                                        : 'bg-white border border-gray-200 text-gray-800'
-                                        }`}
-                                >
-                                    <p className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap">{message.text}</p>
+                                {/* Bot Icon for Bot Messages */}
+                                {message.sender === 'bot' && (
+                                    <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 mr-3 mt-1 shrink-0 shadow-sm border border-teal-200">
+                                        <FaRobot size={14} />
+                                    </div>
+                                )}
 
+                                <div className={`flex flex-col max-w-[90%] md:max-w-[75%] lg:max-w-[60%] ${message.sender === 'user' ? 'items-end' : 'items-start'}`}>
+                                    <div
+                                        className={`rounded-2xl px-5 py-4 shadow-md text-sm md:text-base leading-relaxed whitespace-pre-wrap ${message.sender === 'user'
+                                            ? 'bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-br-none'
+                                            : 'bg-white border border-gray-200 text-gray-800 rounded-tl-none'
+                                            }`}
+                                    >
+                                        {message.text}
+                                    </div>
+
+                                    {/* Jobs Display */}
                                     {message.jobs && message.jobs.length > 0 && (
-                                        <div className="mt-4 space-y-3">
-                                            <div className="text-xs font-semibold text-teal-700 uppercase tracking-wide mb-2">
-                                                📋 {message.jobs.length} Job{message.jobs.length > 1 ? 's' : ''} Found
+                                        <div className="mt-4 w-full space-y-3">
+                                            <div className="flex items-center gap-2 text-xs font-bold text-teal-700 uppercase tracking-wider px-1">
+                                                <FiSearch />
+                                                <span>{message.jobs.length} Found</span>
                                             </div>
                                             {message.jobs.map((job, idx) => (
                                                 <div
                                                     key={idx}
-                                                    className="bg-white rounded-xl p-4 shadow-md border border-gray-200 hover:shadow-lg hover:border-teal-300 transition-all cursor-pointer group"
+                                                    onClick={() => setSelectedJob(job)}
+                                                    className="bg-white rounded-xl p-4 shadow-md border border-gray-200 hover:border-teal-400 hover:shadow-lg transition-all cursor-pointer group/job relative overflow-hidden"
                                                 >
-                                                    <div className="flex items-start justify-between gap-3">
+                                                    <div className="flex items-start justify-between gap-4">
                                                         <div className="flex-1 min-w-0">
-                                                            <h4 className="font-bold text-gray-900 text-sm sm:text-base mb-1 group-hover:text-teal-600 transition-colors">
+                                                            <h4 className="font-bold text-gray-900 mb-1 group-hover/job:text-teal-600 transition-colors line-clamp-1">
                                                                 {job.title}
                                                             </h4>
-                                                            <div className="space-y-1 text-xs sm:text-sm text-gray-600">
-                                                                <div className="flex items-center gap-2">
-                                                                    <span className="text-gray-400">🏢</span>
-                                                                    <span className="font-medium">{job.company}</span>
+                                                            <div className="flex flex-wrap gap-y-1 gap-x-4 text-xs text-gray-600">
+                                                                <div className="flex items-center gap-1.5">
+                                                                    <FaBuilding className="text-gray-400" />
+                                                                    <span className="truncate max-w-[150px]">{job.company}</span>
                                                                 </div>
-                                                                <div className="flex items-center gap-2">
-                                                                    <span className="text-gray-400">📍</span>
-                                                                    <span>{job.location}</span>
+                                                                <div className="flex items-center gap-1.5">
+                                                                    <FaMapMarkerAlt className="text-gray-400" />
+                                                                    <span className="truncate max-w-[150px]">{job.location}</span>
                                                                 </div>
                                                                 {job.salary && job.salary !== 'Not specified' && (
-                                                                    <div className="flex items-center gap-2">
-                                                                        <span className="text-gray-400">💰</span>
-                                                                        <span className="font-semibold text-green-600">{job.salary}</span>
+                                                                    <div className="flex items-center gap-1.5 text-green-600 font-medium">
+                                                                        <FaMoneyBillWave />
+                                                                        <span>{job.salary}</span>
                                                                     </div>
                                                                 )}
                                                             </div>
                                                         </div>
-                                                        {job.link && (
-                                                            <button
-                                                                onClick={() => setSelectedJob(job)}
-                                                                className="shrink-0 px-3 py-2 bg-gradient-to-r from-green-500 to-teal-600 text-white text-xs font-semibold rounded-lg hover:from-green-600 hover:to-teal-700 transition-all shadow-sm hover:shadow-md"
-                                                            >
-                                                                View Details
-                                                            </button>
-                                                        )}
+                                                        <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover/job:bg-teal-50 group-hover/job:text-teal-600 transition-colors shrink-0">
+                                                            <FiMoreVertical />
+                                                        </div>
                                                     </div>
                                                 </div>
                                             ))}
                                         </div>
                                     )}
 
-                                    <div className={`text-[10px] sm:text-xs mt-2 ${message.sender === 'user' ? 'text-white/70' : 'text-gray-500'}`}>
+                                    <div className={`text-[10px] mt-1.5 px-1 font-medium ${message.sender === 'user' ? 'text-white/70' : 'text-gray-500'}`}>
                                         {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                     </div>
                                 </div>
@@ -365,13 +411,14 @@ export default function ChatBot() {
                         ))}
 
                         {isTyping && (
-                            <div className="flex justify-start animate-fade-in-up">
-                                <div className="glass-panel border-2 border-teal-400/20 rounded-2xl px-5 py-4">
-                                    <div className="flex gap-2">
-                                        <div className="w-2 h-2 bg-teal-500 rounded-full animate-bounce"></div>
-                                        <div className="w-2 h-2 bg-teal-500 rounded-full animate-bounce delay-75"></div>
-                                        <div className="w-2 h-2 bg-teal-500 rounded-full animate-bounce delay-150"></div>
-                                    </div>
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 mt-1 shadow-sm border border-teal-200">
+                                    <FaRobot size={14} />
+                                </div>
+                                <div className="glass-panel border border-teal-400/20 rounded-2xl rounded-tl-none px-4 py-3 flex gap-1.5 items-center">
+                                    <div className="w-1.5 h-1.5 bg-teal-500 rounded-full animate-bounce"></div>
+                                    <div className="w-1.5 h-1.5 bg-teal-500 rounded-full animate-bounce delay-75"></div>
+                                    <div className="w-1.5 h-1.5 bg-teal-500 rounded-full animate-bounce delay-150"></div>
                                 </div>
                             </div>
                         )}
@@ -379,17 +426,17 @@ export default function ChatBot() {
                     </div>
                 </div>
 
-                {/* Suggested Queries (Only show if new chat/empty) */}
+                {/* Suggested Queries */}
                 {messages.length <= 1 && !currentSessionId && (
-                    <div className="shrink-0 px-2 sm:px-4 pb-3">
-                        <div className="max-w-4xl mx-auto">
-                            <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
+                    <div className="shrink-0 px-4 sm:px-6 pb-3 z-10 w-full">
+                        <div className="w-full max-w-[95%] xl:max-w-[1600px] mx-auto">
+                            <div className="flex gap-2 overflow-x-auto pb-2 justify-center hide-scrollbar flex-wrap">
                                 {[
-                                    "💼 Find Python developer jobs",
-                                    "💰 Average salary for data scientists",
-                                    "🏢 Jobs at Google",
-                                    "🔥 Remote React jobs",
-                                    "📊 Tech jobs in Jerusalem"
+                                    "Waiter in Jerusalem",
+                                    "Driver in Tel Aviv",
+                                    "Student Job",
+                                    "Full Stack Developer",
+                                    "Part time retail"
                                 ].map((query, idx) => (
                                     <button
                                         key={idx}
@@ -405,98 +452,104 @@ export default function ChatBot() {
                 )}
 
                 {/* Input Area */}
-                <div className="shrink-0 glass-panel border-t-2 border-teal-400/20 px-2 sm:px-4 py-3 sm:py-4 z-10">
-                    <div className="max-w-4xl mx-auto flex gap-2 sm:gap-3">
+                <div className="shrink-0 glass-panel border-t-2 border-teal-400/20 px-4 py-4 sm:px-6 sm:py-5 z-20">
+                    <div className="w-full max-w-[95%] xl:max-w-[1600px] mx-auto flex gap-3 relative">
                         <input
                             type="text"
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                            placeholder="Ask me anything about jobs..."
-                            className="flex-1 px-4 sm:px-5 py-3 sm:py-3.5 bg-white border-2 border-gray-300 rounded-xl text-sm sm:text-base focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all shadow-sm"
+                            placeholder="Type your message..."
+                            className="flex-1 px-5 py-3.5 bg-white border-2 border-gray-300 rounded-xl text-sm md:text-base focus:outline-none focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/10 transition-all shadow-sm pl-5"
                         />
                         <button
                             onClick={handleSend}
                             disabled={!inputValue.trim() || isTyping}
-                            className="px-4 sm:px-6 py-3 sm:py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 transition-all transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                            className="px-5 md:px-8 py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md active:scale-95 flex items-center gap-2"
                         >
-                            <span className="hidden sm:inline">Send</span>
-                            <span className="sm:hidden text-xl">📤</span>
+                            <span className="hidden md:inline">Send</span>
+                            <FaPaperPlane className="transform -rotate-0 translate-y-[1px]" />
                         </button>
                     </div>
                 </div>
-            </div>
+            </main>
 
             {/* Job Details Modal */}
             {selectedJob && (
                 <div
-                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4 md:p-6"
                     onClick={() => setSelectedJob(null)}
                 >
                     <div
-                        className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+                        className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden animate-scale-in"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Modal Header */}
-                        <div className="sticky top-0 bg-gradient-to-r from-green-500 to-teal-600 text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
-                            <h2 className="text-xl font-bold">Job Details</h2>
+                        <div className="bg-gradient-to-r from-green-500 to-teal-600 text-white px-6 py-5 flex items-center justify-between shrink-0">
+                            <div>
+                                <h2 className="text-lg font-bold">Job Details</h2>
+                                <p className="text-xs text-green-100 uppercase tracking-wider mt-0.5">RizqaAI Verified</p>
+                            </div>
                             <button
                                 onClick={() => setSelectedJob(null)}
-                                className="text-2xl hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center transition-all"
+                                className="text-white/60 hover:text-white hover:bg-white/20 rounded-full p-2 transition-all"
                             >
-                                ×
+                                <FiX size={24} />
                             </button>
                         </div>
 
                         {/* Modal Body */}
-                        <div className="p-6 space-y-6">
-                            {/* Job Title */}
-                            <div>
-                                <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                                    {selectedJob.title}
-                                </h3>
-                            </div>
+                        <div className="p-6 md:p-8 overflow-y-auto custom-scrollbar">
+                            <h3 className="text-2xl font-bold text-gray-900 mb-6 leading-tight">
+                                {selectedJob.title}
+                            </h3>
 
-                            {/* Job Details Grid */}
-                            <div className="space-y-4">
-                                <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">
-                                    <span className="text-2xl">🏢</span>
+                            <div className="grid gap-4">
+                                <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                    <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-gray-600 shadow-sm border border-gray-100">
+                                        <FaBuilding size={20} />
+                                    </div>
                                     <div>
-                                        <div className="text-xs text-gray-500 uppercase font-semibold mb-1">Company</div>
-                                        <div className="text-base font-medium text-gray-900">{selectedJob.company}</div>
+                                        <div className="text-xs text-gray-400 uppercase font-bold mb-1">Company</div>
+                                        <div className="text-base font-semibold text-gray-900">{selectedJob.company}</div>
                                     </div>
                                 </div>
 
-                                <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">
-                                    <span className="text-2xl">📍</span>
+                                <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                    <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-gray-600 shadow-sm border border-gray-100">
+                                        <FaMapMarkerAlt size={20} />
+                                    </div>
                                     <div>
-                                        <div className="text-xs text-gray-500 uppercase font-semibold mb-1">Location</div>
-                                        <div className="text-base font-medium text-gray-900">{selectedJob.location}</div>
+                                        <div className="text-xs text-gray-400 uppercase font-bold mb-1">Location</div>
+                                        <div className="text-base font-semibold text-gray-900">{selectedJob.location}</div>
                                     </div>
                                 </div>
 
                                 {selectedJob.salary && selectedJob.salary !== 'Not specified' && (
-                                    <div className="flex items-start gap-3 p-4 bg-green-50 rounded-xl border border-green-200">
-                                        <span className="text-2xl">💰</span>
+                                    <div className="flex items-start gap-4 p-4 bg-green-50 rounded-xl border border-green-100">
+                                        <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-green-600 shadow-sm border border-green-100">
+                                            <FaMoneyBillWave size={20} />
+                                        </div>
                                         <div>
-                                            <div className="text-xs text-green-700 uppercase font-semibold mb-1">Salary</div>
-                                            <div className="text-base font-bold text-green-600">{selectedJob.salary}</div>
+                                            <div className="text-xs text-green-600 uppercase font-bold mb-1">Salary Range</div>
+                                            <div className="text-base font-bold text-green-700">{selectedJob.salary}</div>
                                         </div>
                                     </div>
                                 )}
                             </div>
+                        </div>
 
-                            {/* Apply Button */}
-                            <div className="pt-4 border-t border-gray-200">
-                                <a
-                                    href={selectedJob.link}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="block w-full text-center px-6 py-4 bg-gradient-to-r from-green-500 to-teal-600 text-white font-bold rounded-xl hover:from-green-600 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
-                                >
-                                    Apply Now →
-                                </a>
-                            </div>
+                        {/* Modal Footer */}
+                        <div className="p-6 border-t border-gray-100 bg-gray-50 shrink-0">
+                            <a
+                                href={selectedJob.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center justify-center gap-2 w-full py-4 bg-gradient-to-r from-green-500 to-teal-600 text-white font-bold rounded-xl hover:from-green-600 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                            >
+                                <span>Apply Now</span>
+                                <FiArrowUpRight size={20} />
+                            </a>
                         </div>
                     </div>
                 </div>
