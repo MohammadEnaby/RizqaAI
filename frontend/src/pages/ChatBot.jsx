@@ -348,8 +348,8 @@ export default function ChatBot() {
                                 <div className={`flex flex-col max-w-[90%] md:max-w-[75%] lg:max-w-[60%] ${message.sender === 'user' ? 'items-end' : 'items-start'}`}>
                                     <div
                                         className={`rounded-2xl px-5 py-4 shadow-md text-sm md:text-base leading-relaxed whitespace-pre-wrap ${message.sender === 'user'
-                                                ? 'bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-br-none'
-                                                : 'bg-white border border-gray-200 text-gray-800 rounded-tl-none'
+                                            ? 'bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-br-none'
+                                            : 'bg-white border border-gray-200 text-gray-800 rounded-tl-none'
                                             }`}
                                     >
                                         {message.text}
@@ -426,13 +426,13 @@ export default function ChatBot() {
                 {messages.length <= 1 && !currentSessionId && (
                     <div className="shrink-0 px-4 sm:px-6 pb-3 z-10 w-full">
                         <div className="w-full max-w-[95%] xl:max-w-[1600px] mx-auto">
-                            <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
+                            <div className="flex gap-2 overflow-x-auto pb-2 justify-center hide-scrollbar flex-wrap">
                                 {[
-                                    "Python developer",
-                                    "Data Scientist salary",
-                                    "Google Tel Aviv",
-                                    "Remote React jobs",
-                                    "Junior DevOps"
+                                    "Waiter in Jerusalem",
+                                    "Driver in Tel Aviv",
+                                    "Student Job",
+                                    "Full Stack Developer",
+                                    "Part time retail"
                                 ].map((query, idx) => (
                                     <button
                                         key={idx}
