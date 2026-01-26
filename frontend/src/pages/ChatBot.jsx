@@ -332,7 +332,7 @@ export default function ChatBot() {
 
                 {/* Messages List */}
                 <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 scroll-smooth min-h-0">
-                    <div className="max-w-4xl mx-auto space-y-6">
+                    <div className="w-full max-w-[95%] xl:max-w-[1600px] mx-auto space-y-6">
                         {messages.map((message) => (
                             <div
                                 key={message.id}
@@ -345,7 +345,7 @@ export default function ChatBot() {
                                     </div>
                                 )}
 
-                                <div className={`flex flex-col max-w-[85%] md:max-w-[70%] ${message.sender === 'user' ? 'items-end' : 'items-start'}`}>
+                                <div className={`flex flex-col max-w-[90%] md:max-w-[75%] lg:max-w-[60%] ${message.sender === 'user' ? 'items-end' : 'items-start'}`}>
                                     <div
                                         className={`rounded-2xl px-5 py-4 shadow-md text-sm md:text-base leading-relaxed whitespace-pre-wrap ${message.sender === 'user'
                                                 ? 'bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-br-none'
@@ -424,8 +424,8 @@ export default function ChatBot() {
 
                 {/* Suggested Queries */}
                 {messages.length <= 1 && !currentSessionId && (
-                    <div className="shrink-0 px-4 sm:px-6 pb-3 z-10">
-                        <div className="max-w-4xl mx-auto">
+                    <div className="shrink-0 px-4 sm:px-6 pb-3 z-10 w-full">
+                        <div className="w-full max-w-[95%] xl:max-w-[1600px] mx-auto">
                             <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
                                 {[
                                     "Python developer",
@@ -449,7 +449,7 @@ export default function ChatBot() {
 
                 {/* Input Area */}
                 <div className="shrink-0 glass-panel border-t-2 border-teal-400/20 px-4 py-4 sm:px-6 sm:py-5 z-20">
-                    <div className="max-w-4xl mx-auto flex gap-3 relative">
+                    <div className="w-full max-w-[95%] xl:max-w-[1600px] mx-auto flex gap-3 relative">
                         <input
                             type="text"
                             value={inputValue}
