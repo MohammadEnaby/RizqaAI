@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { FaLeaf } from 'react-icons/fa';
 
 export default function ChatBot() {
     const { userProfile, currentUser, logout } = useAuth();
@@ -278,12 +279,16 @@ export default function ChatBot() {
                         ☰
                     </button>
 
-                    <div className="w-10 h-10 rounded-full theme-green-blue flex items-center justify-center shadow-lg animate-pulse-custom shrink-0 cursor-pointer hover:scale-105 transition-transform" onClick={() => navigate('/')}>
-                        <span className="text-xl">🤖</span>
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-green-500 to-teal-500 flex items-center justify-center text-white shadow-lg shadow-green-500/30 shrink-0 cursor-pointer hover:scale-105 transition-transform" onClick={() => navigate('/')}>
+                        <FaLeaf size={20} />
                     </div>
 
                     <div className="flex-1 min-w-0">
-                        <h1 onClick={() => navigate('/')} className="text-lg font-bold title-color truncate cursor-pointer hover:opacity-80 transition-opacity">AI Job Assistant</h1>
+                        <div onClick={() => navigate('/')} className="cursor-pointer hover:opacity-80 transition-opacity">
+                            <span className="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-teal-600 tracking-tight">
+                                Rizqa<span className="text-gray-700">AI</span>
+                            </span>
+                        </div>
                         <div className="flex items-center gap-2 text-xs text-teal-600 font-medium">
                             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                             <span>Online</span>
