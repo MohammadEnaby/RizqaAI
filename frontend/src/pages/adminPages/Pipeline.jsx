@@ -1,4 +1,5 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
+import { auth } from '../../firebase';
 import AdminHeader from '../../components/adminPage/AdminHeader';
 import PipelineGrid from '../../components/adminPage/PipelineGrid';
 import SystemLogs from '../../components/adminPage/SystemLogs';
@@ -65,11 +66,17 @@ const Admin = () => {
 
         try {
             const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+            let headers = {
+                'Content-Type': 'application/json',
+            };
+            if (auth.currentUser) {
+                const token = await auth.currentUser.getIdToken();
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
             const response = await fetch(`${apiUrl}/api/run-pipeline`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: headers,
                 body: JSON.stringify({
                     groupID: groupId,
                     timeInterval: parseInt(timeInterval) // Send both, backend can ignore if manual
@@ -146,26 +153,26 @@ const Admin = () => {
     return (
         <div className="min-h-screen p-6 md:p-12 font-sans text-[#0f172a]">
 
-                <AdminHeader
-                    groupId={groupId}
-                    setGroupId={setGroupId}
-                    timeInterval={timeInterval}
-                    setTimeInterval={setTimeInterval}
-                    handleRunPipeline={handleRunPipeline}
-                    isRunning={isRunning}
-                />
+            <AdminHeader
+                groupId={groupId}
+                setGroupId={setGroupId}
+                timeInterval={timeInterval}
+                setTimeInterval={setTimeInterval}
+                handleRunPipeline={handleRunPipeline}
+                isRunning={isRunning}
+            />
 
-                <PipelineGrid
-                    stats={stats}
-                    progress={progress}
-                    activeStep={activeStep}
-                />
+            <PipelineGrid
+                stats={stats}
+                progress={progress}
+                activeStep={activeStep}
+            />
 
-                <SystemLogs
-                    logs={logs}
-                    logsEndRef={logsEndRef}
-                    isRunning={isRunning}
-                />
+            <SystemLogs
+                logs={logs}
+                logsEndRef={logsEndRef}
+                isRunning={isRunning}
+            />
         </div>
     );
 };

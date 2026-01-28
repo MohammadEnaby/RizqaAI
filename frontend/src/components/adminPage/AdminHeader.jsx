@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { FaPlay, FaSpinner } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
+import { auth } from '../../firebase';
+
 const AdminHeader = ({
     title = "Pipeline Overview",
     description = "Control center for automated job scraping, structuring, and database synchronization.",
@@ -12,11 +14,21 @@ const AdminHeader = ({
     const [showDropdown, setShowDropdown] = useState(false);
     const [activeMode, setActiveMode] = useState(null); // 'auto', 'manual', or null
 
+
+
     useEffect(() => {
         const fetchPastGroups = async () => {
             try {
                 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-                const response = await fetch(`${apiUrl}/api/platform-groups`);
+
+                // Get token if user is logged in
+                let headers = {};
+                if (auth.currentUser) {
+                    const token = await auth.currentUser.getIdToken();
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+
+                const response = await fetch(`${apiUrl}/api/platform-groups`, { headers });
                 const data = await response.json();
                 if (Array.isArray(data)) {
                     // Map groupID to id for compatibility

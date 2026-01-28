@@ -3,7 +3,7 @@ import sys
 import subprocess
 import asyncio
 from typing import AsyncGenerator, Optional, List, Dict, Any
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from firebase_admin import firestore
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -18,6 +18,7 @@ if current_dir not in sys.path:
 
 
 from api.chatbot import router as chatbot_router
+from api.dependencies import verify_admin
 
 # Import pipeline logic from core
 from core.pipeline import pipeline_generator
@@ -69,7 +70,7 @@ async def startup_event():
     asyncio.create_task(scheduler_loop())
     print("[INFO] AutoFill Scheduler started in background.")
 
-@app.post("/api/run-pipeline")
+@app.post("/api/run-pipeline", dependencies=[Depends(verify_admin)])
 async def run_pipeline(request: PipelineRequest):
     return StreamingResponse(
         pipeline_generator(request.groupID),
@@ -88,7 +89,7 @@ except ImportError:
 
 # --- CRUD Endpoints for Platform Groups ---
 
-@app.get("/api/platform-groups", response_model=List[Dict[str, Any]])
+@app.get("/api/platform-groups", response_model=List[Dict[str, Any]], dependencies=[Depends(verify_admin)])
 async def get_platform_groups():
     if not db:
         raise HTTPException(status_code=500, detail="Database not initialized")
@@ -104,7 +105,7 @@ async def get_platform_groups():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/platform-groups")
+@app.post("/api/platform-groups", dependencies=[Depends(verify_admin)])
 async def create_platform_group(group: PlatformGroupCreate):
     if not db:
         raise HTTPException(status_code=500, detail="Database not initialized")
@@ -122,7 +123,7 @@ async def create_platform_group(group: PlatformGroupCreate):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.put("/api/platform-groups/{group_id}")
+@app.put("/api/platform-groups/{group_id}", dependencies=[Depends(verify_admin)])
 async def update_platform_group(group_id: str, group_update: PlatformGroupUpdate):
     if not db:
         raise HTTPException(status_code=500, detail="Database not initialized")
@@ -143,7 +144,7 @@ async def update_platform_group(group_id: str, group_update: PlatformGroupUpdate
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.delete("/api/platform-groups/{group_id}")
+@app.delete("/api/platform-groups/{group_id}", dependencies=[Depends(verify_admin)])
 async def delete_platform_group(group_id: str):
     if not db:
         raise HTTPException(status_code=500, detail="Database not initialized")
