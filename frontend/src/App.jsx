@@ -4,7 +4,6 @@ import { AuthProvider } from './contexts/AuthContext';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import CompleteProfile from './pages/CompleteProfile';
-import Home from './pages/Home';
 import ChatBot from './pages/ChatBot';
 import Admin from './pages/adminPages/Pipeline';
 import Dashboard from './pages/adminPages/Dashboard';
@@ -33,14 +32,6 @@ function App() {
             }
           />
           <Route path="/" element={<MainPage />} />
-          <Route
-            path="/home"
-            element={
-              <ProtectedRoute>
-                <Home />
-              </ProtectedRoute>
-            }
-          />
           <Route
             path="/chatbot"
             element={
