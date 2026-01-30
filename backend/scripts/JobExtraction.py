@@ -222,6 +222,9 @@ def main():
         if source_id:
             item['groupID'] = source_id
 
+        if source_id == "233704417129124": #this group posts jobs for students
+            item['target_audience'] = "students"
+
         # Fallback for contact_info
         if not item.get('contact_info'):
             item['contact_info'] = post_link
