@@ -164,55 +164,57 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
         if not title: continue
         
         # Smart match logic
-        match_score = 0
+        # Strict Matching Logic
+        keyword_match = False
+        location_match = False
         
-        # Check against ALL related keywords
+        # 1. Check Keywords (OR logic within keywords: any synonym match)
         if keyword_list:
             for k in keyword_list:
                 if k in title:
-                    match_score += 2
-                    break # Matched one keyword, good enough for keyword score
+                    keyword_match = True
+                    break
         
+        # 2. Check Location (OR logic within locations: any variation match)
         if location_list:
-            # Flexible location match - check against all locations in the list
             doc_loc = data.get("location") or ""
             doc_loc = doc_loc.lower() if doc_loc else ""
-            for loc in location_list:
-                if loc in doc_loc or doc_loc in loc:
-                    match_score += 1
-                    break  # One match is enough
             
-        # Decision Logic:
-        # 1. If we have keywords, we ideally want a keyword match.
-        #    BUT if we have a location match and no keyword match, should we show it?
-        #    User: "Selling in Jerusalem". 
-        #    If no sales jobs in JLM, showing "Waiter in JLM" is better than nothing? 
-        #    Let's stick to: Must match Keyword OR Location.
+            # Only match if job has a valid location
+            if doc_loc and doc_loc != "unknown" and doc_loc != "not specified":
+                for loc in location_list:
+                    if loc in doc_loc or doc_loc in loc:
+                        location_match = True
+                        break
         
-        # Decision Logic:
-        # Match Score Logic:
-        # - Keyword Match: +2
-        # - Location Match: +1
-        
-        # 1. User provided Keywords AND Location
+        # 3. Decision: Strict AND enforcement
+        keep_job = False
+        match_score = 0
+
+        # Case A: User asked for Keywords AND Location
         if keyword_list and location_list:
-             # If neither matched, skip.
-             if match_score == 0: continue
-             # If at least one matched (score >= 1), we keep it. 
-             # (Allows "Waiter in Holon" to show "Waiter in Jerusalem" [score 2] or "Job in Holon" [score 1])
+            if keyword_match and location_match:
+                keep_job = True
+                match_score = 3 # Highest priority
 
-        # 2. User provided ONLY Keywords (e.g. "Selling")
+        # Case B: User asked ONLY for Keywords
         elif keyword_list and not location_list:
-             if match_score == 0: continue
+            if keyword_match:
+                keep_job = True
+                match_score = 2
 
-        # 3. User provided ONLY Location (e.g. "Holon")
+        # Case C: User asked ONLY for Location
         elif location_list and not keyword_list:
-             # Critical Fix: match_score must be > 0 (which means location matched, since k-list matches gave 0)
-             if match_score == 0: continue
-
-        # 4. User provided NOTHING (e.g. "I want a job")
+            if location_match:
+                keep_job = True
+                match_score = 1
+        
+        # Case D: User asked for nothing (General) -> Return all (handled by default list capability but here we filter)
         else:
-             pass # Return all (recent)
+             keep_job = True # Pass through recent jobs
+
+        if not keep_job:
+            continue
 
 
         # Map to JobResult structure
