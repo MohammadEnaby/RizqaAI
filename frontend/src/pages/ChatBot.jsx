@@ -2,9 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { FaLeaf, FaRobot, FaBuilding, FaMapMarkerAlt, FaMoneyBillWave, FaPaperPlane, FaUser } from 'react-icons/fa';
-
 import { FiPlus, FiMessageSquare, FiTrash2, FiMenu, FiLogOut, FiSettings, FiX, FiMoreVertical, FiSearch, FiArrowUpRight } from 'react-icons/fi';
-import ThemeToggle from '../components/ThemeToggle';
 
 export default function ChatBot() {
     const { userProfile, currentUser, logout } = useAuth();
@@ -200,7 +198,7 @@ export default function ChatBot() {
 
             {/* Sidebar Navigation */}
             <aside className={`
-                fixed md:relative z-30 h-full w-80 glass-panel border-r border-teal-400/20 dark:border-teal-500/20 transform transition-transform duration-300 ease-in-out flex flex-col
+                fixed md:relative z-30 h-full w-80 glass-panel border-r border-teal-400/20 transform transition-transform duration-300 ease-in-out flex flex-col
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
             `}>
                 {/* Sidebar Header */}
@@ -233,8 +231,8 @@ export default function ChatBot() {
                             className={`
                                 group flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all border
                                 ${currentSessionId === session.id
-                                    ? 'bg-white/60 dark:bg-gray-700/60 border-teal-400/30 text-teal-900 dark:text-teal-200 shadow-sm'
-                                    : 'border-transparent hover:bg-white/30 dark:hover:bg-gray-700/30 text-gray-700 dark:text-gray-300'}
+                                    ? 'bg-white/60 border-teal-400/30 text-teal-900 shadow-sm'
+                                    : 'border-transparent hover:bg-white/30 text-gray-700'}
                             `}
                         >
                             <div className="flex items-center gap-3 min-w-0">
@@ -259,16 +257,16 @@ export default function ChatBot() {
                 </div>
 
                 {/* User Profile / Lower Sidebar */}
-                <div className="p-4 border-t border-teal-400/20 dark:border-teal-500/20 bg-white/30 dark:bg-gray-800/30">
+                <div className="p-4 border-t border-teal-400/20 bg-white/30">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-green-400 to-teal-500 flex items-center justify-center text-white font-bold shadow-sm">
                             {(userProfile?.name || currentUser?.displayName || currentUser?.email || '?')[0].toUpperCase()}
                         </div>
                         <div className="flex-1 min-w-0">
-                            <div className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+                            <div className="text-sm font-semibold text-gray-900 truncate">
                                 {userProfile?.name || currentUser?.displayName || 'User'}
                             </div>
-                            <div className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                            <div className="text-xs text-gray-600 truncate">
                                 {currentUser?.email}
                             </div>
                         </div>
@@ -280,7 +278,7 @@ export default function ChatBot() {
             <main className="flex-1 flex flex-col h-full min-w-0 relative w-full">
 
                 {/* Header */}
-                <header className="glass-panel border-b-2 border-teal-400/20 dark:border-teal-500/20 px-4 py-3 flex items-center justify-between sticky top-0 z-10 shrink-0">
+                <header className="glass-panel border-b-2 border-teal-400/20 px-4 py-3 flex items-center justify-between sticky top-0 z-10 shrink-0">
                     <div className="flex items-center gap-3">
                         {/* Mobile Menu Toggle */}
                         <button
@@ -298,9 +296,9 @@ export default function ChatBot() {
                                 <FaLeaf size={20} />
                             </div>
                             <div>
-                                <h1 className="text-lg font-bold text-gray-900 dark:text-white leading-tight">
-                                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-teal-600 dark:from-green-400 dark:to-teal-400">Rizqa</span>
-                                    <span className="text-gray-700 dark:text-gray-300">AI</span>
+                                <h1 className="text-lg font-bold text-gray-900 leading-tight">
+                                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-teal-600">Rizqa</span>
+                                    <span className="text-gray-700">AI</span>
                                 </h1>
                                 <div className="flex items-center gap-1.5">
                                     <span className="relative flex h-2 w-2">
@@ -318,18 +316,16 @@ export default function ChatBot() {
                         {userProfile?.role === 'admin' && (
                             <Link
                                 to="/admin"
-                                className="flex items-center gap-2 px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-gray-700/50 rounded-lg text-sm font-medium transition-all"
+                                className="flex items-center gap-2 px-3 py-2 text-gray-700 hover:text-gray-900 hover:bg-white/50 rounded-lg text-sm font-medium transition-all"
                             >
                                 <FiSettings className="text-lg" />
                                 <span className="hidden md:inline">Dashboard</span>
                             </Link>
                         )}
 
-                        <ThemeToggle />
-
                         <button
                             onClick={handleLogout}
-                            className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border-2 border-red-100 dark:border-red-900/30 text-red-500 dark:text-red-400 rounded-xl text-xs sm:text-sm font-semibold hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-200 dark:hover:border-red-800 hover:shadow-md transition-all shrink-0"
+                            className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white border-2 border-red-100 text-red-500 rounded-xl text-xs sm:text-sm font-semibold hover:bg-red-50 hover:border-red-200 hover:shadow-md transition-all shrink-0"
                             title="Sign Out"
                         >
                             <FiLogOut className="text-lg" />
@@ -357,7 +353,7 @@ export default function ChatBot() {
                                     <div
                                         className={`rounded-2xl px-5 py-4 shadow-md text-sm md:text-base leading-relaxed whitespace-pre-wrap ${message.sender === 'user'
                                             ? 'bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-br-none'
-                                            : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 rounded-tl-none'
+                                            : 'bg-white border border-gray-200 text-gray-800 rounded-tl-none'
                                             }`}
                                     >
                                         {message.text}
@@ -366,7 +362,7 @@ export default function ChatBot() {
                                     {/* Jobs Display */}
                                     {message.jobs && message.jobs.length > 0 && (
                                         <div className="mt-4 w-full space-y-3">
-                                            <div className="flex items-center gap-2 text-xs font-bold text-teal-700 dark:text-teal-400 uppercase tracking-wider px-1">
+                                            <div className="flex items-center gap-2 text-xs font-bold text-teal-700 uppercase tracking-wider px-1">
                                                 <FiSearch />
                                                 <span>{message.jobs.length} Found</span>
                                             </div>
@@ -374,11 +370,11 @@ export default function ChatBot() {
                                                 <div
                                                     key={idx}
                                                     onClick={() => setSelectedJob(job)}
-                                                    className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md border border-gray-200 dark:border-gray-700 hover:border-teal-400 dark:hover:border-teal-500 hover:shadow-lg transition-all cursor-pointer group/job relative overflow-hidden"
+                                                    className="bg-white rounded-xl p-4 shadow-md border border-gray-200 hover:border-teal-400 hover:shadow-lg transition-all cursor-pointer group/job relative overflow-hidden"
                                                 >
                                                     <div className="flex items-start justify-between gap-4">
                                                         <div className="flex-1 min-w-0">
-                                                            <h4 className="font-bold text-gray-900 dark:text-white mb-1 group-hover/job:text-teal-600 dark:group-hover/job:text-teal-400 transition-colors line-clamp-1">
+                                                            <h4 className="font-bold text-gray-900 mb-1 group-hover/job:text-teal-600 transition-colors line-clamp-1">
                                                                 {job.title}
                                                             </h4>
                                                             <div className="flex flex-wrap gap-y-1 gap-x-4 text-xs text-gray-600">
@@ -398,7 +394,7 @@ export default function ChatBot() {
                                                                 )}
                                                             </div>
                                                         </div>
-                                                        <div className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-700 flex items-center justify-center text-gray-400 dark:text-gray-500 group-hover/job:bg-teal-50 dark:group-hover/job:bg-teal-900/30 group-hover/job:text-teal-600 dark:group-hover/job:text-teal-400 transition-colors shrink-0">
+                                                        <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover/job:bg-teal-50 group-hover/job:text-teal-600 transition-colors shrink-0">
                                                             <FiMoreVertical />
                                                         </div>
                                                     </div>
@@ -445,7 +441,7 @@ export default function ChatBot() {
                                     <button
                                         key={idx}
                                         onClick={() => handleSuggestedClick(query)}
-                                        className="px-3 sm:px-4 py-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-teal-400/30 dark:border-teal-500/30 rounded-full text-xs sm:text-sm font-semibold text-teal-700 dark:text-teal-400 hover:bg-white dark:hover:bg-gray-800 hover:border-teal-400 dark:hover:border-teal-500 transition-all whitespace-nowrap hover:scale-105"
+                                        className="px-3 sm:px-4 py-2 bg-white/80 backdrop-blur-sm border-2 border-teal-400/30 rounded-full text-xs sm:text-sm font-semibold text-teal-700 hover:bg-white hover:border-teal-400 transition-all whitespace-nowrap hover:scale-105"
                                     >
                                         {query}
                                     </button>
@@ -456,7 +452,7 @@ export default function ChatBot() {
                 )}
 
                 {/* Input Area */}
-                <div className="shrink-0 glass-panel border-t-2 border-teal-400/20 dark:border-teal-500/20 px-4 py-4 sm:px-6 sm:py-5 z-20">
+                <div className="shrink-0 glass-panel border-t-2 border-teal-400/20 px-4 py-4 sm:px-6 sm:py-5 z-20">
                     <div className="w-full max-w-[95%] xl:max-w-[1600px] mx-auto flex gap-3 relative">
                         <input
                             type="text"
@@ -464,7 +460,7 @@ export default function ChatBot() {
                             onChange={(e) => setInputValue(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                             placeholder="Type your message..."
-                            className="flex-1 px-5 py-3.5 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-700 rounded-xl text-sm md:text-base text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-teal-500 dark:focus:border-teal-500 focus:bg-white dark:focus:bg-gray-800 focus:ring-4 focus:ring-teal-500/10 transition-all shadow-sm pl-5"
+                            className="flex-1 px-5 py-3.5 bg-white border-2 border-gray-300 rounded-xl text-sm md:text-base focus:outline-none focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/10 transition-all shadow-sm pl-5"
                         />
                         <button
                             onClick={handleSend}
@@ -485,7 +481,7 @@ export default function ChatBot() {
                     onClick={() => setSelectedJob(null)}
                 >
                     <div
-                        className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden animate-scale-in"
+                        className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden animate-scale-in"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Modal Header */}
@@ -503,35 +499,35 @@ export default function ChatBot() {
                         </div>
 
                         {/* Modal Body */}
-                        <div className="p-6 md:p-8 overflow-y-auto custom-scrollbar bg-white dark:bg-gray-800">
-                            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+                        <div className="p-6 md:p-8 overflow-y-auto custom-scrollbar">
+                            <h3 className="text-2xl font-bold text-gray-900 mb-6 leading-tight">
                                 {selectedJob.title}
                             </h3>
 
                             <div className="grid gap-4">
-                                <div className="flex items-start gap-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-100 dark:border-gray-700">
-                                    <div className="w-10 h-10 rounded-lg bg-white dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-400 shadow-sm border border-gray-100 dark:border-gray-700">
+                                <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                    <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-gray-600 shadow-sm border border-gray-100">
                                         <FaBuilding size={20} />
                                     </div>
                                     <div>
                                         <div className="text-xs text-gray-400 uppercase font-bold mb-1">Company</div>
-                                        <div className="text-base font-semibold text-gray-900 dark:text-white">{selectedJob.company}</div>
+                                        <div className="text-base font-semibold text-gray-900">{selectedJob.company}</div>
                                     </div>
                                 </div>
 
-                                <div className="flex items-start gap-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-100 dark:border-gray-700">
-                                    <div className="w-10 h-10 rounded-lg bg-white dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-400 shadow-sm border border-gray-100 dark:border-gray-700">
+                                <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                    <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-gray-600 shadow-sm border border-gray-100">
                                         <FaMapMarkerAlt size={20} />
                                     </div>
                                     <div>
                                         <div className="text-xs text-gray-400 uppercase font-bold mb-1">Location</div>
-                                        <div className="text-base font-semibold text-gray-900 dark:text-white">{selectedJob.location}</div>
+                                        <div className="text-base font-semibold text-gray-900">{selectedJob.location}</div>
                                     </div>
                                 </div>
 
                                 {selectedJob.salary && selectedJob.salary !== 'Not specified' && (
-                                    <div className="flex items-start gap-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-100 dark:border-green-800/30">
-                                        <div className="w-10 h-10 rounded-lg bg-white dark:bg-gray-800 flex items-center justify-center text-green-600 dark:text-green-400 shadow-sm border border-green-100 dark:border-green-800/30">
+                                    <div className="flex items-start gap-4 p-4 bg-green-50 rounded-xl border border-green-100">
+                                        <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-green-600 shadow-sm border border-green-100">
                                             <FaMoneyBillWave size={20} />
                                         </div>
                                         <div>
@@ -544,7 +540,7 @@ export default function ChatBot() {
                         </div>
 
                         {/* Modal Footer */}
-                        <div className="p-6 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 shrink-0">
+                        <div className="p-6 border-t border-gray-100 bg-gray-50 shrink-0">
                             <a
                                 href={selectedJob.link}
                                 target="_blank"

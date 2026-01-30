@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { FaEye, FaEyeSlash, FaCheck, FaTimes } from 'react-icons/fa';
-import ThemeToggle from '../components/ThemeToggle';
 
 export default function CompleteProfile() {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
@@ -47,36 +46,75 @@ export default function CompleteProfile() {
   const defaultLastName = currentUser?.displayName?.split(' ').slice(1).join(' ') || '';
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#667eea] to-[#764ba2] dark:from-gray-900 dark:to-gray-800 p-5 relative">
-
-      <div className="absolute top-5 right-5 z-10">
-        <ThemeToggle />
-      </div>
-      <div className="w-full max-w-xl bg-white dark:bg-gray-800 p-8 md:p-12 rounded-2xl shadow-2xl transition-all">
-        <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-gradient-to-br from-[#667eea] to-[#764ba2] rounded-full flex items-center justify-center mx-auto mb-5 text-4xl shadow-lg">
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      padding: '40px 20px'
+    }}>
+      <div style={{
+        maxWidth: '600px',
+        width: '100%',
+        background: 'white',
+        padding: '48px 40px',
+        borderRadius: '16px',
+        boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+      }}>
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <div style={{
+            width: '80px',
+            height: '80px',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 20px',
+            fontSize: '36px'
+          }}>
             ✨
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          <h2 style={{
+            fontSize: '28px',
+            fontWeight: '700',
+            color: '#1a202c',
+            marginBottom: '8px'
+          }}>
             Complete Your Profile
           </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p style={{ fontSize: '14px', color: '#718096' }}>
             Welcome! Please provide a few more details
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-xl mb-5 text-sm font-medium text-center">
+          <div style={{
+            background: '#fee',
+            border: '1px solid #fcc',
+            color: '#c33',
+            padding: '12px 16px',
+            borderRadius: '8px',
+            marginBottom: '20px',
+            fontSize: '14px'
+          }}>
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* Name Fields */}
-          <div className="grid grid-cols-2 gap-4 mb-5">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
             <div>
-              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
-                First Name <span className="text-red-500">*</span>
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#2d3748',
+                marginBottom: '8px'
+              }}>
+                First Name <span style={{ color: '#e53e3e' }}>*</span>
               </label>
               <input
                 {...register("firstName", {
@@ -89,18 +127,34 @@ export default function CompleteProfile() {
                 type="text"
                 defaultValue={defaultFirstName}
                 placeholder="John"
-                className="w-full px-4 py-3 bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-[#667eea] dark:focus:border-[#667eea] transition-all"
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  border: '2px solid #e2e8f0',
+                  borderRadius: '8px',
+                  fontSize: '15px',
+                  outline: 'none',
+                  transition: 'border-color 0.2s',
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
               />
               {errors.firstName && (
-                <p className="text-red-500 text-xs mt-1.5 font-semibold">
+                <p style={{ color: '#e53e3e', fontSize: '13px', marginTop: '6px' }}>
                   {errors.firstName.message}
                 </p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
-                Last Name <span className="text-red-500">*</span>
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#2d3748',
+                marginBottom: '8px'
+              }}>
+                Last Name <span style={{ color: '#e53e3e' }}>*</span>
               </label>
               <input
                 {...register("lastName", {
@@ -113,10 +167,20 @@ export default function CompleteProfile() {
                 type="text"
                 defaultValue={defaultLastName}
                 placeholder="Doe"
-                className="w-full px-4 py-3 bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-[#667eea] dark:focus:border-[#667eea] transition-all"
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  border: '2px solid #e2e8f0',
+                  borderRadius: '8px',
+                  fontSize: '15px',
+                  outline: 'none',
+                  transition: 'border-color 0.2s',
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
               />
               {errors.lastName && (
-                <p className="text-red-500 text-xs mt-1.5 font-semibold">
+                <p style={{ color: '#e53e3e', fontSize: '13px', marginTop: '6px' }}>
                   {errors.lastName.message}
                 </p>
               )}
@@ -124,25 +188,46 @@ export default function CompleteProfile() {
           </div>
 
           {/* Email (Read-only from Google) */}
-          <div className="mb-5">
-            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#2d3748',
+              marginBottom: '8px'
+            }}>
               Email Address
             </label>
             <input
               type="email"
               value={currentUser?.email || ''}
               disabled
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700/50 border-2 border-gray-200 dark:border-gray-600 rounded-xl text-gray-500 dark:text-gray-400 cursor-not-allowed"
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                border: '2px solid #e2e8f0',
+                borderRadius: '8px',
+                fontSize: '15px',
+                background: '#f7f7f7',
+                color: '#666',
+                cursor: 'not-allowed'
+              }}
             />
-            <p className="text-xs text-gray-400 mt-1.5">
+            <p style={{ color: '#718096', fontSize: '12px', marginTop: '4px' }}>
               This email is from your Google account
             </p>
           </div>
 
           {/* Phone Number */}
-          <div className="mb-5">
-            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
-              Phone Number <span className="text-red-500">*</span>
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#2d3748',
+              marginBottom: '8px'
+            }}>
+              Phone Number <span style={{ color: '#e53e3e' }}>*</span>
             </label>
             <input
               {...register("phone", {
@@ -158,61 +243,107 @@ export default function CompleteProfile() {
               })}
               type="tel"
               placeholder="+1 (555) 123-4567"
-              className="w-full px-4 py-3 bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-[#667eea] dark:focus:border-[#667eea] transition-all"
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                border: '2px solid #e2e8f0',
+                borderRadius: '8px',
+                fontSize: '15px',
+                outline: 'none',
+                transition: 'border-color 0.2s',
+              }}
+              onFocus={(e) => e.target.style.borderColor = '#667eea'}
+              onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
             />
             {errors.phone && (
-              <p className="text-red-500 text-xs mt-1.5 font-semibold">
+              <p style={{ color: '#e53e3e', fontSize: '13px', marginTop: '6px' }}>
                 {errors.phone.message}
               </p>
             )}
           </div>
 
           {/* Account Type */}
-          <div className="mb-5">
-            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
-              Account Type <span className="text-red-500">*</span>
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#2d3748',
+              marginBottom: '8px'
+            }}>
+              Account Type <span style={{ color: '#e53e3e' }}>*</span>
             </label>
-            <div className="flex gap-3">
-              <label className="flex-1 p-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl cursor-pointer flex items-center gap-2 hover:border-[#667eea] transition-all bg-white dark:bg-gray-700">
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <label style={{
+                flex: 1,
+                padding: '12px',
+                border: '2px solid #e2e8f0',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                transition: 'all 0.2s'
+              }}
+                onMouseOver={(e) => e.currentTarget.style.borderColor = '#667eea'}
+                onMouseOut={(e) => e.currentTarget.style.borderColor = '#e2e8f0'}>
                 <input
                   {...register("role", { required: "Please select an account type" })}
                   type="radio"
                   value="user"
                   defaultChecked
-                  className="w-4 h-4 text-[#667eea] focus:ring-[#667eea]"
+                  style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                 />
                 <div>
-                  <div className="font-bold text-sm text-gray-800 dark:text-gray-200">User</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">Browse & apply for jobs</div>
+                  <div style={{ fontWeight: '600', fontSize: '14px', color: '#2d3748' }}>User</div>
+                  <div style={{ fontSize: '12px', color: '#718096' }}>Browse & apply for jobs</div>
                 </div>
               </label>
 
-              <label className="flex-1 p-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl cursor-pointer flex items-center gap-2 hover:border-[#667eea] transition-all bg-white dark:bg-gray-700">
+              <label style={{
+                flex: 1,
+                padding: '12px',
+                border: '2px solid #e2e8f0',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                transition: 'all 0.2s'
+              }}
+                onMouseOver={(e) => e.currentTarget.style.borderColor = '#667eea'}
+                onMouseOut={(e) => e.currentTarget.style.borderColor = '#e2e8f0'}>
                 <input
                   {...register("role")}
                   type="radio"
                   value="admin"
-                  className="w-4 h-4 text-[#667eea] focus:ring-[#667eea]"
+                  style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                 />
                 <div>
-                  <div className="font-bold text-sm text-gray-800 dark:text-gray-200">Admin</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">Manage the platform</div>
+                  <div style={{ fontWeight: '600', fontSize: '14px', color: '#2d3748' }}>Admin</div>
+                  <div style={{ fontSize: '12px', color: '#718096' }}>Manage the platform</div>
                 </div>
               </label>
             </div>
             {errors.role && (
-              <p className="text-red-500 text-xs mt-1.5 font-semibold">
+              <p style={{ color: '#e53e3e', fontSize: '13px', marginTop: '6px' }}>
                 {errors.role.message}
               </p>
             )}
           </div>
 
           {/* Password */}
-          <div className="mb-4">
-            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
-              Create a Password <span className="text-red-500">*</span>
+          <div style={{ marginBottom: '12px' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#2d3748',
+              marginBottom: '8px'
+            }}>
+              Create a Password <span style={{ color: '#e53e3e' }}>*</span>
             </label>
-            <div className="relative">
+            <div style={{ position: 'relative' }}>
               <input
                 {...register("password", {
                   required: "Password is required",
@@ -229,68 +360,114 @@ export default function CompleteProfile() {
                 })}
                 type={showPassword ? "text" : "password"}
                 placeholder="Create a strong password for your account"
-                className="w-full pl-4 pr-12 py-3 bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-[#667eea] dark:focus:border-[#667eea] transition-all"
+                style={{
+                  width: '100%',
+                  padding: '12px 45px 12px 16px',
+                  border: '2px solid #e2e8f0',
+                  borderRadius: '8px',
+                  fontSize: '15px',
+                  outline: 'none',
+                  transition: 'border-color 0.2s',
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-lg p-2"
+                style={{
+                  position: 'absolute',
+                  right: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: '#718096',
+                  fontSize: '18px',
+                  padding: '8px'
+                }}
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
             {errors.password && (
-              <p className="text-red-500 text-xs mt-1.5 font-semibold">
+              <p style={{ color: '#e53e3e', fontSize: '13px', marginTop: '6px' }}>
                 {errors.password.message}
               </p>
             )}
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1.5">
+            <p style={{ color: '#718096', fontSize: '12px', marginTop: '4px' }}>
               This will be your JobScout password (separate from Google)
             </p>
           </div>
 
           {/* Password Strength Indicator */}
           {password && (
-            <div className="mb-5 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600">
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-xs font-bold text-gray-700 dark:text-gray-300">
+            <div style={{
+              marginBottom: '20px',
+              padding: '16px',
+              background: '#f7fafc',
+              borderRadius: '8px',
+              border: '1px solid #e2e8f0'
+            }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '12px'
+              }}>
+                <span style={{ fontSize: '13px', fontWeight: '600', color: '#2d3748' }}>
                   Password Strength
                 </span>
-                <span className={`text-xs font-bold ${passwordStrength >= 4 ? 'text-green-500' : passwordStrength >= 3 ? 'text-yellow-500' : 'text-red-500'}`}>
+                <span style={{
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  color: passwordStrength >= 4 ? '#10b981' : passwordStrength >= 3 ? '#f59e0b' : '#ef4444'
+                }}>
                   {passwordStrength >= 4 ? 'Strong' : passwordStrength >= 3 ? 'Medium' : 'Weak'}
                 </span>
               </div>
-              <div className="grid gap-2 text-xs">
-                <div className="flex items-center gap-2">
-                  {hasMinLength ? <FaCheck className="text-green-500" /> : <FaTimes className="text-red-500" />}
-                  <span className={hasMinLength ? 'text-green-500' : 'text-gray-500 dark:text-gray-400'}>At least 8 characters</span>
+              <div style={{
+                display: 'grid',
+                gap: '8px',
+                fontSize: '13px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {hasMinLength ? <FaCheck style={{ color: '#10b981' }} /> : <FaTimes style={{ color: '#ef4444' }} />}
+                  <span style={{ color: hasMinLength ? '#10b981' : '#6b7280' }}>At least 8 characters</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  {hasUpperCase ? <FaCheck className="text-green-500" /> : <FaTimes className="text-red-500" />}
-                  <span className={hasUpperCase ? 'text-green-500' : 'text-gray-500 dark:text-gray-400'}>One uppercase letter (A-Z)</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {hasUpperCase ? <FaCheck style={{ color: '#10b981' }} /> : <FaTimes style={{ color: '#ef4444' }} />}
+                  <span style={{ color: hasUpperCase ? '#10b981' : '#6b7280' }}>One uppercase letter (A-Z)</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  {hasLowerCase ? <FaCheck className="text-green-500" /> : <FaTimes className="text-red-500" />}
-                  <span className={hasLowerCase ? 'text-green-500' : 'text-gray-500 dark:text-gray-400'}>One lowercase letter (a-z)</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {hasLowerCase ? <FaCheck style={{ color: '#10b981' }} /> : <FaTimes style={{ color: '#ef4444' }} />}
+                  <span style={{ color: hasLowerCase ? '#10b981' : '#6b7280' }}>One lowercase letter (a-z)</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  {hasNumber ? <FaCheck className="text-green-500" /> : <FaTimes className="text-red-500" />}
-                  <span className={hasNumber ? 'text-green-500' : 'text-gray-500 dark:text-gray-400'}>One number (0-9)</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {hasNumber ? <FaCheck style={{ color: '#10b981' }} /> : <FaTimes style={{ color: '#ef4444' }} />}
+                  <span style={{ color: hasNumber ? '#10b981' : '#6b7280' }}>One number (0-9)</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  {hasSpecialChar ? <FaCheck className="text-green-500" /> : <FaTimes className="text-red-500" />}
-                  <span className={hasSpecialChar ? 'text-green-500' : 'text-gray-500 dark:text-gray-400'}>One special character (!@#$%...)</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {hasSpecialChar ? <FaCheck style={{ color: '#10b981' }} /> : <FaTimes style={{ color: '#ef4444' }} />}
+                  <span style={{ color: hasSpecialChar ? '#10b981' : '#6b7280' }}>One special character (!@#$%...)</span>
                 </div>
               </div>
             </div>
           )}
 
           {/* Confirm Password */}
-          <div className="mb-6">
-            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
-              Confirm Password <span className="text-red-500">*</span>
+          <div style={{ marginBottom: '24px' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#2d3748',
+              marginBottom: '8px'
+            }}>
+              Confirm Password <span style={{ color: '#e53e3e' }}>*</span>
             </label>
-            <div className="relative">
+            <div style={{ position: 'relative' }}>
               <input
                 {...register("confirmPassword", {
                   required: "Please confirm your password",
@@ -298,18 +475,39 @@ export default function CompleteProfile() {
                 })}
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="Re-enter your password"
-                className="w-full pl-4 pr-12 py-3 bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-[#667eea] dark:focus:border-[#667eea] transition-all"
+                style={{
+                  width: '100%',
+                  padding: '12px 45px 12px 16px',
+                  border: '2px solid #e2e8f0',
+                  borderRadius: '8px',
+                  fontSize: '15px',
+                  outline: 'none',
+                  transition: 'border-color 0.2s',
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-lg p-2"
+                style={{
+                  position: 'absolute',
+                  right: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: '#718096',
+                  fontSize: '18px',
+                  padding: '8px'
+                }}
               >
                 {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
             {errors.confirmPassword && (
-              <p className="text-red-500 text-xs mt-1.5 font-semibold">
+              <p style={{ color: '#e53e3e', fontSize: '13px', marginTop: '6px' }}>
                 {errors.confirmPassword.message}
               </p>
             )}
@@ -318,7 +516,21 @@ export default function CompleteProfile() {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-3.5 bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white font-bold rounded-xl text-lg shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed`}
+            style={{
+              width: '100%',
+              padding: '14px',
+              background: loading ? '#a0aec0' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '16px',
+              fontWeight: '600',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              transition: 'transform 0.2s, box-shadow 0.2s',
+              boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4)'
+            }}
+            onMouseOver={(e) => !loading && (e.target.style.transform = 'translateY(-2px)')}
+            onMouseOut={(e) => !loading && (e.target.style.transform = 'translateY(0)')}
           >
             {loading ? 'Completing Profile...' : 'Complete Profile'}
           </button>

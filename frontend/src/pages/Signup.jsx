@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import ThemeToggle from '../components/ThemeToggle';
 
 export default function Signup() {
   const { register, handleSubmit, formState: { errors }, watch } = useForm();
@@ -81,15 +80,12 @@ export default function Signup() {
 
         {/* Login Link */}
         <div className="absolute top-3 right-3 z-10">
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
-            <Link
-              to="/login"
-              className="flex items-center gap-1 px-2 py-1 bg-white/80 border border-teal-400 rounded-full text-teal-700 font-bold hover:bg-white transition-transform hover:scale-105 text-[0.7em] sm:text-[0.75em]"
-            >
-              <span>🔓 Sign In</span>
-            </Link>
-          </div>
+          <Link
+            to="/login"
+            className="flex items-center gap-1 px-2 py-1 bg-white/80 border border-teal-400 rounded-full text-teal-700 font-bold hover:bg-white transition-transform hover:scale-105 text-[0.7em] sm:text-[0.75em]"
+          >
+            <span>🔓 Sign In</span>
+          </Link>
         </div>
 
         {/* Header - Compact */}
