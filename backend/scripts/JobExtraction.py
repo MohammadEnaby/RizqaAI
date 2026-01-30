@@ -87,7 +87,7 @@ def extract_jobs_batch(posts_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]
     - job_title (string): e.g., 'Cashier'
     - location (string): e.g., 'Jerusalem'
     - wage_per_hour (string/null): e.g., '36-40'
-    - shifts (string/null): e.g., 'Morning', 'Evening'
+    - shifts (string/null): e.g., 'Morning', 'Evening', 'Night', 'Full-time', 'Part-time', 'flexible'
     - requirements (string/null): e.g., 'Experience', 'Education', 'Skills'
     - features (string/null): e.g., 'Transportation available', 'Food available'
     - contact_info (string/null): Phone numbers and names
