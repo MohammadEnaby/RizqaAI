@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FaHome, FaCogs, FaSignOutAlt, FaLeaf, FaDatabase, FaClock, FaUsers, FaRobot } from 'react-icons/fa';
 import { useAuth } from '../../contexts/AuthContext';
 import { motion } from 'framer-motion';
+import ThemeToggle from '../ThemeToggle';
 
 const Sidebar = () => {
     const location = useLocation();
@@ -40,7 +41,7 @@ const Sidebar = () => {
                     <FaLeaf size={24} />
                 </div>
                 <div>
-                    <h1 className="text-3xl font-extrabold title-color tracking-tight">
+                    <h1 className="text-3xl font-extrabold title-color dark:text-teal-400 tracking-tight">
                         Rizqa
                     </h1>
                     <p className="text-[11px] uppercase tracking-widest text-green-500 font-bold">
@@ -60,8 +61,8 @@ const Sidebar = () => {
                     to="/admin/dashboard"
                     className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
             ${isActive('/admin/dashboard')
-                            ? 'bg-gradient-to-r from-green-100 to-teal-100 text-[#134e4a] shadow-lg'
-                            : 'text-gray-500 hover:bg-white hover:shadow-md'
+                            ? 'bg-gradient-to-r from-green-100 to-teal-100 dark:from-green-900/30 dark:to-teal-900/30 text-[#134e4a] dark:text-teal-400 shadow-lg'
+                            : 'text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md'
                         }`}
                 >
                     <FaHome
@@ -76,8 +77,8 @@ const Sidebar = () => {
                     to="/admin/users"
                     className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
             ${isActive('/admin/users')
-                            ? 'bg-gradient-to-r from-green-100 to-teal-100 text-[#134e4a] shadow-lg'
-                            : 'text-gray-500 hover:bg-white hover:shadow-md'
+                            ? 'bg-gradient-to-r from-green-100 to-teal-100 dark:from-green-900/30 dark:to-teal-900/30 text-[#134e4a] dark:text-teal-400 shadow-lg'
+                            : 'text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md'
                         }`}
                 >
                     <FaUsers
@@ -92,8 +93,8 @@ const Sidebar = () => {
                     to="/admin/pipeline"
                     className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
             ${isActive('/admin/pipeline')
-                            ? 'bg-gradient-to-r from-green-100 to-teal-100 text-[#134e4a] shadow-lg'
-                            : 'text-gray-500 hover:bg-white hover:shadow-md'
+                            ? 'bg-gradient-to-r from-green-100 to-teal-100 dark:from-green-900/30 dark:to-teal-900/30 text-[#134e4a] dark:text-teal-400 shadow-lg'
+                            : 'text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md'
                         }`}
                 >
                     <FaCogs
@@ -108,8 +109,8 @@ const Sidebar = () => {
                     to="/admin/datasources"
                     className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
             ${isActive('/admin/datasources')
-                            ? 'bg-gradient-to-r from-green-100 to-teal-100 text-[#134e4a] shadow-lg'
-                            : 'text-gray-500 hover:bg-white hover:shadow-md'
+                            ? 'bg-gradient-to-r from-green-100 to-teal-100 dark:from-green-900/30 dark:to-teal-900/30 text-[#134e4a] dark:text-teal-400 shadow-lg'
+                            : 'text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md'
                         }`}
                 >
                     <FaDatabase
@@ -124,8 +125,8 @@ const Sidebar = () => {
                     to="/admin/schedules"
                     className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
             ${isActive('/admin/schedules')
-                            ? 'bg-gradient-to-r from-green-100 to-teal-100 text-[#134e4a] shadow-lg'
-                            : 'text-gray-500 hover:bg-white hover:shadow-md'
+                            ? 'bg-gradient-to-r from-green-100 to-teal-100 dark:from-green-900/30 dark:to-teal-900/30 text-[#134e4a] dark:text-teal-400 shadow-lg'
+                            : 'text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md'
                         }`}
                 >
                     <FaClock
@@ -140,8 +141,8 @@ const Sidebar = () => {
                     to="/chatbot"
                     className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
             ${isActive('/chatbot')
-                            ? 'bg-gradient-to-r from-green-100 to-teal-100 text-[#134e4a] shadow-lg'
-                            : 'text-gray-500 hover:bg-white hover:shadow-md'
+                            ? 'bg-gradient-to-r from-green-100 to-teal-100 dark:from-green-900/30 dark:to-teal-900/30 text-[#134e4a] dark:text-teal-400 shadow-lg'
+                            : 'text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md'
                         }`}
                 >
                     <FaRobot
@@ -170,13 +171,19 @@ const Sidebar = () => {
             </nav>
 
             {/* ✅ USER CARD */}
-            <div className="p-6 border-t border-white/20">
-                <div className="flex items-center gap-3 glass-panel p-4 rounded-2xl">
+            <div className="p-6 border-t border-white/20 dark:border-gray-700/30">
+                <div className="flex items-center justify-between gap-2 mb-4">
+                    <p className="px-3 text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+                        Preference
+                    </p>
+                    <ThemeToggle />
+                </div>
+                <div className="flex items-center gap-3 glass-panel dark:bg-gray-800/50 p-4 rounded-2xl">
                     <div className="w-11 h-11 rounded-full theme-btn-primary flex items-center justify-center text-white font-bold text-sm">
                         AD
                     </div>
                     <div>
-                        <p className="text-sm font-bold text-[#134e4a]">Admin</p>
+                        <p className="text-sm font-bold text-[#134e4a] dark:text-teal-300">Admin</p>
                         <p className="text-xs text-gray-400">admin@rizqa.com</p>
                     </div>
                 </div>

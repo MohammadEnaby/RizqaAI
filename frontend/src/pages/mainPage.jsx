@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaRobot, FaSearch, FaPaperPlane, FaArrowRight, FaLeaf } from 'react-icons/fa';
+import ThemeToggle from '../components/ThemeToggle';
 
 const MainPage = () => {
     const fadeIn = {
@@ -10,7 +11,7 @@ const MainPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-green-50 via-teal-50 to-emerald-50 relative overflow-hidden font-sans text-gray-800">
+        <div className="min-h-screen bg-gradient-to-br from-green-50 via-teal-50 to-emerald-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden font-sans text-gray-800 dark:text-gray-100">
             {/* Background Blobs */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
                 <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-green-200/30 rounded-full blur-[100px]" />
@@ -27,10 +28,11 @@ const MainPage = () => {
                         Rizqa<span className="text-gray-700">AI</span>
                     </span>
                 </div>
-                <div>
+                <div className="flex items-center gap-4">
+                    <ThemeToggle />
                     <Link
                         to="/login"
-                        className="px-6 py-2.5 rounded-full bg-white text-green-700 font-bold text-sm shadow-md hover:shadow-lg hover:scale-105 transition-all border border-green-100"
+                        className="px-6 py-2.5 rounded-full bg-white dark:bg-gray-800 text-green-700 dark:text-green-400 font-bold text-sm shadow-md hover:shadow-lg hover:scale-105 transition-all border border-green-100 dark:border-gray-700"
                     >
                         Login
                     </Link>
@@ -48,13 +50,13 @@ const MainPage = () => {
                     <span className="inline-block px-4 py-1.5 rounded-full bg-green-100 text-green-700 font-bold text-xs uppercase tracking-widest mb-6 border border-green-200">
                         The Future of Job Hunting
                     </span>
-                    <h1 className="text-5xl md:text-7xl font-extrabold mb-8 leading-tight text-gray-900">
+                    <h1 className="text-5xl md:text-7xl font-extrabold mb-8 leading-tight text-gray-900 dark:text-white">
                         Automate Your <br className="hidden md:block" />
                         <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-500 to-teal-500">
                             Career Growth
                         </span>
                     </h1>
-                    <p className="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
+                    <p className="text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
                         RizqaAI is your intelligent assistant that autonomously finds, analyzes, and applies to jobs that match your profile. Stop searching, start working.
                     </p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -67,7 +69,7 @@ const MainPage = () => {
                         </Link>
                         <Link
                             to="/login"
-                            className="px-8 py-4 rounded-2xl bg-white text-gray-700 font-bold text-lg shadow-lg hover:shadow-xl hover:bg-gray-50 transition-all border border-gray-100"
+                            className="px-8 py-4 rounded-2xl bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-bold text-lg shadow-lg hover:shadow-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all border border-gray-100 dark:border-gray-600"
                         >
                             Access Dashboard
                         </Link>
@@ -76,11 +78,11 @@ const MainPage = () => {
             </header>
 
             {/* How It Works Section */}
-            <section className="relative z-10 px-6 py-20 bg-white/50 backdrop-blur-sm border-t border-white/50">
+            <section className="relative z-10 px-6 py-20 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border-t border-white/50 dark:border-gray-700/50">
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">How RizqaAI Works</h2>
-                        <p className="text-gray-500 max-w-xl mx-auto">
+                        <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white mb-4">How RizqaAI Works</h2>
+                        <p className="text-gray-500 dark:text-gray-400 max-w-xl mx-auto">
                             Our advanced pipeline handles the tedious parts of job hunting, so you can focus on the interviews.
                         </p>
                     </div>
@@ -92,13 +94,13 @@ const MainPage = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.1 }}
-                            className="p-8 rounded-3xl bg-white border border-gray-100 shadow-xl shadow-gray-200/50 hover:shadow-2xl hover:-translate-y-1 transition-all"
+                            className="p-8 rounded-3xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-xl shadow-gray-200/50 dark:shadow-gray-900/50 hover:shadow-2xl hover:-translate-y-1 transition-all"
                         >
-                            <div className="w-16 h-16 rounded-2xl bg-blue-100 flex items-center justify-center text-blue-600 mb-6 text-2xl">
+                            <div className="w-16 h-16 rounded-2xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-6 text-2xl">
                                 <FaSearch />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-3">1. Smart Discovery</h3>
-                            <p className="text-gray-500 leading-relaxed">
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">1. Smart Discovery</h3>
+                            <p className="text-gray-500 dark:text-gray-400 leading-relaxed">
                                 Our AI constantly scans multiple platforms to find job openings that perfectly match your skills and preferences.
                             </p>
                         </motion.div>
@@ -141,7 +143,7 @@ const MainPage = () => {
             </section>
 
             {/* Footer / Credits */}
-            <footer className="relative z-10 py-12 px-6 bg-gray-50 border-t border-gray-200">
+            <footer className="relative z-10 py-12 px-6 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
                 <div className="max-w-7xl mx-auto flex flex-col items-center justify-center text-center">
                     <div className="flex items-center gap-2 mb-6 opacity-50 grayscale hover:grayscale-0 transition-all">
                         <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-green-500 to-teal-500 flex items-center justify-center text-white">
@@ -150,8 +152,8 @@ const MainPage = () => {
                         <span className="text-xl font-bold text-gray-700">RizqaAI</span>
                     </div>
 
-                    <p className="text-sm md:text-base font-medium text-gray-500 max-w-2xl leading-relaxed">
-                        Created by <span className="text-gray-900 font-bold">Nazieh Sayegh</span> and <span className="text-gray-900 font-bold">Mohammad Enaby</span>
+                    <p className="text-sm md:text-base font-medium text-gray-500 dark:text-gray-400 max-w-2xl leading-relaxed">
+                        Created by <span className="text-gray-900 dark:text-white font-bold">Nazieh Sayegh</span> and <span className="text-gray-900 dark:text-white font-bold">Mohammad Enaby</span>
                     </p>
                     <p className="text-xs md:text-sm text-gray-400 mt-2">
                         Students of Azrieli College of Engineering - Graduation Project

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import ThemeToggle from '../components/ThemeToggle';
 
 export default function Login() {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -139,13 +140,16 @@ export default function Login() {
 
         {/* Create Account Button */}
         <div className="absolute top-4 right-4 z-10">
-          <Link
-            to="/signup"
-            className="flex items-center gap-2 px-3 py-1 theme-green-blue border border-teal-400/30 rounded-full text-white font-bold hover:shadow-lg hover:brightness-110 transition-all transform hover:scale-105"
-            style={{ fontSize: 'var(--fluid-text-sm)' }}
-          >
-            <span>✨ Create Account</span>
-          </Link>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <Link
+              to="/signup"
+              className="flex items-center gap-2 px-3 py-1 theme-green-blue border border-teal-400/30 rounded-full text-white font-bold hover:shadow-lg hover:brightness-110 transition-all transform hover:scale-105"
+              style={{ fontSize: 'var(--fluid-text-sm)' }}
+            >
+              <span>✨ Create Account</span>
+            </Link>
+          </div>
         </div>
 
         {/* Header */}
