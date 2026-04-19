@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { FaLeaf } from 'react-icons/fa';
 
 export default function Login() {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, formState: { errors }, getValues } = useForm();
   const { login, initiateGoogleSignIn, resetPassword } = useAuth();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -37,7 +38,11 @@ export default function Login() {
       setError('');
       setLoading(true);
       const result = await initiateGoogleSignIn();
-      navigate('/chatbot');
+      if (result.isNewUser) {
+        navigate('/complete-profile');
+      } else {
+        navigate('/chatbot');
+      }
     } catch (err) {
       console.error(err);
       setError(err.message || 'Failed to sign in with Google.');
@@ -57,7 +62,11 @@ export default function Login() {
       await resetPassword(resetEmail);
       setResetSuccess(true);
     } catch (err) {
-      setError(err.code === 'auth/user-not-found' ? 'No account found with this email.' : 'Failed to send reset email.');
+      if (err.code === 'auth/invalid-email') {
+        setError('Invalid email address.');
+      } else {
+        setResetSuccess(true);
+      }
     } finally {
       setLoading(false);
     }
@@ -70,8 +79,8 @@ export default function Login() {
 
           {/* Header */}
           <div className="text-center fluid-mb shrink-0">
-            <div style={{ width: 'clamp(40px, 10vmin, 90px)', height: 'clamp(40px, 10vmin, 90px)' }} className="theme-green-blue rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg fluid-mb-sm">
-              <span className="fluid-h1">🔐</span>
+            <div style={{ width: 'clamp(40px, 10vmin, 90px)', height: 'clamp(40px, 10vmin, 90px)' }} className="bg-gradient-to-tr from-green-500 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg shadow-green-500/30 fluid-mb-sm text-white transition-transform duration-300 hover:scale-105">
+              <FaLeaf className="w-1/2 h-1/2" />
             </div>
             <h2 className="fluid-h2 font-bold text-[#0f172a] fluid-mb-sm">Reset Password</h2>
             <p className="text-gray-600 fluid-text-sm">Enter your email to receive a reset link</p>
@@ -150,11 +159,17 @@ export default function Login() {
 
         {/* Header */}
         <div className="text-center shrink-0 fluid-mb">
-          <div style={{ width: 'clamp(50px, 12vmin, 100px)', height: 'clamp(50px, 12vmin, 100px)' }} className="theme-green-blue rounded-3xl flex items-center justify-center mx-auto mb-3 shadow-lg fluid-mb-sm">
-            <span className="fluid-h1 font-black text-white leading-none">JS</span>
+          <div className="flex flex-col items-center justify-center mx-auto mb-3 fluid-mb-sm group cursor-default">
+            <div style={{ width: 'clamp(50px, 12vmin, 100px)', height: 'clamp(50px, 12vmin, 100px)' }} className="bg-gradient-to-tr from-green-500 to-teal-600 rounded-3xl flex items-center justify-center text-white shadow-lg shadow-green-500/30 mb-3 md:mb-4 transition-transform duration-300 group-hover:scale-105">
+              <FaLeaf className="w-3/5 h-3/5" />
+            </div>
+            <h1 className="fluid-h1 font-bold text-gray-900 leading-tight">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-teal-600">Rizqa</span>
+              <span className="text-gray-700">AI</span>
+            </h1>
           </div>
-          <h1 className="fluid-h1 font-bold title-color leading-tight fluid-mb-sm">Welcome Back</h1>
-          <p className="fluid-h2 text-gray-600 font-medium leading-tight">Sign in to continue to Risqa</p>
+          <h2 className="fluid-h2 font-bold title-color leading-tight fluid-mb-sm">Welcome Back</h2>
+          <p className="fluid-h2 text-gray-600 font-medium leading-tight">Sign in to continue to Rizqa</p>
         </div>
 
         {/* Content Container */}
@@ -211,7 +226,11 @@ export default function Login() {
                 </label>
                 <button
                   type="button"
-                  onClick={() => setShowForgotPassword(true)}
+                  onClick={() => {
+                    const currentEmail = getValues('email');
+                    if (currentEmail) setResetEmail(currentEmail);
+                    setShowForgotPassword(true);
+                  }}
                   className="text-[10px] sm:text-xs lg:text-sm text-teal-600 hover:text-teal-700 hover:underline font-bold flex items-center gap-1 transition-all"
                 >
                   Forgot password? <span>🔑</span>

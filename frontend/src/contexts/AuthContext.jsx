@@ -9,7 +9,7 @@ import {
   updateProfile,
   sendPasswordResetEmail
 } from "firebase/auth";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { auth, db } from "../firebase";
 
 const AuthContext = createContext();
@@ -112,6 +112,15 @@ export function AuthProvider({ children }) {
             console.log("✅ Existing user - logging in");
             return { user: result.user, isNewUser: false, profile: userDoc.data() };
           } else {
+            // Check if email already belongs to a different UID (prevents duplication)
+            const q = query(collection(db, "users"), where("email", "==", result.user.email));
+            const querySnapshot = await getDocs(q);
+            if (!querySnapshot.empty) {
+                // Sign out Google session and throw error
+                await signOut(auth);
+                throw new Error("An account already exists with this email address. Please log in using your email and password.");
+            }
+            
             console.log("🆕 New user - needs to complete profile");
             return { user: result.user, isNewUser: true };
           }

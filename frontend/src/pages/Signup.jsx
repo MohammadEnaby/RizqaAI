@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { FaLeaf } from 'react-icons/fa';
 
 export default function Signup() {
-  const { register, handleSubmit, formState: { errors }, watch } = useForm();
+  const { register, handleSubmit, formState: { errors }, watch } = useForm({ defaultValues: { role: 'user' } });
   const { signup, initiateGoogleSignIn } = useAuth();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -26,9 +27,6 @@ export default function Signup() {
   const passwordsMatch = password && confirmPassword && password === confirmPassword;
 
   const onSubmit = async (data) => {
-    if (data.password !== data.confirmPassword) {
-      return setError('Passwords do not match');
-    }
     try {
       setError('');
       setLoading(true);
@@ -44,7 +42,7 @@ export default function Signup() {
       if (err.code === 'auth/email-already-in-use') {
         setError('Email already in use.');
       } else if (err.code === 'auth/weak-password') {
-        setError('Password should be at least 6 characters.');
+        setError('Password does not meet requirements.');
       } else if (err.code === 'auth/invalid-email') {
         setError('Invalid email address.');
       } else {
@@ -60,7 +58,11 @@ export default function Signup() {
       setError('');
       setLoading(true);
       const result = await initiateGoogleSignIn();
-      navigate('/chatbot');
+      if (result.isNewUser) {
+        navigate('/complete-profile');
+      } else {
+        navigate('/chatbot');
+      }
     } catch (err) {
       console.error(err);
       setError(err.message || 'Failed to sign in with Google.');
@@ -90,11 +92,17 @@ export default function Signup() {
 
         {/* Header - Compact */}
         <div className="text-center mb-2 sm:mb-3 shrink-0">
-          <div style={{ width: 'clamp(2rem, 6vw, 4rem)', height: 'clamp(2rem, 6vw, 4rem)' }} className="theme-green-blue rounded-xl flex items-center justify-center mx-auto mb-1 sm:mb-2 shadow-lg">
-            <span className="fluid-h1 font-black text-white">JS</span>
+          <div className="flex flex-col items-center justify-center mx-auto mb-1 sm:mb-2 group cursor-default">
+            <div style={{ width: 'clamp(2rem, 6vw, 4rem)', height: 'clamp(2rem, 6vw, 4rem)' }} className="bg-gradient-to-tr from-green-500 to-teal-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-green-500/30 mb-1 sm:mb-2 transition-transform duration-300 group-hover:scale-105">
+              <FaLeaf className="w-3/5 h-3/5" />
+            </div>
+            <h1 className="fluid-h1 font-bold text-gray-900 leading-tight">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-teal-600">Rizqa</span>
+              <span className="text-gray-700">AI</span>
+            </h1>
           </div>
-          <h1 className="fluid-h1 font-bold title-color leading-tight mb-0.5">Create Account</h1>
-          <p className="fluid-h2 text-gray-600 font-medium leading-tight">Join Risqa today</p>
+          <h2 className="fluid-h2 font-bold title-color leading-tight mb-0.5 mt-1">Create Account</h2>
+          <p className="fluid-h2 text-gray-600 font-medium leading-tight">Join Rizqa today</p>
         </div>
 
         {/* Content Container - fits remaining space */}
