@@ -23,7 +23,7 @@ export default function CompleteProfile() {
   const hasLowerCase = /[a-z]/.test(password);
   const hasNumber = /[0-9]/.test(password);
   const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-  
+
   const passwordStrength = [hasMinLength, hasUpperCase, hasLowerCase, hasNumber, hasSpecialChar].filter(Boolean).length;
 
   const onSubmit = async (data) => {
@@ -117,7 +117,7 @@ export default function CompleteProfile() {
                 First Name <span style={{ color: '#e53e3e' }}>*</span>
               </label>
               <input
-                {...register("firstName", { 
+                {...register("firstName", {
                   required: "First name is required",
                   minLength: {
                     value: 2,
@@ -157,7 +157,7 @@ export default function CompleteProfile() {
                 Last Name <span style={{ color: '#e53e3e' }}>*</span>
               </label>
               <input
-                {...register("lastName", { 
+                {...register("lastName", {
                   required: "Last name is required",
                   minLength: {
                     value: 2,
@@ -230,7 +230,7 @@ export default function CompleteProfile() {
               Phone Number <span style={{ color: '#e53e3e' }}>*</span>
             </label>
             <input
-              {...register("phone", { 
+              {...register("phone", {
                 required: "Phone number is required",
                 pattern: {
                   value: /^[0-9+\-\s()]+$/,
@@ -285,8 +285,8 @@ export default function CompleteProfile() {
                 gap: '8px',
                 transition: 'all 0.2s'
               }}
-              onMouseOver={(e) => e.currentTarget.style.borderColor = '#667eea'}
-              onMouseOut={(e) => e.currentTarget.style.borderColor = '#e2e8f0'}>
+                onMouseOver={(e) => e.currentTarget.style.borderColor = '#667eea'}
+                onMouseOut={(e) => e.currentTarget.style.borderColor = '#e2e8f0'}>
                 <input
                   {...register("role", { required: "Please select an account type" })}
                   type="radio"
@@ -311,8 +311,8 @@ export default function CompleteProfile() {
                 gap: '8px',
                 transition: 'all 0.2s'
               }}
-              onMouseOver={(e) => e.currentTarget.style.borderColor = '#667eea'}
-              onMouseOut={(e) => e.currentTarget.style.borderColor = '#e2e8f0'}>
+                onMouseOver={(e) => e.currentTarget.style.borderColor = '#667eea'}
+                onMouseOut={(e) => e.currentTarget.style.borderColor = '#e2e8f0'}>
                 <input
                   {...register("role")}
                   type="radio"
@@ -345,7 +345,7 @@ export default function CompleteProfile() {
             </label>
             <div style={{ position: 'relative' }}>
               <input
-                {...register("password", { 
+                {...register("password", {
                   required: "Password is required",
                   minLength: {
                     value: 8,
@@ -469,7 +469,7 @@ export default function CompleteProfile() {
             </label>
             <div style={{ position: 'relative' }}>
               <input
-                {...register("confirmPassword", { 
+                {...register("confirmPassword", {
                   required: "Please confirm your password",
                   validate: value => value === password || "Passwords do not match"
                 })}

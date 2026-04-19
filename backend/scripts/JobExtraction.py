@@ -46,6 +46,7 @@ class JobOffer(BaseModel):
     contact_info: Optional[str]
     is_job_offer: bool
     post_link: Optional[str]
+    target_audience: Optional[str]
 
 def extract_post_id_from_url(post_url: str) -> str:
     """
@@ -86,12 +87,13 @@ def extract_jobs_batch(posts_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]
     - job_title (string): e.g., 'Cashier'
     - location (string): e.g., 'Jerusalem'
     - wage_per_hour (string/null): e.g., '36-40'
-    - shifts (string/null): e.g., 'Morning', 'Evening'
+    - shifts (string/null): e.g., 'Morning', 'Evening', 'Night', 'Full-time', 'Part-time', 'flexible'
     - requirements (string/null): e.g., 'Experience', 'Education', 'Skills'
     - features (string/null): e.g., 'Transportation available', 'Food available'
     - contact_info (string/null): Phone numbers and names
     - post_time (string): ISO 8601 format (YYYY-MM-DDTHH:MM:SS). Use 'created_at' from input as reference.
     - is_job_offer (bool): true if it's a job, false if spam/question
+    - target_audience (string/null): e.g., 'men', 'women', 'students', 'not specified'
     
     Current Date and Time: {current_time}
 
@@ -219,6 +221,9 @@ def main():
         
         if source_id:
             item['groupID'] = source_id
+
+        if source_id == "233704417129124": #this group posts jobs for students
+            item['target_audience'] = "students"
 
         # Fallback for contact_info
         if not item.get('contact_info'):

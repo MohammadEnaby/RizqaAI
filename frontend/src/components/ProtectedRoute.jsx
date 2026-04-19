@@ -2,7 +2,7 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
-export default function ProtectedRoute({ children, adminOnly = false }) {
+export default function ProtectedRoute({ children, requiredRole = null }) {
   const { currentUser, userProfile } = useAuth();
   const location = useLocation();
 
@@ -15,9 +15,10 @@ export default function ProtectedRoute({ children, adminOnly = false }) {
     return <Navigate to="/complete-profile" />;
   }
 
-  // Enforce admin role for restricted routes
-  if (adminOnly && userProfile?.role !== 'admin') {
-    return <Navigate to="/chatbot" />;
+  // Enforce required role for restricted routes
+  if (requiredRole && userProfile?.role !== requiredRole) {
+    // If user is logged in but doesn't have the right role, redirect to the main page
+    return <Navigate to="/" />;
   }
 
   return children;

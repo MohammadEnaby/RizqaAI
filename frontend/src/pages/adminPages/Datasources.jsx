@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaPlus, FaEdit, FaTrash, FaDatabase, FaFacebook, FaLinkedin, FaGlobe, FaSearch, FaTimes } from 'react-icons/fa';
+import { auth } from '../../firebase';
 
 const Modal = ({ isOpen, onClose, title, children }) => {
     if (!isOpen) return null;
@@ -47,7 +48,13 @@ const Datasources = () => {
     const fetchGroups = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`${apiUrl}/api/platform-groups`);
+            let headers = {};
+            if (auth.currentUser) {
+                const token = await auth.currentUser.getIdToken();
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            const response = await fetch(`${apiUrl}/api/platform-groups`, { headers });
             if (response.ok) {
                 const data = await response.json();
                 setGroups(data);
@@ -70,9 +77,15 @@ const Datasources = () => {
     const handleAddSubmit = async (e) => {
         e.preventDefault();
         try {
+            let headers = { 'Content-Type': 'application/json' };
+            if (auth.currentUser) {
+                const token = await auth.currentUser.getIdToken();
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
             const response = await fetch(`${apiUrl}/api/platform-groups`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: headers,
                 body: JSON.stringify(formData)
             });
             if (response.ok) {
@@ -102,9 +115,15 @@ const Datasources = () => {
     const handleEditSubmit = async (e) => {
         e.preventDefault();
         try {
+            let headers = { 'Content-Type': 'application/json' };
+            if (auth.currentUser) {
+                const token = await auth.currentUser.getIdToken();
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
             const response = await fetch(`${apiUrl}/api/platform-groups/${currentGroup.groupID}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: headers,
                 body: JSON.stringify({
                     name: formData.name,
                     platformType: formData.platformType,
@@ -124,8 +143,15 @@ const Datasources = () => {
     const handleDelete = async (groupId) => {
         if (window.confirm("Are you sure you want to delete this datasource?")) {
             try {
+                let headers = {};
+                if (auth.currentUser) {
+                    const token = await auth.currentUser.getIdToken();
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+
                 const response = await fetch(`${apiUrl}/api/platform-groups/${groupId}`, {
-                    method: 'DELETE'
+                    method: 'DELETE',
+                    headers: headers
                 });
                 if (response.ok) {
                     fetchGroups();

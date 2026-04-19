@@ -4,7 +4,6 @@ import { AuthProvider } from './contexts/AuthContext';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import CompleteProfile from './pages/CompleteProfile';
-import Home from './pages/Home';
 import ChatBot from './pages/ChatBot';
 import Admin from './pages/adminPages/Pipeline';
 import Dashboard from './pages/adminPages/Dashboard';
@@ -34,14 +33,6 @@ function App() {
           />
           <Route path="/" element={<MainPage />} />
           <Route
-            path="/home"
-            element={
-              <ProtectedRoute>
-                <Home />
-              </ProtectedRoute>
-            }
-          />
-          <Route
             path="/chatbot"
             element={
               <ProtectedRoute>
@@ -52,7 +43,7 @@ function App() {
           <Route
             path="/admin"
             element={
-              <ProtectedRoute adminOnly={true}>
+              <ProtectedRoute requiredRole="admin">
                 <Layout>
                   <Welcome />
                 </Layout>
@@ -62,7 +53,7 @@ function App() {
           <Route
             path="/admin/pipeline"
             element={
-              <ProtectedRoute adminOnly={true}>
+              <ProtectedRoute requiredRole="admin">
                 <Layout>
                   <Admin />
                 </Layout>
@@ -72,7 +63,7 @@ function App() {
           <Route
             path="/admin/dashboard"
             element={
-              <ProtectedRoute adminOnly={true}>
+              <ProtectedRoute requiredRole="admin">
                 <Layout>
                   <Dashboard />
                 </Layout>
@@ -82,7 +73,7 @@ function App() {
           <Route
             path="/admin/users"
             element={
-              <ProtectedRoute adminOnly={true}>
+              <ProtectedRoute requiredRole="admin">
                 <Layout>
                   <UsersManagement />
                 </Layout>
@@ -92,7 +83,7 @@ function App() {
           <Route
             path="/admin/datasources"
             element={
-              <ProtectedRoute adminOnly={true}>
+              <ProtectedRoute requiredRole="admin">
                 <Layout>
                   <Datasources />
                 </Layout>
@@ -102,7 +93,7 @@ function App() {
           <Route
             path="/admin/schedules"
             element={
-              <ProtectedRoute adminOnly={true}>
+              <ProtectedRoute requiredRole="admin">
                 <Layout>
                   <ScheduledPipelines />
                 </Layout>
