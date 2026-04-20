@@ -1,8 +1,103 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { FaLeaf } from 'react-icons/fa';
+import { FiMail, FiLock } from 'react-icons/fi';
+import { FcGoogle } from 'react-icons/fc';
+
+const LOGIN_QUOTES = [
+  {
+    title: <>Unlock Your <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-green-300 font-extrabold">Career Potential</span></>,
+    text: "Join Rizqa AI, your intelligent career assistant. Find the perfect role tailored specifically to your skills and aspirations."
+  },
+  {
+    title: <>Discover <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-green-300 font-extrabold">New Opportunities</span></>,
+    text: "Our advanced AI matches you with positions you didn't even know existed, perfectly aligned with your unique skill set."
+  },
+  {
+    title: <>Accelerate Your <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-green-300 font-extrabold">Professional Growth</span></>,
+    text: "Experience seamless job hunting with tailored insights and step-by-step guidance to climb your career ladder."
+  }
+];
+
+// Carousel component isolated so interval doesn't re-render the forms
+const HeroCarousel = ({ quotes }) => {
+  const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentQuoteIndex((prev) => (prev + 1) % quotes.length);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [quotes.length]);
+
+  return (
+    <div className="hidden lg:flex lg:w-1/2 relative bg-[#064e3b] items-center justify-center overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-full opacity-30 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-teal-500 rounded-full mix-blend-screen filter blur-[100px] opacity-50 animate-pulse"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-green-500 rounded-full mix-blend-screen filter blur-[100px] opacity-40 animate-pulse delay-1000"></div>
+      </div>
+      
+      {/* Hero Content */}
+      <div className="relative z-10 flex flex-col justify-center p-16 max-w-xl h-full w-full">
+        <div className="flex items-center gap-3 mb-auto">
+          <div className="w-10 h-10 bg-gradient-to-tr from-green-400 to-teal-400 rounded-lg flex items-center justify-center text-white shadow-lg">
+            <FaLeaf className="w-5 h-5" />
+          </div>
+          <span className="text-xl font-bold tracking-tight text-white">Rizqa AI</span>
+        </div>
+
+        <div className="my-auto transition-opacity duration-500 ease-in-out" key={currentQuoteIndex}>
+          <h1 className="text-5xl font-extrabold text-white mb-6 leading-[1.1] animate-fade-in-up">
+            {quotes[currentQuoteIndex].title}
+          </h1>
+          <p className="text-lg text-teal-100/80 font-medium leading-relaxed max-w-md animate-fade-in-up" style={{animationDelay: '100ms'}}>
+            {quotes[currentQuoteIndex].text}
+          </p>
+        </div>
+        
+        <div className="mt-auto flex items-center space-x-2">
+          {quotes.map((_, i) => (
+            <div 
+              key={i} 
+              className={`h-1.5 rounded-full transition-all duration-500 ${i === currentQuoteIndex ? 'w-8 bg-teal-400' : 'w-2 bg-teal-700'}`}
+            ></div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const SplitScreenLayout = ({ children, isResetFlow = false }) => (
+  <div className="min-h-screen max-h-screen w-full flex bg-white overflow-hidden">
+    {/* Left Panel */}
+    <HeroCarousel quotes={LOGIN_QUOTES} />
+
+    {/* Right Panel - Form Area */}
+    <div className="w-full lg:w-1/2 flex flex-col p-6 sm:p-10 relative overflow-y-auto custom-scrollbar">
+      {!isResetFlow && (
+        <div className="w-full flex justify-end mb-4 sm:mb-8 shrink-0">
+           <div className="flex items-center gap-3">
+             <span className="text-sm font-medium text-gray-500 hidden sm:inline">Don't have an account?</span>
+             <Link
+              to="/signup"
+              className="px-5 py-2.5 bg-gray-50 hover:bg-gray-100 text-gray-900 rounded-lg font-semibold transition-all text-sm border border-gray-200"
+            >
+              Sign up
+            </Link>
+          </div>
+        </div>
+      )}
+
+      <div className="w-full max-w-md mx-auto my-auto animate-fade-in-up">
+        {children}
+      </div>
+    </div>
+  </div>
+);
 
 export default function Login() {
   const { register, handleSubmit, formState: { errors }, getValues } = useForm();
@@ -18,7 +113,7 @@ export default function Login() {
     try {
       setError('');
       setLoading(true);
-      const { profile } = await login(data.email, data.password);
+      await login(data.email, data.password);
       navigate('/chatbot');
     } catch (err) {
       console.error(err);
@@ -74,197 +169,178 @@ export default function Login() {
 
   if (showForgotPassword) {
     return (
-      <div className="h-screen w-screen flex items-center justify-center app-bg overflow-hidden relative">
-        <div className="auth-card w-[95vw] sm:w-[80vw] md:w-[60vw] lg:w-[40vw] max-w-[600px] h-auto max-h-[95vh] glass-panel rounded-3xl shadow-2xl fluid-p relative flex flex-col justify-center">
-
-          {/* Header */}
-          <div className="text-center fluid-mb shrink-0">
-            <div style={{ width: 'clamp(40px, 10vmin, 90px)', height: 'clamp(40px, 10vmin, 90px)' }} className="bg-gradient-to-tr from-green-500 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg shadow-green-500/30 fluid-mb-sm text-white transition-transform duration-300 hover:scale-105">
-              <FaLeaf className="w-1/2 h-1/2" />
-            </div>
-            <h2 className="fluid-h2 font-bold text-[#0f172a] fluid-mb-sm">Reset Password</h2>
-            <p className="text-gray-600 fluid-text-sm">Enter your email to receive a reset link</p>
+      <SplitScreenLayout isResetFlow={true}>
+        {/* Mobile Header (Only visible on small screens) */}
+        <div className="lg:hidden mb-8 flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-tr from-green-500 to-teal-600 rounded-lg flex items-center justify-center text-white shadow-md">
+            <FaLeaf className="w-5 h-5" />
           </div>
+          <h1 className="text-xl font-bold text-gray-900">Rizqa AI</h1>
+        </div>
 
-          {/* Content */}
-          <div className="w-full flex-1 flex flex-col justify-center min-h-0">
-            {resetSuccess ? (
-              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 sm:p-6 text-center">
-                <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">✅</div>
-                <p className="text-emerald-700 text-sm sm:text-base font-semibold mb-3 sm:mb-4">Check your inbox!</p>
-                <button
-                  onClick={() => setShowForgotPassword(false)}
-                  className="text-xs sm:text-sm text-teal-600 hover:text-teal-700 font-medium transition-colors"
-                >
-                  ← Back to Login
-                </button>
-              </div>
-            ) : (
-              <div className="flex flex-col fluid-gap w-full">
-                {error && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 px-3 rounded-lg fluid-text-sm font-medium flex items-center justify-center" style={{ height: 'var(--fluid-input-height)' }}>
-                    ⚠️ {error}
-                  </div>
-                )}
-                <div>
-                  <label className="block text-xs sm:text-sm font-semibold text-[#0f172a] mb-1 sm:mb-2">Email Address</label>
-                  <input
-                    type="email"
-                    value={resetEmail}
-                    onChange={(e) => setResetEmail(e.target.value)}
-                    className="fluid-input w-full px-4 bg-white border-2 border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 fluid-text-base focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200 hover:border-gray-400 transition-all"
-                    placeholder="name@example.com"
-                  />
-                </div>
-                <button
-                  onClick={handleForgotPassword}
-                  disabled={loading}
-                  className="fluid-button w-full rounded-xl font-semibold fluid-text-base text-white bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 transition-all transform hover:scale-[1.02] hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50 shadow-lg hover:shadow-xl"
-                >
-                  {loading ? 'Sending...' : 'Send Reset Link'}
-                </button>
-                <button
-                  onClick={() => setShowForgotPassword(false)}
-                  className="w-full fluid-text-sm text-gray-600 hover:text-gray-900 font-medium transition-colors mt-2"
-                >
-                  ← Back to Login
-                </button>
+        <div className="mb-8">
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-2 tracking-tight">Reset Password</h2>
+          <p className="text-gray-500 text-sm">Enter your email to receive a secure reset link.</p>
+        </div>
+
+        {resetSuccess ? (
+          <div className="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
+            <div className="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-xl">✓</div>
+            <h3 className="text-lg font-bold text-green-800 mb-2">Check your inbox</h3>
+            <p className="text-green-700 text-sm mb-6">We've sent a password reset link to your email address.</p>
+            <button
+              onClick={() => setShowForgotPassword(false)}
+              className="w-full py-2.5 text-sm font-semibold text-teal-700 bg-green-100/50 hover:bg-green-100 rounded-lg transition-colors"
+            >
+              Back to Login
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col space-y-5 w-full">
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm font-medium flex items-center gap-2">
+                <span className="font-bold">!</span> {error}
               </div>
             )}
+            
+            <div className="group">
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-teal-600">
+                  <FiMail className="w-5 h-5"/>
+                </div>
+                <input
+                  type="email"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm font-medium hover:border-gray-400"
+                  placeholder="name@example.com"
+                />
+              </div>
+            </div>
+            
+            <button
+              onClick={handleForgotPassword}
+              disabled={loading}
+              className="w-full py-2.5 rounded-lg font-semibold text-white bg-teal-600 hover:bg-teal-700 transition-colors disabled:opacity-70 flex justify-center items-center mt-2 text-sm shadow-sm"
+            >
+              {loading ? 'Sending Link...' : 'Send Reset Link'}
+            </button>
+            <button
+               onClick={() => {
+                 setError('');
+                 setShowForgotPassword(false);
+               }}
+              className="w-full py-2.5 text-sm text-gray-500 hover:text-gray-800 font-semibold transition-colors mt-2"
+            >
+              Cancel
+            </button>
           </div>
-        </div>
-      </div>
+        )}
+      </SplitScreenLayout>
     );
   }
 
   return (
-    <div className="h-screen w-screen flex items-center justify-center app-bg overflow-hidden relative">
-
-      {/* Main Card */}
-      <div className="auth-card w-[95vw] sm:w-[80vw] md:w-[60vw] lg:w-[50vw] xl:w-[40vw] max-w-[700px] h-auto max-h-[95vh] glass-panel rounded-3xl shadow-2xl fluid-p relative flex flex-col justify-center">
-
-        {/* Top decoration dot */}
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 w-2 h-2 bg-teal-500 rounded-full animate-pulse-custom hidden min-[375px]:block"></div>
-
-        {/* Create Account Button */}
-        <div className="absolute top-4 right-4 z-10">
-          <Link
-            to="/signup"
-            className="flex items-center gap-2 px-3 py-1 theme-green-blue border border-teal-400/30 rounded-full text-white font-bold hover:shadow-lg hover:brightness-110 transition-all transform hover:scale-105"
-            style={{ fontSize: 'var(--fluid-text-sm)' }}
-          >
-            <span>✨ Create Account</span>
-          </Link>
+    <SplitScreenLayout>
+      {/* Mobile Header */}
+      <div className="lg:hidden mb-10 flex items-center gap-3">
+        <div className="w-10 h-10 bg-gradient-to-tr from-green-500 to-teal-600 rounded-lg flex items-center justify-center text-white shadow-md">
+          <FaLeaf className="w-5 h-5" />
         </div>
+        <h1 className="text-xl font-bold text-gray-900">Rizqa AI</h1>
+      </div>
 
-        {/* Header */}
-        <div className="text-center shrink-0 fluid-mb">
-          <div className="flex flex-col items-center justify-center mx-auto mb-3 fluid-mb-sm group cursor-default">
-            <div style={{ width: 'clamp(50px, 12vmin, 100px)', height: 'clamp(50px, 12vmin, 100px)' }} className="bg-gradient-to-tr from-green-500 to-teal-600 rounded-3xl flex items-center justify-center text-white shadow-lg shadow-green-500/30 mb-3 md:mb-4 transition-transform duration-300 group-hover:scale-105">
-              <FaLeaf className="w-3/5 h-3/5" />
-            </div>
-            <h1 className="fluid-h1 font-bold text-gray-900 leading-tight">
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-teal-600">Rizqa</span>
-              <span className="text-gray-700">AI</span>
-            </h1>
+      <div className="mb-6 sm:mb-8">
+        <h2 className="text-3xl lg:text-4xl font-extrabold text-gray-900 mb-2 tracking-tight">Login to your account</h2>
+        <p className="text-gray-500 text-sm font-medium">Welcome back! Please enter your details.</p>
+      </div>
+
+      <div className="w-full flex flex-col space-y-4 sm:space-y-6">
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm font-medium flex items-center gap-2">
+            <span className="font-bold">!</span> {error}
           </div>
-          <h2 className="fluid-h2 font-bold title-color leading-tight fluid-mb-sm">Welcome Back</h2>
-          <p className="fluid-h2 text-gray-600 font-medium leading-tight">Sign in to continue to Rizqa</p>
-        </div>
+        )}
 
-        {/* Content Container */}
-        <div className="w-full flex-1 flex flex-col justify-center min-h-0">
-
-          {/* Google Sign In */}
-          <button
-            onClick={handleGoogleSignIn}
-            disabled={loading}
-            className="fluid-button w-full bg-white border-2 border-gray-300 rounded-xl px-4 flex items-center justify-center gap-3 fluid-text-base font-semibold text-gray-700 hover:bg-gray-50 hover:border-teal-400 hover:shadow-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] fluid-mb shrink-0"
-          >
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style={{ width: '1.2em', height: '1.2em' }} />
-            <span>Continue with Google</span>
-          </button>
-
-          {/* Divider */}
-          <div className="flex items-center gap-4 mb-3 sm:mb-4 md:mb-5 lg:mb-6 shrink-0">
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
-            <span className="text-[10px] sm:text-xs lg:text-sm text-gray-400 font-semibold">OR</span>
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
-          </div>
-
-          {/* Error Message */}
-          {error && (
-            <div className="bg-red-50 border-2 border-red-200 text-red-700 px-4 rounded-lg text-center font-semibold animate-shake shrink-0 fluid-mb fluid-text-sm flex items-center justify-center" style={{ height: 'var(--fluid-input-height)' }}>
-              ⚠️ {error}
-            </div>
-          )}
-
-          {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col fluid-gap w-full">
-
-            {/* Email Field */}
-            <div>
-              <label className="flex items-center gap-2 text-xs sm:text-sm lg:text-base font-bold text-[#0f172a] mb-1 sm:mb-1.5 lg:mb-2">
-                <span className="text-sm sm:text-lg lg:text-xl">📧</span>
-                <span>Email Address</span>
-              </label>
+        {/* Form */}
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col space-y-4 sm:space-y-5">
+          {/* Email Field */}
+          <div className="group">
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-teal-600">
+                <FiMail className="w-5 h-5"/>
+              </div>
               <input
                 {...register("email", { required: "Email is required" })}
                 type="email"
-                className="fluid-input w-full px-3 sm:px-4 bg-white border-2 border-gray-300 rounded-lg sm:rounded-xl text-gray-900 placeholder-gray-400 font-medium fluid-text-base focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100 hover:border-gray-400 hover:shadow-md transition-all"
+                className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm font-medium hover:border-gray-400"
                 placeholder="name@example.com"
               />
-              {errors.email && <p className="text-red-500 text-[10px] sm:text-xs mt-1 ml-1 font-semibold">⚠️ {errors.email.message}</p>}
             </div>
+            {errors.email && <p className="text-red-500 text-xs mt-1.5 font-medium">{errors.email.message}</p>}
+          </div>
 
-            {/* Password Field */}
-            <div>
-              <div className="flex items-center justify-between mb-1 sm:mb-1.5 lg:mb-2">
-                <label className="flex items-center gap-2 text-xs sm:text-sm lg:text-base font-bold text-[#0f172a]">
-                  <span className="text-sm sm:text-lg lg:text-xl">🔒</span>
-                  <span>Password</span>
-                </label>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const currentEmail = getValues('email');
-                    if (currentEmail) setResetEmail(currentEmail);
-                    setShowForgotPassword(true);
-                  }}
-                  className="text-[10px] sm:text-xs lg:text-sm text-teal-600 hover:text-teal-700 hover:underline font-bold flex items-center gap-1 transition-all"
-                >
-                  Forgot password? <span>🔑</span>
-                </button>
+          {/* Password Field */}
+          <div className="group">
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-sm font-semibold text-gray-700">Password</label>
+              <button
+                type="button"
+                onClick={() => {
+                  const currentEmail = getValues('email');
+                  if (currentEmail) setResetEmail(currentEmail);
+                  setShowForgotPassword(true);
+                }}
+                className="text-xs text-teal-600 hover:text-teal-800 font-semibold transition-colors"
+              >
+                Forgot password?
+              </button>
+            </div>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-teal-600">
+                <FiLock className="w-5 h-5"/>
               </div>
               <input
                 {...register("password", { required: "Password is required" })}
                 type="password"
-                className="fluid-input w-full px-3 sm:px-4 bg-white border-2 border-gray-300 rounded-lg sm:rounded-xl text-gray-900 placeholder-gray-400 font-medium fluid-text-base focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100 hover:border-gray-400 hover:shadow-md transition-all"
+                className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm font-medium hover:border-gray-400"
                 placeholder="••••••••"
               />
-              {errors.password && <p className="text-red-500 text-[10px] sm:text-xs mt-1 ml-1 font-semibold">⚠️ {errors.password.message}</p>}
             </div>
+            {errors.password && <p className="text-red-500 text-xs mt-1.5 font-medium">{errors.password.message}</p>}
+          </div>
 
-            {/* Sign In Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="fluid-button w-full rounded-xl font-bold fluid-text-base text-white bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 transition-all transform hover:scale-[1.03] hover:-translate-y-1 active:scale-[0.98] mt-2 shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Signing In...
-                </span>
-              ) : 'Sign In'}
-            </button>
-          </form>
+          {/* Sign In Button */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-2.5 mt-1 sm:mt-2 rounded-lg font-semibold text-white bg-teal-600 hover:bg-teal-700 active:bg-teal-800 transition-colors disabled:opacity-70 flex items-center justify-center gap-2 text-sm shadow-sm"
+          >
+            {loading ? 'Signing In...' : 'Sign In'}
+          </button>
+        </form>
 
+        {/* Divider */}
+        <div className="flex items-center gap-4 py-1">
+          <div className="flex-1 h-px bg-gray-200"></div>
+          <span className="text-xs text-gray-500 font-medium">OR</span>
+          <div className="flex-1 h-px bg-gray-200"></div>
         </div>
+
+        {/* Google Sign In */}
+        <button
+          onClick={handleGoogleSignIn}
+          disabled={loading}
+          className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 flex items-center justify-center gap-3 font-semibold text-gray-700 hover:bg-gray-50 transition-colors active:bg-gray-100 disabled:opacity-70 text-sm"
+        >
+          <FcGoogle className="w-5 h-5" />
+          <span>Continue with Google</span>
+        </button>
+
       </div>
-    </div>
+    </SplitScreenLayout>
   );
 }
