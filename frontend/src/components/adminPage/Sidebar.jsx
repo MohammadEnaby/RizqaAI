@@ -68,23 +68,6 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                     System
                 </p>
 
-                {/* ✅ DASHBOARD */}
-                <Link
-                    to="/admin/dashboard"
-                    onClick={handleLinkClick}
-                    className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
-            ${isActive('/admin/dashboard')
-                            ? 'bg-gradient-to-r from-green-100 to-teal-100 text-[#134e4a] shadow-lg'
-                            : 'text-gray-500 hover:bg-white hover:shadow-md'
-                        }`}
-                >
-                    <FaHome
-                        className={`${isActive('/admin/dashboard') ? 'text-green-500' : 'text-gray-400'
-                            }`}
-                    />
-                    <span>Dashboard</span>
-                </Link>
-
                 {/* ✅ USERS MANAGEMENT */}
                 <Link
                     to="/admin/users"
