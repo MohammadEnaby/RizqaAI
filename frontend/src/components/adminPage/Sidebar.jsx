@@ -63,7 +63,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
             </div>
 
             {/* ✅ NAVIGATION */}
-            <nav className="flex-1 px-6 py-8 space-y-3">
+            <nav className="flex-1 px-6 py-8 flex flex-col gap-3">
                 <p className="px-3 text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4">
                     System
                 </p>
@@ -154,7 +154,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                 </Link>
 
                 {/* ✅ ACCOUNT */}
-                <div className="pt-7 mt-7 border-t border-white/20">
+                <div className="mt-auto pt-7 border-t border-white/20">
                     <p className="px-3 text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4">
                         Account
                     </p>
