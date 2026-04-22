@@ -220,9 +220,9 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="min-h-screen p-6 md:p-12 font-sans text-[#0f172a]">
+        <div className="min-h-screen p-4 md:p-12 font-sans text-[#0f172a]">
             {/* Header */}
-            <div className="flex-none mb-6 flex justify-between items-end">
+            <div className="flex-none mb-6 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                 <div>
                     <h1 className="text-[42px] font-extrabold title-color tracking-tight leading-none mb-3">
                         Recruitment CRM

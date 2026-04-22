@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaHome, FaCogs, FaSignOutAlt, FaLeaf, FaDatabase, FaClock, FaUsers, FaRobot } from 'react-icons/fa';
+import { FaHome, FaCogs, FaSignOutAlt, FaLeaf, FaDatabase, FaClock, FaUsers, FaRobot, FaTimes } from 'react-icons/fa';
 import { useAuth } from '../../contexts/AuthContext';
 import { motion } from 'framer-motion';
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, setIsOpen }) => {
     const location = useLocation();
     const navigate = useNavigate();
     const { logout } = useAuth();
@@ -23,7 +23,12 @@ const Sidebar = () => {
         // Only navigate if clicking the empty background, not interactive elements
         if (e.target === e.currentTarget || e.target.tagName === 'NAV') {
             navigate('/admin');
+            if (setIsOpen) setIsOpen(false);
         }
+    };
+
+    const handleLinkClick = () => {
+        if (setIsOpen) setIsOpen(false);
     };
 
     return (
@@ -31,23 +36,31 @@ const Sidebar = () => {
             initial={{ x: -40, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.4 }}
-            className="w-72 min-h-screen bg-transparent backdrop-blur-xl shadow-2xl flex flex-col sticky"
+            className={`w-72 min-h-screen bg-white/95 md:bg-transparent backdrop-blur-xl shadow-2xl flex flex-col fixed md:sticky top-0 z-50 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 overflow-y-auto`}
             onClick={handleSidebarClick}
         >
             {/* ✅ LOGO HEADER */}
-            <Link to="/admin" className="p-8 flex items-center gap-4 border-b border-white/20 hover:opacity-80 transition-opacity">
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center theme-btn-primary text-white">
-                    <FaLeaf size={24} />
-                </div>
-                <div>
-                    <h1 className="text-3xl font-extrabold title-color tracking-tight">
-                        Rizqa
-                    </h1>
-                    <p className="text-[11px] uppercase tracking-widest text-green-500 font-bold">
-                        Automation
-                    </p>
-                </div>
-            </Link>
+            <div className="p-8 flex items-center justify-between border-b border-white/20">
+                <Link to="/admin" onClick={handleLinkClick} className="flex items-center gap-4 hover:opacity-80 transition-opacity">
+                    <div className="w-14 h-14 rounded-2xl flex items-center justify-center theme-btn-primary text-white">
+                        <FaLeaf size={24} />
+                    </div>
+                    <div>
+                        <h1 className="text-3xl font-extrabold title-color tracking-tight">
+                            Rizqa
+                        </h1>
+                        <p className="text-[11px] uppercase tracking-widest text-green-500 font-bold">
+                            Automation
+                        </p>
+                    </div>
+                </Link>
+                <button 
+                    className="md:hidden text-gray-400 hover:text-gray-600 p-2 -mr-2"
+                    onClick={() => setIsOpen && setIsOpen(false)}
+                >
+                    <FaTimes size={20} />
+                </button>
+            </div>
 
             {/* ✅ NAVIGATION */}
             <nav className="flex-1 px-6 py-8 space-y-3">
@@ -58,6 +71,7 @@ const Sidebar = () => {
                 {/* ✅ DASHBOARD */}
                 <Link
                     to="/admin/dashboard"
+                    onClick={handleLinkClick}
                     className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
             ${isActive('/admin/dashboard')
                             ? 'bg-gradient-to-r from-green-100 to-teal-100 text-[#134e4a] shadow-lg'
@@ -74,6 +88,7 @@ const Sidebar = () => {
                 {/* ✅ USERS MANAGEMENT */}
                 <Link
                     to="/admin/users"
+                    onClick={handleLinkClick}
                     className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
             ${isActive('/admin/users')
                             ? 'bg-gradient-to-r from-green-100 to-teal-100 text-[#134e4a] shadow-lg'
@@ -90,6 +105,7 @@ const Sidebar = () => {
                 {/* ✅ PIPELINE */}
                 <Link
                     to="/admin/pipeline"
+                    onClick={handleLinkClick}
                     className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
             ${isActive('/admin/pipeline')
                             ? 'bg-gradient-to-r from-green-100 to-teal-100 text-[#134e4a] shadow-lg'
@@ -106,6 +122,7 @@ const Sidebar = () => {
                 {/* ✅ DATASOURCES */}
                 <Link
                     to="/admin/datasources"
+                    onClick={handleLinkClick}
                     className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
             ${isActive('/admin/datasources')
                             ? 'bg-gradient-to-r from-green-100 to-teal-100 text-[#134e4a] shadow-lg'
@@ -122,6 +139,7 @@ const Sidebar = () => {
                 {/* ✅ SCHEDULED PIPELINES */}
                 <Link
                     to="/admin/schedules"
+                    onClick={handleLinkClick}
                     className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
             ${isActive('/admin/schedules')
                             ? 'bg-gradient-to-r from-green-100 to-teal-100 text-[#134e4a] shadow-lg'
@@ -138,6 +156,7 @@ const Sidebar = () => {
                 {/* ✅ CHATBOT */}
                 <Link
                     to="/chatbot"
+                    onClick={handleLinkClick}
                     className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
             ${isActive('/chatbot')
                             ? 'bg-gradient-to-r from-green-100 to-teal-100 text-[#134e4a] shadow-lg'

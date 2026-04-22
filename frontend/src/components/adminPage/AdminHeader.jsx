@@ -56,7 +56,7 @@ const AdminHeader = ({
     return (
         <div className="flex flex-col gap-6 mb-8">
             {/* Header Section */}
-            <div className="flex lg:flex-row items-center justify-between">
+            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
                 <div>
                     <div className="flex items-center space-x-3 mb-2">
                         <h1 className="text-[48px] font-extrabold title-color tracking-tight leading-none">
@@ -96,7 +96,7 @@ const AdminHeader = ({
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex flex-col lg:flex-row items-end gap-4 w-full p-6 glass-panel rounded-2xl shadow-sm relative z-50"
+                    className="flex flex-col lg:flex-row items-start lg:items-end gap-4 w-full p-6 glass-panel rounded-2xl shadow-sm relative z-50"
                 >
                     <div className="flex flex-col space-y-1 w-full sm:w-auto relative z-50">
                         <label className="text-[10px] font-bold text-[#134e4a] uppercase tracking-widest">Group ID</label>
@@ -153,7 +153,7 @@ const AdminHeader = ({
                         whileTap={{ scale: 0.98 }}
                         onClick={() => handleRunPipeline(activeMode)}
                         disabled={isRunning}
-                        className={`h-[42px] px-8 rounded-xl font-bold text-sm tracking-wide shadow-lg transition-all flex items-center justify-center space-x-2 ml-auto ${isRunning
+                        className={`h-[42px] px-8 rounded-xl font-bold text-sm tracking-wide shadow-lg transition-all flex items-center justify-center space-x-2 w-full lg:w-auto lg:ml-auto ${isRunning
                             ? 'bg-gray-400 cursor-not-allowed text-white'
                             : 'theme-btn-primary'
                             }`}
