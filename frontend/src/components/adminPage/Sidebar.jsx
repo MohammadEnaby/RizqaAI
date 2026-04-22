@@ -36,11 +36,11 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
             initial={{ x: -40, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.4 }}
-            className={`w-72 h-screen bg-white/95 md:bg-transparent backdrop-blur-xl shadow-2xl flex flex-col fixed md:sticky top-0 z-50 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 overflow-y-auto`}
+            className={`w-72 h-screen bg-white/95 dark:bg-gray-900/95 md:bg-transparent dark:md:bg-transparent backdrop-blur-xl shadow-2xl flex flex-col fixed md:sticky top-0 z-50 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 overflow-y-auto`}
             onClick={handleSidebarClick}
         >
             {/* ✅ LOGO HEADER */}
-            <div className="p-8 flex items-center justify-between border-b border-white/20">
+            <div className="p-8 flex items-center justify-between border-b border-white/20 dark:border-gray-800">
                 <Link to="/admin" onClick={handleLinkClick} className="flex items-center gap-4 hover:opacity-80 transition-opacity">
                     <div className="w-14 h-14 rounded-2xl flex items-center justify-center theme-btn-primary text-white">
                         <FaLeaf size={24} />
@@ -74,8 +74,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                     onClick={handleLinkClick}
                     className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
             ${isActive('/admin/users')
-                            ? 'bg-gradient-to-r from-green-100 to-teal-100 text-[#134e4a] shadow-lg'
-                            : 'text-gray-500 hover:bg-white hover:shadow-md'
+                            ? 'bg-gradient-to-r from-green-100 to-teal-100 dark:from-green-900/50 dark:to-teal-900/50 text-[#134e4a] dark:text-teal-100 shadow-lg'
+                            : 'text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md'
                         }`}
                 >
                     <FaUsers
@@ -91,8 +91,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                     onClick={handleLinkClick}
                     className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
             ${isActive('/admin/pipeline')
-                            ? 'bg-gradient-to-r from-green-100 to-teal-100 text-[#134e4a] shadow-lg'
-                            : 'text-gray-500 hover:bg-white hover:shadow-md'
+                            ? 'bg-gradient-to-r from-green-100 to-teal-100 dark:from-green-900/50 dark:to-teal-900/50 text-[#134e4a] dark:text-teal-100 shadow-lg'
+                            : 'text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md'
                         }`}
                 >
                     <FaCogs
@@ -108,8 +108,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                     onClick={handleLinkClick}
                     className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
             ${isActive('/admin/datasources')
-                            ? 'bg-gradient-to-r from-green-100 to-teal-100 text-[#134e4a] shadow-lg'
-                            : 'text-gray-500 hover:bg-white hover:shadow-md'
+                            ? 'bg-gradient-to-r from-green-100 to-teal-100 dark:from-green-900/50 dark:to-teal-900/50 text-[#134e4a] dark:text-teal-100 shadow-lg'
+                            : 'text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md'
                         }`}
                 >
                     <FaDatabase
@@ -125,8 +125,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                     onClick={handleLinkClick}
                     className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
             ${isActive('/admin/schedules')
-                            ? 'bg-gradient-to-r from-green-100 to-teal-100 text-[#134e4a] shadow-lg'
-                            : 'text-gray-500 hover:bg-white hover:shadow-md'
+                            ? 'bg-gradient-to-r from-green-100 to-teal-100 dark:from-green-900/50 dark:to-teal-900/50 text-[#134e4a] dark:text-teal-100 shadow-lg'
+                            : 'text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md'
                         }`}
                 >
                     <FaClock
@@ -142,8 +142,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                     onClick={handleLinkClick}
                     className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
             ${isActive('/chatbot')
-                            ? 'bg-gradient-to-r from-green-100 to-teal-100 text-[#134e4a] shadow-lg'
-                            : 'text-gray-500 hover:bg-white hover:shadow-md'
+                            ? 'bg-gradient-to-r from-green-100 to-teal-100 dark:from-green-900/50 dark:to-teal-900/50 text-[#134e4a] dark:text-teal-100 shadow-lg'
+                            : 'text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md'
                         }`}
                 >
                     <FaRobot
@@ -163,7 +163,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.96 }}
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl font-medium text-gray-500 hover:bg-red-50 hover:text-red-500 transition"
+                        className="w-full flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl font-medium text-gray-500 dark:text-gray-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 dark:hover:text-red-400 transition"
                     >
                         <FaSignOutAlt />
                         <span>Logout</span>

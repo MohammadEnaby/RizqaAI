@@ -12,7 +12,7 @@ const Layout = ({ children }) => {
             <div className="bg-blob teal"></div>
             
             {/* Mobile Header */}
-            <div className="md:hidden w-full flex items-center justify-between p-4 bg-white/50 backdrop-blur-md border-b border-white/20 z-30 relative shadow-sm">
+            <div className="md:hidden w-full flex items-center justify-between p-4 bg-white/50 dark:bg-gray-900/50 backdrop-blur-md border-b border-white/20 dark:border-gray-800 z-30 relative shadow-sm">
                 <Link to="/admin" className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center theme-btn-primary text-white">
                         <FaLeaf size={14} />
@@ -23,7 +23,7 @@ const Layout = ({ children }) => {
                 </Link>
                 <button 
                     onClick={() => setIsSidebarOpen(true)}
-                    className="p-2 text-[#134e4a] hover:bg-white/50 rounded-lg transition-colors"
+                    className="p-2 text-[#134e4a] dark:text-teal-400 hover:bg-white/50 dark:hover:bg-gray-800/50 rounded-lg transition-colors"
                 >
                     <FaBars size={20} />
                 </button>

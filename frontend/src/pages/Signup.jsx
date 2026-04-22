@@ -72,7 +72,7 @@ const HeroCarousel = ({ quotes }) => {
 };
 
 const SplitScreenLayout = ({ children }) => (
-  <div className="min-h-screen max-h-screen w-full flex bg-white overflow-hidden">
+  <div className="min-h-screen max-h-screen w-full flex bg-white dark:bg-gray-900 overflow-hidden">
     {/* Left Panel */}
     <HeroCarousel quotes={SIGNUP_QUOTES} />
 
@@ -80,10 +80,10 @@ const SplitScreenLayout = ({ children }) => (
     <div className="w-full lg:w-1/2 flex flex-col p-4 sm:p-6 lg:p-8 overflow-y-auto custom-scrollbar">
       <div className="w-full flex justify-end mb-4 shrink-0">
          <div className="flex items-center gap-3">
-           <span className="text-sm font-medium text-gray-500 hidden sm:inline">Already have an account?</span>
+           <span className="text-sm font-medium text-gray-500 dark:text-gray-400 hidden sm:inline">Already have an account?</span>
            <Link
             to="/login"
-            className="px-5 py-2 bg-gray-50 hover:bg-gray-100 text-gray-900 rounded-lg font-semibold transition-all text-sm border border-gray-200"
+            className="px-5 py-2 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-semibold transition-all text-sm border border-gray-200 dark:border-gray-700"
           >
             Log in
           </Link>
@@ -171,18 +171,18 @@ export default function Signup() {
         <div className="w-10 h-10 bg-gradient-to-tr from-green-500 to-teal-600 rounded-lg flex items-center justify-center text-white shadow-md">
           <FaLeaf className="w-5 h-5" />
         </div>
-        <h1 className="text-xl font-bold text-gray-900">Rizqa AI</h1>
+        <h1 className="text-xl font-bold text-gray-900 dark:text-white">Rizqa AI</h1>
       </div>
 
       <div className="mb-5 sm:mb-6">
-        <h2 className="text-2xl lg:text-3xl font-extrabold text-gray-900 mb-1 lg:mb-2 tracking-tight">Create an account</h2>
-        <p className="text-gray-500 text-sm font-medium">Join us today to launch your career.</p>
+        <h2 className="text-2xl lg:text-3xl font-extrabold text-gray-900 dark:text-white mb-1 lg:mb-2 tracking-tight">Create an account</h2>
+        <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">Join us today to launch your career.</p>
       </div>
 
       <div className="w-full flex flex-col space-y-4">
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
             <span className="font-bold">!</span> {error}
           </div>
         )}
@@ -193,30 +193,30 @@ export default function Signup() {
           {/* Name Fields */}
           <div className="grid grid-cols-2 gap-3">
             <div className="group">
-              <label className="block text-xs font-semibold text-gray-700 mb-1">First Name</label>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">First Name</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-teal-600">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-teal-600 dark:group-focus-within:text-teal-400">
                   <FiUser className="w-4 h-4"/>
                 </div>
                 <input
                   {...register("firstName", { required: "Required", minLength: { value: 2, message: "Min 2 chars" } })}
                   type="text"
-                  className="w-full pl-8 pr-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm hover:border-gray-400 font-medium"
+                  className="w-full pl-8 pr-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm hover:border-gray-400 dark:hover:border-gray-600 font-medium"
                   placeholder="First"
                 />
               </div>
               {errors.firstName && <p className="text-red-500 text-[10px] mt-0.5 font-medium">{errors.firstName.message}</p>}
             </div>
             <div className="group">
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Last Name</label>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Last Name</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-teal-600">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-teal-600 dark:group-focus-within:text-teal-400">
                   <FiUser className="w-4 h-4"/>
                 </div>
                 <input
                   {...register("lastName", { required: "Required", minLength: { value: 2, message: "Min 2 chars" } })}
                   type="text"
-                  className="w-full pl-8 pr-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm hover:border-gray-400 font-medium"
+                  className="w-full pl-8 pr-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm hover:border-gray-400 dark:hover:border-gray-600 font-medium"
                   placeholder="Last"
                 />
               </div>
@@ -226,9 +226,9 @@ export default function Signup() {
 
           {/* Email Drop */}
           <div className="group">
-            <label className="block text-xs font-semibold text-gray-700 mb-1">Email</label>
+            <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Email</label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-teal-600">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-teal-600 dark:group-focus-within:text-teal-400">
                 <FiMail className="w-4 h-4"/>
               </div>
               <input
@@ -237,7 +237,7 @@ export default function Signup() {
                   pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, message: "Invalid email" }
                 })}
                 type="email"
-                className="w-full pl-8 pr-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm hover:border-gray-400 font-medium"
+                className="w-full pl-8 pr-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm hover:border-gray-400 dark:hover:border-gray-600 font-medium"
                 placeholder="name@example.com"
               />
             </div>
@@ -246,9 +246,9 @@ export default function Signup() {
           
           {/* Phone Drop */}
           <div className="group">
-            <label className="block text-xs font-semibold text-gray-700 mb-1">Phone Number</label>
+            <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Phone Number</label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-teal-600">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-teal-600 dark:group-focus-within:text-teal-400">
                 <FiPhone className="w-4 h-4"/>
               </div>
               <input
@@ -258,7 +258,7 @@ export default function Signup() {
                   minLength: { value: 9, message: "Min 9 digits" }
                 })}
                 type="tel"
-                className="w-full pl-8 pr-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm hover:border-gray-400 font-medium"
+                className="w-full pl-8 pr-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm hover:border-gray-400 dark:hover:border-gray-600 font-medium"
                 placeholder="(555) 123-4567"
               />
             </div>
@@ -268,9 +268,9 @@ export default function Signup() {
           {/* Password Fields */}
           <div className="grid grid-cols-2 gap-3">
             <div className="group">
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Password</label>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Password</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-teal-600">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-teal-600 dark:group-focus-within:text-teal-400">
                   <FiLock className="w-4 h-4"/>
                 </div>
                 <input
@@ -285,13 +285,13 @@ export default function Signup() {
                     }
                   })}
                   type={showPassword ? "text" : "password"}
-                  className="w-full pl-8 pr-9 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm hover:border-gray-400 font-medium"
+                  className="w-full pl-8 pr-9 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm hover:border-gray-400 dark:hover:border-gray-600 font-medium"
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors text-[10px] font-semibold"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors text-[10px] font-semibold"
                 >
                   {showPassword ? 'HIDE' : 'SHOW'}
                 </button>
@@ -300,9 +300,9 @@ export default function Signup() {
             </div>
 
             <div className="group">
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Confirm</label>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Confirm</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-teal-600">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-teal-600 dark:group-focus-within:text-teal-400">
                   <FiLock className="w-4 h-4"/>
                 </div>
                 <input
@@ -311,7 +311,7 @@ export default function Signup() {
                     validate: value => value === password || "Passwords don't match"
                   })}
                   type={showConfirmPassword ? "text" : "password"}
-                  className="w-full pl-8 pr-9 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm hover:border-gray-400 font-medium"
+                  className="w-full pl-8 pr-9 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm hover:border-gray-400 dark:hover:border-gray-600 font-medium"
                   placeholder="••••••••"
                 />
               </div>
@@ -321,16 +321,16 @@ export default function Signup() {
 
           {/* Password Strength Indicator */}
           {password && passwordStrength < 5 && (
-            <div className="bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 mt-0.5">
+            <div className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 mt-0.5">
               <div className="flex items-center justify-between text-[10px]">
-                <span className="font-semibold text-gray-600">Strength:</span>
+                <span className="font-semibold text-gray-600 dark:text-gray-400">Strength:</span>
                 <div className="flex gap-1.5">
-                  <span className={`font-semibold ${hasMinLength ? 'text-green-600' : 'text-gray-400'}`}>{hasMinLength ? '✓' : '○'} 8+</span>
-                  <span className={`font-semibold ${hasUpperCase ? 'text-green-600' : 'text-gray-400'}`}>{hasUpperCase ? '✓' : '○'} A</span>
-                  <span className={`font-semibold ${hasLowerCase ? 'text-green-600' : 'text-gray-400'}`}>{hasLowerCase ? '✓' : '○'} a</span>
-                  <span className={`font-semibold ${hasNumber ? 'text-green-600' : 'text-gray-400'}`}>{hasNumber ? '✓' : '○'} #</span>
-                  <span className={`font-semibold ${hasSpecialChar ? 'text-green-600' : 'text-gray-400'}`}>{hasSpecialChar ? '✓' : '○'} !</span>
-                  <span className={`font-semibold ${passwordsMatch ? 'text-green-600' : 'text-gray-400'}`}>{passwordsMatch ? '✓' : '○'} =</span>
+                  <span className={`font-semibold ${hasMinLength ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-600'}`}>{hasMinLength ? '✓' : '○'} 8+</span>
+                  <span className={`font-semibold ${hasUpperCase ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-600'}`}>{hasUpperCase ? '✓' : '○'} A</span>
+                  <span className={`font-semibold ${hasLowerCase ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-600'}`}>{hasLowerCase ? '✓' : '○'} a</span>
+                  <span className={`font-semibold ${hasNumber ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-600'}`}>{hasNumber ? '✓' : '○'} #</span>
+                  <span className={`font-semibold ${hasSpecialChar ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-600'}`}>{hasSpecialChar ? '✓' : '○'} !</span>
+                  <span className={`font-semibold ${passwordsMatch ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-600'}`}>{passwordsMatch ? '✓' : '○'} =</span>
                 </div>
               </div>
             </div>
@@ -338,23 +338,23 @@ export default function Signup() {
 
           {/* Role Selection */}
           <div className="grid grid-cols-2 gap-3 pt-1">
-            <label className="flex items-center justify-center gap-2 bg-white border border-gray-200 rounded-lg cursor-pointer hover:border-teal-400 transition-all py-1.5 px-3">
+            <label className="flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:border-teal-400 dark:hover:border-teal-500 transition-all py-1.5 px-3">
               <input
                 {...register("role", { required: true })}
                 type="radio"
                 value="user"
-                className="w-3.5 h-3.5 text-teal-600 focus:ring-teal-500 border-gray-300"
+                className="w-3.5 h-3.5 text-teal-600 focus:ring-teal-500 border-gray-300 dark:border-gray-600"
               />
-              <span className="text-xs font-semibold text-gray-700">Job Seeker</span>
+              <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">Job Seeker</span>
             </label>
-            <label className="flex items-center justify-center gap-2 bg-white border border-gray-200 rounded-lg cursor-pointer hover:border-teal-400 transition-all py-1.5 px-3">
+            <label className="flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:border-teal-400 dark:hover:border-teal-500 transition-all py-1.5 px-3">
               <input
                 {...register("role", { required: true })}
                 type="radio"
                 value="admin"
-                className="w-3.5 h-3.5 text-teal-600 focus:ring-teal-500 border-gray-300"
+                className="w-3.5 h-3.5 text-teal-600 focus:ring-teal-500 border-gray-300 dark:border-gray-600"
               />
-              <span className="text-xs font-semibold text-gray-700">Employer</span>
+              <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">Employer</span>
             </label>
           </div>
           {errors.role && <p className="text-red-500 text-[10px] text-center font-medium">Please select a role</p>}
@@ -371,16 +371,16 @@ export default function Signup() {
 
         {/* Divider */}
         <div className="flex items-center gap-4 py-1">
-          <div className="flex-1 h-px bg-gray-200"></div>
-          <span className="text-[10px] text-gray-500 font-bold uppercase">OR</span>
-          <div className="flex-1 h-px bg-gray-200"></div>
+          <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
+          <span className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase">OR</span>
+          <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
         </div>
 
         {/* Google Sign In */}
         <button
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2 flex items-center justify-center gap-3 font-semibold text-gray-700 hover:bg-gray-50 transition-colors active:bg-gray-100 disabled:opacity-70 text-sm"
+          className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-2 flex items-center justify-center gap-3 font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors active:bg-gray-100 dark:active:bg-gray-600 disabled:opacity-70 text-sm"
         >
           <FcGoogle className="w-4 h-4" />
           <span>Continue with Google</span>

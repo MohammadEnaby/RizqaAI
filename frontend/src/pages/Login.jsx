@@ -72,7 +72,7 @@ const HeroCarousel = ({ quotes }) => {
 };
 
 const SplitScreenLayout = ({ children, isResetFlow = false }) => (
-  <div className="min-h-screen max-h-screen w-full flex bg-white overflow-hidden">
+  <div className="min-h-screen max-h-screen w-full flex bg-white dark:bg-gray-900 overflow-hidden">
     {/* Left Panel */}
     <HeroCarousel quotes={LOGIN_QUOTES} />
 
@@ -81,10 +81,10 @@ const SplitScreenLayout = ({ children, isResetFlow = false }) => (
       {!isResetFlow && (
         <div className="w-full flex justify-end mb-4 sm:mb-8 shrink-0">
            <div className="flex items-center gap-3">
-             <span className="text-sm font-medium text-gray-500 hidden sm:inline">Don't have an account?</span>
+             <span className="text-sm font-medium text-gray-500 dark:text-gray-400 hidden sm:inline">Don't have an account?</span>
              <Link
               to="/signup"
-              className="px-5 py-2.5 bg-gray-50 hover:bg-gray-100 text-gray-900 rounded-lg font-semibold transition-all text-sm border border-gray-200"
+              className="px-5 py-2.5 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-semibold transition-all text-sm border border-gray-200 dark:border-gray-700"
             >
               Sign up
             </Link>
@@ -175,19 +175,19 @@ export default function Login() {
           <div className="w-10 h-10 bg-gradient-to-tr from-green-500 to-teal-600 rounded-lg flex items-center justify-center text-white shadow-md">
             <FaLeaf className="w-5 h-5" />
           </div>
-          <h1 className="text-xl font-bold text-gray-900">Rizqa AI</h1>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white">Rizqa AI</h1>
         </div>
 
         <div className="mb-8">
-          <h2 className="text-3xl font-extrabold text-gray-900 mb-2 tracking-tight">Reset Password</h2>
-          <p className="text-gray-500 text-sm">Enter your email to receive a secure reset link.</p>
+          <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2 tracking-tight">Reset Password</h2>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">Enter your email to receive a secure reset link.</p>
         </div>
 
         {resetSuccess ? (
-          <div className="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
-            <div className="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-xl">✓</div>
-            <h3 className="text-lg font-bold text-green-800 mb-2">Check your inbox</h3>
-            <p className="text-green-700 text-sm mb-6">We've sent a password reset link to your email address.</p>
+          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-8 text-center">
+            <div className="w-12 h-12 bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center mx-auto mb-4 text-xl">✓</div>
+            <h3 className="text-lg font-bold text-green-800 dark:text-green-400 mb-2">Check your inbox</h3>
+            <p className="text-green-700 dark:text-green-500 text-sm mb-6">We've sent a password reset link to your email address.</p>
             <button
               onClick={() => setShowForgotPassword(false)}
               className="w-full py-2.5 text-sm font-semibold text-teal-700 bg-green-100/50 hover:bg-green-100 rounded-lg transition-colors"
@@ -198,22 +198,22 @@ export default function Login() {
         ) : (
           <div className="flex flex-col space-y-5 w-full">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm font-medium flex items-center gap-2">
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm font-medium flex items-center gap-2">
                 <span className="font-bold">!</span> {error}
               </div>
             )}
             
             <div className="group">
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Email</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-teal-600">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-teal-600 dark:group-focus-within:text-teal-400">
                   <FiMail className="w-5 h-5"/>
                 </div>
                 <input
                   type="email"
                   value={resetEmail}
                   onChange={(e) => setResetEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm font-medium hover:border-gray-400"
+                  className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm font-medium hover:border-gray-400 dark:hover:border-gray-600"
                   placeholder="name@example.com"
                 />
               </div>
@@ -231,7 +231,7 @@ export default function Login() {
                  setError('');
                  setShowForgotPassword(false);
                }}
-              className="w-full py-2.5 text-sm text-gray-500 hover:text-gray-800 font-semibold transition-colors mt-2"
+              className="w-full py-2.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white font-semibold transition-colors mt-2"
             >
               Cancel
             </button>
@@ -248,18 +248,18 @@ export default function Login() {
         <div className="w-10 h-10 bg-gradient-to-tr from-green-500 to-teal-600 rounded-lg flex items-center justify-center text-white shadow-md">
           <FaLeaf className="w-5 h-5" />
         </div>
-        <h1 className="text-xl font-bold text-gray-900">Rizqa AI</h1>
+        <h1 className="text-xl font-bold text-gray-900 dark:text-white">Rizqa AI</h1>
       </div>
 
       <div className="mb-6 sm:mb-8">
-        <h2 className="text-3xl lg:text-4xl font-extrabold text-gray-900 mb-2 tracking-tight">Login to your account</h2>
-        <p className="text-gray-500 text-sm font-medium">Welcome back! Please enter your details.</p>
+        <h2 className="text-3xl lg:text-4xl font-extrabold text-gray-900 dark:text-white mb-2 tracking-tight">Login to your account</h2>
+        <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">Welcome back! Please enter your details.</p>
       </div>
 
       <div className="w-full flex flex-col space-y-4 sm:space-y-6">
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm font-medium flex items-center gap-2">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm font-medium flex items-center gap-2">
             <span className="font-bold">!</span> {error}
           </div>
         )}
@@ -268,15 +268,15 @@ export default function Login() {
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col space-y-4 sm:space-y-5">
           {/* Email Field */}
           <div className="group">
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Email</label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-teal-600">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-teal-600 dark:group-focus-within:text-teal-400">
                 <FiMail className="w-5 h-5"/>
               </div>
               <input
                 {...register("email", { required: "Email is required" })}
                 type="email"
-                className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm font-medium hover:border-gray-400"
+                className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm font-medium hover:border-gray-400 dark:hover:border-gray-600"
                 placeholder="name@example.com"
               />
             </div>
@@ -286,7 +286,7 @@ export default function Login() {
           {/* Password Field */}
           <div className="group">
             <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-sm font-semibold text-gray-700">Password</label>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Password</label>
               <button
                 type="button"
                 onClick={() => {
@@ -294,19 +294,19 @@ export default function Login() {
                   if (currentEmail) setResetEmail(currentEmail);
                   setShowForgotPassword(true);
                 }}
-                className="text-xs text-teal-600 hover:text-teal-800 font-semibold transition-colors"
+                className="text-xs text-teal-600 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-300 font-semibold transition-colors"
               >
                 Forgot password?
               </button>
             </div>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-teal-600">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-teal-600 dark:group-focus-within:text-teal-400">
                 <FiLock className="w-5 h-5"/>
               </div>
               <input
                 {...register("password", { required: "Password is required" })}
                 type="password"
-                className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm font-medium hover:border-gray-400"
+                className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm font-medium hover:border-gray-400 dark:hover:border-gray-600"
                 placeholder="••••••••"
               />
             </div>
@@ -325,16 +325,16 @@ export default function Login() {
 
         {/* Divider */}
         <div className="flex items-center gap-4 py-1">
-          <div className="flex-1 h-px bg-gray-200"></div>
-          <span className="text-xs text-gray-500 font-medium">OR</span>
-          <div className="flex-1 h-px bg-gray-200"></div>
+          <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
+          <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">OR</span>
+          <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
         </div>
 
         {/* Google Sign In */}
         <button
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 flex items-center justify-center gap-3 font-semibold text-gray-700 hover:bg-gray-50 transition-colors active:bg-gray-100 disabled:opacity-70 text-sm"
+          className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-2.5 flex items-center justify-center gap-3 font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors active:bg-gray-100 dark:active:bg-gray-600 disabled:opacity-70 text-sm"
         >
           <FcGoogle className="w-5 h-5" />
           <span>Continue with Google</span>
