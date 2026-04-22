@@ -120,15 +120,15 @@ const ScheduledPipelines = () => {
                                 </div>
 
                                 <div className="flex items-start justify-between mb-4">
-                                    <div>
+                                    <div className="min-w-0 flex-1 pr-4">
                                         <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase bg-green-50 text-green-700 mb-2">
                                             Active
                                         </span>
-                                        <h3 className="text-xl font-bold text-[#134e4a] truncate max-w-[200px]" title={groupNames[schedule.groupID] || schedule.groupID}>
+                                        <h3 className="text-xl font-bold text-[#134e4a] truncate" title={groupNames[schedule.groupID] || schedule.groupID}>
                                             {groupNames[schedule.groupID] || schedule.groupID}
                                         </h3>
                                         {(groupNames[schedule.groupID] && groupNames[schedule.groupID] !== schedule.groupID) && (
-                                            <p className="text-xs text-gray-400 truncate max-w-[200px]">{schedule.groupID}</p>
+                                            <p className="text-xs text-gray-400 truncate">{schedule.groupID}</p>
                                         )}
                                     </div>
                                 </div>
