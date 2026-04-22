@@ -111,12 +111,12 @@ const UsersManagement = () => {
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
-                    <h1 className="text-[42px] font-extrabold title-color tracking-tight leading-none mb-3">Users Management</h1>
+                    <h1 className="text-3xl md:text-[42px] font-extrabold title-color tracking-tight leading-none mb-3">Users Management</h1>
                     <p className="text-gray-500 font-medium">Manage platform users, roles, and view their activity stats.</p>
                 </div>
             </div>
 
-            <div className="flex-1 p-8 overflow-y-auto">
+            <div className="flex-1 py-4 md:py-8 overflow-y-auto">
                 {/* Stats Cards Row */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div className="glass-panel p-6 rounded-2xl flex items-center justify-between">

@@ -59,7 +59,7 @@ const AdminHeader = ({
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
                 <div>
                     <div className="flex items-center space-x-3 mb-2">
-                        <h1 className="text-[48px] font-extrabold title-color tracking-tight leading-none">
+                        <h1 className="text-3xl md:text-[48px] font-extrabold title-color tracking-tight leading-none">
                             {title}
                         </h1>
                     </div>

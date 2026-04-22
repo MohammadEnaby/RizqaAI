@@ -170,19 +170,6 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                     </motion.button>
                 </div>
             </nav>
-
-            {/* ✅ USER CARD */}
-            <div className="p-6 border-t border-white/20">
-                <div className="flex items-center gap-3 glass-panel p-4 rounded-2xl">
-                    <div className="w-11 h-11 rounded-full theme-btn-primary flex items-center justify-center text-white font-bold text-sm">
-                        AD
-                    </div>
-                    <div>
-                        <p className="text-sm font-bold text-[#134e4a]">Admin</p>
-                        <p className="text-xs text-gray-400">admin@rizqa.com</p>
-                    </div>
-                </div>
-            </div>
         </motion.div>
     );
 };
