@@ -36,7 +36,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
             initial={{ x: -40, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.4 }}
-            className={`w-72 min-h-screen bg-white/95 md:bg-transparent backdrop-blur-xl shadow-2xl flex flex-col fixed md:sticky top-0 z-50 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 overflow-y-auto`}
+            className={`w-72 h-screen bg-white/95 md:bg-transparent backdrop-blur-xl shadow-2xl flex flex-col fixed md:sticky top-0 z-50 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 overflow-y-auto`}
             onClick={handleSidebarClick}
         >
             {/* ✅ LOGO HEADER */}
