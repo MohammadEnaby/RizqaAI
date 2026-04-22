@@ -6,7 +6,6 @@ import Signup from './pages/Signup';
 import CompleteProfile from './pages/CompleteProfile';
 import ChatBot from './pages/ChatBot';
 import Admin from './pages/adminPages/Pipeline';
-import Dashboard from './pages/adminPages/Dashboard';
 import Datasources from './pages/adminPages/Datasources';
 import ScheduledPipelines from './pages/adminPages/ScheduledPipelines';
 import UsersManagement from './pages/adminPages/UsersManagement';
@@ -56,16 +55,6 @@ function App() {
               <ProtectedRoute requiredRole="admin">
                 <Layout>
                   <Admin />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/dashboard"
-            element={
-              <ProtectedRoute requiredRole="admin">
-                <Layout>
-                  <Dashboard />
                 </Layout>
               </ProtectedRoute>
             }
