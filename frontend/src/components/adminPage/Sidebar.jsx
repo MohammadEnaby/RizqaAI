@@ -154,7 +154,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                 </Link>
 
                 {/* ✅ ACCOUNT */}
-                <div className="pt-10 mt-10 border-t border-white/20">
+                <div className="pt-5 mt-5 border-t border-white/20">
                     <p className="px-3 text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4">
                         Account
                     </p>
