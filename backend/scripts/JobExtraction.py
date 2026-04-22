@@ -35,14 +35,13 @@ model = genai.GenerativeModel(
     generation_config={"response_mime_type": "application/json"}
 )
 
-# 2. Define the Schema (For documentation and structure reference)
 class JobOffer(BaseModel):
-    job_title: str
-    location: str
+    job_title: Dict[str, str]
+    location: Dict[str, str]
     wage_per_hour: Optional[str]
-    shifts: Optional[str]
-    requirements: Optional[str]
-    features: Optional[str]
+    shifts: Optional[Dict[str, str]]
+    requirements: Optional[Dict[str, str]]
+    features: Optional[Dict[str, str]]
     contact_info: Optional[str]
     is_job_offer: bool
     post_link: Optional[str]
@@ -84,12 +83,12 @@ def extract_jobs_batch(posts_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]
     
     The Output MUST be a JSON LIST of objects. Each object must strictly follow this schema:
     - id (integer): The same 'id' from the input post. THIS IS CRITICAL to map back to the original post.
-    - job_title (string): e.g., 'Cashier'
-    - location (string): e.g., 'Jerusalem'
+    - job_title (object): { "en": "English title", "ar": "Arabic title", "he": "Hebrew title" }
+    - location (object): { "en": "English location", "ar": "Arabic location", "he": "Hebrew location" }
     - wage_per_hour (string/null): e.g., '36-40'
-    - shifts (string/null): e.g., 'Morning', 'Evening', 'Night', 'Full-time', 'Part-time', 'flexible'
-    - requirements (string/null): e.g., 'Experience', 'Education', 'Skills'
-    - features (string/null): e.g., 'Transportation available', 'Food available'
+    - shifts (object/null): { "en": "...", "ar": "...", "he": "..." }
+    - requirements (object/null): { "en": "...", "ar": "...", "he": "..." }
+    - features (object/null): { "en": "...", "ar": "...", "he": "..." }
     - contact_info (string/null): Phone numbers and names
     - post_time (string): ISO 8601 format (YYYY-MM-DDTHH:MM:SS). Use 'created_at' from input as reference.
     - is_job_offer (bool): true if it's a job, false if spam/question
