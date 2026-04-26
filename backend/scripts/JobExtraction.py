@@ -83,12 +83,12 @@ def extract_jobs_batch(posts_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]
     
     The Output MUST be a JSON LIST of objects. Each object must strictly follow this schema:
     - id (integer): The same 'id' from the input post. THIS IS CRITICAL to map back to the original post.
-    - job_title (object): { "en": "English title", "ar": "Arabic title", "he": "Hebrew title" }
-    - location (object): { "en": "English location", "ar": "Arabic location", "he": "Hebrew location" }
+    - job_title (object): {{ "en": "English title", "ar": "Arabic title", "he": "Hebrew title" }}
+    - location (object): {{ "en": "English location", "ar": "Arabic location", "he": "Hebrew location" }}
     - wage_per_hour (string/null): e.g., '36-40'
-    - shifts (object/null): { "en": "...", "ar": "...", "he": "..." }
-    - requirements (object/null): { "en": "...", "ar": "...", "he": "..." }
-    - features (object/null): { "en": "...", "ar": "...", "he": "..." }
+    - shifts (object/null): {{ "en": "...", "ar": "...", "he": "..." }}
+    - requirements (object/null): {{ "en": "...", "ar": "...", "he": "..." }}
+    - features (object/null): {{ "en": "...", "ar": "...", "he": "..." }}
     - contact_info (string/null): Phone numbers and names
     - post_time (string): ISO 8601 format (YYYY-MM-DDTHH:MM:SS). Use 'created_at' from input as reference.
     - is_job_offer (bool): true if it's a job, false if spam/question
