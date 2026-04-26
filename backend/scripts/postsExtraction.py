@@ -113,6 +113,8 @@ def scrape_group_posts(group_url: str, api_token: str):
                 continue
 
             entry = {
+                # user info
+                "user_name": item.get("userName"),
                 "post_text": post_text,
                 "post_url": post_url,
                 "image_url": image_url,

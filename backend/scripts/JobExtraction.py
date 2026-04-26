@@ -42,6 +42,7 @@ class JobOffer(BaseModel):
     shifts: Optional[Dict[str, str]]
     requirements: Optional[Dict[str, str]]
     features: Optional[Dict[str, str]]
+    company: Optional[Dict[str, str]]
     contact_info: Optional[str]
     is_job_offer: bool
     post_link: Optional[str]
@@ -85,6 +86,7 @@ def extract_jobs_batch(posts_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]
     - id (integer): The same 'id' from the input post. THIS IS CRITICAL to map back to the original post.
     - job_title (object): {{ "en": "English title", "ar": "Arabic title", "he": "Hebrew title" }}
     - location (object): {{ "en": "English location", "ar": "Arabic location", "he": "Hebrew location" }}
+    - company (object): {{ "en": "English company name", "ar": "Arabic company name", "he": "Hebrew company name" }} which is userName in the input data
     - wage_per_hour (string/null): e.g., '36-40'
     - shifts (object/null): {{ "en": "...", "ar": "...", "he": "..." }}
     - requirements (object/null): {{ "en": "...", "ar": "...", "he": "..." }}
