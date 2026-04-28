@@ -236,12 +236,20 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
              pass # Return all (recent)
 
 
+        company_data = data.get("company")
+        if isinstance(company_data, dict):
+            display_company = company_data.get(user_lang) or company_data.get("en") or list(company_data.values())[0] if company_data else "Unknown"
+        elif company_data:
+            display_company = str(company_data)
+        else:
+            display_company = "Unknown"
+
         # Map to JobResult structure
         found_jobs.append({
             "score": match_score,
             "id": doc.id,
             "title": display_title,
-            "company": data.get("company") or "Unknown", 
+            "company": display_company, 
             "location": display_location,
             "salary": data.get("wage_per_hour", "Not specified"),
             "link": data.get("post_link") or data.get("contact_info")
