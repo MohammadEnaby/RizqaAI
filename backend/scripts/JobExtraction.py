@@ -28,7 +28,8 @@ except ImportError:
 genai.configure(api_key=API_KEY)
 
 # UPDATED: We use the model available in your specific environment list.
-MODEL_NAME = 'gemini-2.5-flash'
+# use this model Gemini 3.1 Flash Lite
+MODEL_NAME = 'gemini-3.1-flash-lite'
 
 model = genai.GenerativeModel(
     MODEL_NAME,

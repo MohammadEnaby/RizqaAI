@@ -427,7 +427,7 @@ async def chat_query(request: ChatMessage):
             print(f"DEBUG: Found {len(found_jobs)} jobs for query '{request.message}'")
 
         # 2. Generate AI Response with Context
-        model = genai.GenerativeModel('gemini-2.5-flash')
+        model = genai.GenerativeModel('gemma-3-12b-it')
         
         jobs_context = ""
         if found_jobs:
