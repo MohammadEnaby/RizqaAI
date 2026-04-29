@@ -201,7 +201,7 @@ export default function ChatBot() {
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
             `}>
                 {/* Sidebar Header */}
-                <div className="p-5 border-b border-teal-100/50 dark:border-gray-800">
+                <div className="py-4 border-b border-teal-100/50 dark:border-gray-800">
                     <button
                         onClick={createNewSession}
                         className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-xl font-bold shadow-sm hover:shadow-md transition-all active:scale-95 group"
