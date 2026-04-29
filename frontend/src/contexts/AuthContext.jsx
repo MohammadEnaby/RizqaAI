@@ -53,6 +53,14 @@ export function AuthProvider({ children }) {
             role: profileData.role,
             createdAt: new Date().toISOString()
           });
+          setUserProfile({
+            name: fullName,
+            firstName: profileData.firstName,
+            lastName: profileData.lastName,
+            email: email,
+            phone: profileData.phone,
+            role: profileData.role
+          });
           console.log("✅ User profile saved to Firestore");
         } catch (dbError) {
           console.error("❌ FIRESTORE ERROR:", dbError.code, dbError.message);
@@ -84,6 +92,7 @@ export function AuthProvider({ children }) {
         const userDoc = await getDoc(doc(db, "users", result.user.uid));
         if (userDoc.exists()) {
           profile = userDoc.data();
+          setUserProfile(profile);
         }
       }
 
@@ -110,6 +119,7 @@ export function AuthProvider({ children }) {
           const userDoc = await getDoc(doc(db, "users", result.user.uid));
           if (userDoc.exists()) {
             console.log("✅ Existing user - logging in");
+            setUserProfile(userDoc.data());
             return { user: result.user, isNewUser: false, profile: userDoc.data() };
           } else {
             // Check if email already belongs to a different UID (prevents duplication)

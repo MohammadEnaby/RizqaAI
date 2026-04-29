@@ -96,8 +96,8 @@ export default function Login() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (currentUser) {
-      if (userProfile?.role === 'admin') {
+    if (currentUser && userProfile) {
+      if (userProfile.role === 'admin') {
         navigate('/admin');
       } else {
         navigate('/chatbot');

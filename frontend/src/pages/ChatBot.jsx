@@ -187,7 +187,6 @@ export default function ChatBot() {
 
     return (
         <div className="h-screen flex app-bg overflow-hidden relative font-sans">
-
             {/* Mobile Sidebar Overlay */}
             {isSidebarOpen && (
                 <div
@@ -198,14 +197,14 @@ export default function ChatBot() {
 
             {/* Sidebar Navigation */}
             <aside className={`
-                fixed md:relative z-30 h-full w-80 glass-panel border-r border-teal-400/20 transform transition-transform duration-300 ease-in-out flex flex-col
+                fixed md:relative z-30 h-full w-80 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl text-gray-800 dark:text-white border-r border-teal-100/50 dark:border-gray-800 transform transition-transform duration-300 ease-in-out flex flex-col shadow-xl
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
             `}>
                 {/* Sidebar Header */}
-                <div className="p-4 border-b border-teal-400/20">
+                <div className="p-5 border-b border-teal-100/50 dark:border-gray-800">
                     <button
                         onClick={createNewSession}
-                        className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-xl font-semibold shadow-md hover:shadow-lg transition-all active:scale-95 group"
+                        className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-xl font-bold shadow-sm hover:shadow-md transition-all active:scale-95 group"
                     >
                         <FiPlus className="text-xl group-hover:rotate-90 transition-transform" />
                         <span>New Conversation</span>
@@ -229,10 +228,10 @@ export default function ChatBot() {
                                 setIsSidebarOpen(false);
                             }}
                             className={`
-                                group flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all border
+                                group flex items-center justify-between p-3.5 rounded-xl cursor-pointer transition-all border
                                 ${currentSessionId === session.id
-                                    ? 'bg-white/60 dark:bg-gray-800/60 border-teal-400/30 text-teal-900 dark:text-teal-100 shadow-sm'
-                                    : 'border-transparent hover:bg-white/30 dark:hover:bg-gray-800/30 text-gray-700 dark:text-gray-300'}
+                                    ? 'bg-gradient-to-r from-teal-50 to-emerald-50 dark:from-teal-900/20 dark:to-emerald-900/20 border-teal-200 dark:border-teal-800/50 text-teal-900 dark:text-teal-100 shadow-sm'
+                                    : 'border-transparent hover:bg-white/60 dark:hover:bg-gray-800/60 text-gray-600 dark:text-gray-400 hover:text-gray-900'}
                             `}
                         >
                             <div className="flex items-center gap-3 min-w-0">
@@ -257,7 +256,7 @@ export default function ChatBot() {
                 </div>
 
                 {/* User Profile / Lower Sidebar */}
-                <div className="p-4 border-t border-teal-400/20 bg-white/30 dark:bg-gray-800/30">
+                <div className="p-5 border-t border-teal-100/50 dark:border-gray-800 bg-white/50 dark:bg-gray-800/50">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-green-400 to-teal-500 flex items-center justify-center text-white font-bold shadow-sm">
                             {(userProfile?.name || currentUser?.displayName || currentUser?.email || '?')[0].toUpperCase()}
@@ -275,10 +274,10 @@ export default function ChatBot() {
             </aside>
 
             {/* Main Chat Area */}
-            <main className="flex-1 flex flex-col h-full min-w-0 relative w-full">
+            <main className="flex-1 flex flex-col h-full min-w-0 relative w-full bg-transparent z-40">
 
                 {/* Header */}
-                <header className="glass-panel border-b-2 border-teal-400/20 px-4 py-3 flex items-center justify-between sticky top-0 z-10 shrink-0">
+                <header className="bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl border-b border-teal-100/50 dark:border-gray-800 px-6 py-4 flex items-center justify-between sticky top-0 z-10 shrink-0">
                     <div className="flex items-center gap-3">
                         {/* Mobile Menu Toggle */}
                         <button
@@ -296,7 +295,7 @@ export default function ChatBot() {
                                 <FaLeaf size={20} />
                             </div>
                             <div>
-                                <h1 className="text-lg font-bold text-gray-900 dark:text-white leading-tight">
+                                <h1 className="text-lg font-extrabold text-gray-900 dark:text-white leading-tight">
                                     <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-teal-600">Rizqa</span>
                                     <span className="text-gray-700 dark:text-gray-300">AI</span>
                                 </h1>
@@ -350,12 +349,13 @@ export default function ChatBot() {
                                 )}
 
                                 <div className={`flex flex-col max-w-[90%] md:max-w-[75%] lg:max-w-[60%] ${message.sender === 'user' ? 'items-end' : 'items-start'}`}>
-                                    <div
-                                        className={`rounded-2xl px-5 py-4 shadow-md text-sm md:text-base leading-relaxed whitespace-pre-wrap ${message.sender === 'user'
-                                            ? 'bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-br-none'
-                                            : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 rounded-tl-none'
-                                            }`}
-                                    >
+                                    <div className={`
+                                        p-4 rounded-2xl shadow-sm text-sm md:text-base leading-relaxed
+                                        ${message.sender === 'user'
+                                            ? 'bg-gradient-to-br from-teal-600 to-emerald-600 text-white rounded-br-sm'
+                                            : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-teal-100 dark:border-gray-700 rounded-bl-sm shadow-[0_4px_20px_-10px_rgba(20,184,166,0.15)]'
+                                        }
+                                    `}>
                                         {message.text}
                                     </div>
 
@@ -443,7 +443,7 @@ export default function ChatBot() {
                                     <button
                                         key={idx}
                                         onClick={() => handleSuggestedClick(query)}
-                                        className="px-3 sm:px-4 py-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-teal-400/30 rounded-full text-xs sm:text-sm font-semibold text-teal-700 dark:text-teal-300 hover:bg-white dark:hover:bg-gray-800 hover:border-teal-400 transition-all whitespace-nowrap hover:scale-105"
+                                        className="px-3 sm:px-4 py-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-full text-xs sm:text-sm font-semibold text-[#064e3b] dark:text-teal-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-[#064e3b] transition-all whitespace-nowrap hover:scale-105 shadow-sm"
                                     >
                                         {query}
                                     </button>
@@ -453,21 +453,21 @@ export default function ChatBot() {
                     </div>
                 )}
 
-                {/* Input Area */}
-                <div className="shrink-0 glass-panel border-t-2 border-teal-400/20 px-4 py-4 sm:px-6 sm:py-5 z-20">
-                    <div className="w-full max-w-[95%] xl:max-w-[1600px] mx-auto flex gap-3 relative">
+                {/* Input Area (Floating Style) */}
+                <div className="shrink-0 px-4 sm:px-8 pb-6 pt-2 z-20">
+                    <div className="w-full max-w-[95%] xl:max-w-[1200px] mx-auto flex gap-3 relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl p-2 rounded-2xl shadow-[0_8px_30px_-10px_rgba(20,184,166,0.2)] border border-teal-100 dark:border-gray-700">
                         <input
                             type="text"
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                            placeholder="Type your message..."
-                            className="flex-1 px-5 py-3.5 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-700 rounded-xl text-sm md:text-base text-gray-900 dark:text-white focus:outline-none focus:border-teal-500 focus:bg-white dark:focus:bg-gray-800 focus:ring-4 focus:ring-teal-500/10 transition-all shadow-sm pl-5"
+                            placeholder="Type a message..."
+                            className="flex-1 px-5 py-3.5 bg-transparent text-sm md:text-base text-gray-900 dark:text-white focus:outline-none transition-all pl-5"
                         />
                         <button
                             onClick={handleSend}
                             disabled={!inputValue.trim() || isTyping}
-                            className="px-5 md:px-8 py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md active:scale-95 flex items-center gap-2"
+                            className="px-5 md:px-8 py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md active:scale-95 flex items-center gap-2"
                         >
                             <span className="hidden md:inline">Send</span>
                             <FaPaperPlane className="transform -rotate-0 translate-y-[1px]" />
@@ -487,7 +487,7 @@ export default function ChatBot() {
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Modal Header */}
-                        <div className="bg-gradient-to-r from-green-500/90 to-teal-600/90 backdrop-blur-md text-white px-6 py-5 flex items-center justify-between shrink-0 border-b border-white/20">
+                        <div className="bg-[#064e3b] text-white px-6 py-5 flex items-center justify-between shrink-0">
                             <div>
                                 <h2 className="text-lg font-bold flex items-center gap-2">
                                     Job Details
@@ -505,7 +505,7 @@ export default function ChatBot() {
 
                         {/* Modal Body */}
                         <div className="p-6 md:p-8 overflow-y-auto custom-scrollbar">
-                            <h3 className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-700 to-green-600 dark:from-teal-400 dark:to-green-400 mb-6 leading-tight">
+                            <h3 className="text-2xl font-extrabold text-[#064e3b] dark:text-teal-400 mb-6 leading-tight">
                                 {selectedJob.title}
                             </h3>
 
@@ -564,7 +564,7 @@ export default function ChatBot() {
                                 href={selectedJob.link}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="relative flex items-center justify-center gap-2 w-full py-4 bg-gradient-to-r from-green-500 to-teal-600 text-white font-bold rounded-xl hover:from-green-600 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 overflow-hidden group"
+                                className="relative flex items-center justify-center gap-2 w-full py-4 bg-[#064e3b] text-white font-bold rounded-xl hover:bg-[#085a44] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 overflow-hidden group"
                             >
                                 <div className="absolute inset-0 w-full h-full animate-shimmer pointer-events-none opacity-50"></div>
                                 <span className="relative z-10">Apply Now</span>
