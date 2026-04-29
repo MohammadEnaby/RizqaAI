@@ -87,12 +87,12 @@ const ScheduledPipelines = () => {
     };
 
     return (
-        <div className="min-h-screen p-4 md:p-12 font-sans text-[#0f172a]">
+        <div className="min-h-screen p-4 md:p-12 font-sans" style={{ color: '#e2f8f0' }}>
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
                     <h1 className="text-3xl md:text-[42px] font-extrabold title-color tracking-tight leading-none mb-3">Scheduled Pipelines</h1>
-                    <p className="text-[#6b7280] text-[16px] max-w-2xl">Monitor and manage your automated job scraping schedules. Inspect results and track performance.</p>
+                    <p className="text-[16px] max-w-2xl" style={{ color: 'rgba(226,248,240,0.55)' }}>Monitor and manage your automated job scraping schedules. Inspect results and track performance.</p>
                 </div>
             </div>
                 {loading ? (
@@ -101,9 +101,9 @@ const ScheduledPipelines = () => {
                     </div>
                 ) : schedules.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 text-center glass-panel rounded-3xl p-10">
-                        <FaLayerGroup size={64} className="text-gray-200 mb-6" />
-                        <h3 className="text-xl font-bold text-gray-700 mb-2">No Active Schedules</h3>
-                        <p className="text-gray-500">Go to the main Admin page to create a new automatic pipeline schedule.</p>
+                        <FaLayerGroup size={64} className="mb-6" style={{ color: 'rgba(52,232,158,0.2)' }} />
+                        <h3 className="text-xl font-bold mb-2" style={{ color: '#e2f8f0' }}>No Active Schedules</h3>
+                        <p style={{ color: 'rgba(226,248,240,0.5)' }}>Go to the main Admin page to create a new automatic pipeline schedule.</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -121,10 +121,10 @@ const ScheduledPipelines = () => {
 
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="min-w-0 flex-1 pr-4">
-                                        <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase bg-green-50 text-green-700 mb-2">
+                                        <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase mb-2" style={{ background: 'rgba(52,232,158,0.12)', color: '#34e89e' }}>
                                             Active
                                         </span>
-                                        <h3 className="text-xl font-bold text-[#134e4a] truncate" title={groupNames[schedule.groupID] || schedule.groupID}>
+                                        <h3 className="text-xl font-bold truncate" style={{ color: '#34e89e' }} title={groupNames[schedule.groupID] || schedule.groupID}>
                                             {groupNames[schedule.groupID] || schedule.groupID}
                                         </h3>
                                         {(groupNames[schedule.groupID] && groupNames[schedule.groupID] !== schedule.groupID) && (
@@ -135,7 +135,7 @@ const ScheduledPipelines = () => {
 
                                 <div className="grid grid-cols-2 gap-4 mb-6">
                                     <div className="bg-white/50 p-3 rounded-xl border border-gray-100 relative group/edit">
-                                        <div className="flex items-center gap-2 text-gray-400 mb-1">
+                                        <div className="flex items-center gap-2 mb-1" style={{ color: 'rgba(226,248,240,0.4)' }}>
                                             <FaClock size={10} />
                                             <span className="text-[10px] uppercase font-bold tracking-wider">Interval</span>
                                         </div>
@@ -159,7 +159,7 @@ const ScheduledPipelines = () => {
                                             </div>
                                         ) : (
                                             <div className="flex items-center justify-between">
-                                                <p className="font-semibold text-gray-700">{formatInterval(schedule.interval)}</p>
+                                                <p className="font-semibold" style={{ color: '#e2f8f0' }}>{formatInterval(schedule.interval)}</p>
                                                 <button
                                                     onClick={() => startEditing(schedule)}
                                                     className="opacity-0 group-hover/edit:opacity-100 transition-opacity text-gray-400 hover:text-[#134e4a]"

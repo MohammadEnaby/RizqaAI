@@ -63,7 +63,7 @@ const AdminHeader = ({
                             {title}
                         </h1>
                     </div>
-                    <p className="text-[#6b7280] dark:text-gray-300 text-[14px] max-w-lg">
+                    <p className="text-[14px] max-w-lg" style={{ color: 'rgba(226,248,240,0.55)' }}>
                         {description}
                     </p>
                 </div>
@@ -73,8 +73,8 @@ const AdminHeader = ({
                             onClick={() => toggleMode('auto')}
                             className={`px-6 py-3 rounded-xl font-bold text-sm transition-all shadow-md ${activeMode === 'auto'
                                 ? 'theme-btn-primary shadow-lg scale-105'
-                                : 'bg-white/80 dark:bg-gray-800/80 text-[#134e4a] dark:text-teal-400 hover:bg-white dark:hover:bg-gray-700 border border-gray-100 dark:border-gray-700'
-                                }`}
+                                : 'border transition-all'}`}
+                            style={activeMode !== 'auto' ? { background: 'rgba(15,52,67,0.6)', borderColor: 'rgba(52,232,158,0.2)', color: 'rgba(226,248,240,0.7)' } : {}}
                         >
                             Run Automatically
                         </button>
@@ -82,8 +82,8 @@ const AdminHeader = ({
                             onClick={() => toggleMode('manual')}
                             className={`px-6 py-3 rounded-xl font-bold text-sm transition-all shadow-md ${activeMode === 'manual'
                                 ? 'theme-btn-primary shadow-lg scale-105'
-                                : 'bg-white/80 dark:bg-gray-800/80 text-[#134e4a] dark:text-teal-400 hover:bg-white dark:hover:bg-gray-700 border border-gray-100 dark:border-gray-700'
-                                }`}
+                                : 'border transition-all'}`}
+                            style={activeMode !== 'manual' ? { background: 'rgba(15,52,67,0.6)', borderColor: 'rgba(52,232,158,0.2)', color: 'rgba(226,248,240,0.7)' } : {}}
                         >
                             Run Manually
                         </button>
@@ -99,7 +99,7 @@ const AdminHeader = ({
                     className="flex flex-col lg:flex-row items-start lg:items-end gap-4 w-full p-6 glass-panel rounded-2xl shadow-sm relative z-50"
                 >
                     <div className="flex flex-col space-y-1 w-full sm:w-auto relative z-50">
-                        <label className="text-[10px] font-bold text-[#134e4a] dark:text-teal-400 uppercase tracking-widest">Group ID</label>
+                        <label className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#34e89e' }}>Group ID</label>
                         <input
                             type="text"
                             placeholder="Enter Group ID"
@@ -107,15 +107,15 @@ const AdminHeader = ({
                             onChange={(e) => setGroupId(e.target.value)}
                             onFocus={() => setShowDropdown(true)}
                             onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-                            className="theme-input rounded-xl px-4 py-2.5 text-sm font-medium w-full sm:w-64 border border-gray-200 dark:border-gray-700 focus:border-[#107884] transition-colors outline-none text-[#134e4a] dark:text-white"
+                            className="theme-input rounded-xl px-4 py-2.5 text-sm font-medium w-full sm:w-64 focus:border-[#34e89e] transition-colors outline-none"
                         />
                         {showDropdown && pastGroups.length > 0 && (
-                            <div className="absolute top-full left-0 mt-1 w-full bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border border-gray-100 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden z-50">
+                            <div className="absolute top-full left-0 mt-1 w-full backdrop-blur-md rounded-xl shadow-xl overflow-hidden z-50 border" style={{ background: 'rgba(10,30,46,0.97)', borderColor: 'rgba(52,232,158,0.2)' }}>
                                 <div className="max-h-48 overflow-y-auto custom-scrollbar p-1">
                                     {pastGroups.map((group) => (
                                         <div
                                             key={group.id}
-                                            className="px-3 py-2 hover:bg-[#dcfce7] dark:hover:bg-teal-900/50 rounded-lg cursor-pointer text-sm text-[#134e4a] dark:text-teal-100 font-medium transition-colors border-b border-gray-50 dark:border-gray-700 last:border-0"
+                                            className="px-3 py-2 rounded-lg cursor-pointer text-sm font-medium transition-colors border-b last:border-0" style={{ color: '#e2f8f0', borderColor: 'rgba(52,232,158,0.1)' }}
                                             onMouseDown={(e) => {
                                                 e.preventDefault(); // Prevent input blur
                                                 setGroupId(group.id);
@@ -133,11 +133,11 @@ const AdminHeader = ({
 
                     {activeMode === 'auto' && (
                         <div className="flex flex-col space-y-1 w-full sm:w-auto">
-                            <label className="text-[10px] font-bold text-[#134e4a] dark:text-teal-400 uppercase tracking-widest">Interval</label>
+                            <label className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#34e89e' }}>Interval</label>
                             <select
                                 value={timeInterval}
                                 onChange={(e) => setTimeInterval(e.target.value)}
-                                className="theme-input rounded-xl px-4 py-2.5 text-sm font-medium w-full sm:w-40 border border-gray-200 dark:border-gray-700 focus:border-[#107884] transition-colors outline-none text-[#134e4a] dark:text-white appearance-none cursor-pointer"
+                                className="theme-input rounded-xl px-4 py-2.5 text-sm font-medium w-full sm:w-40 focus:border-[#34e89e] transition-colors outline-none appearance-none cursor-pointer"
                             >
                                 <option value="1440">Daily</option>
                                 <option value="10080">Weekly</option>

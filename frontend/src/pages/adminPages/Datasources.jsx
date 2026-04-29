@@ -13,7 +13,7 @@ const Modal = ({ isOpen, onClose, title, children }) => {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+                className="rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border" style={{ background: 'rgba(10,30,46,0.98)', borderColor: 'rgba(52,232,158,0.2)' }}
             >
                 <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                     <h3 className="text-lg font-bold text-gray-800">{title}</h3>
@@ -173,17 +173,17 @@ const Datasources = () => {
     );
 
     return (
-        <div className="min-h-screen p-4 md:p-12 font-sans text-[#0f172a]">
+        <div className="min-h-screen p-4 md:p-12 font-sans" style={{ color: '#e2f8f0' }}>
 
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
                     <h1 className="text-3xl md:text-[42px] font-extrabold title-color tracking-tight leading-none mb-3">Datasources</h1>
-                    <p className="text-gray-500 font-medium">Manage your data extraction targets and configuration.</p>
+                    <p className="font-medium" style={{ color: 'rgba(226,248,240,0.5)' }}>Manage your data extraction targets and configuration.</p>
                 </div>
                 <button
                     onClick={() => setIsAddModalOpen(true)}
-                    className="flex items-center gap-2 bg-[#0f172a] text-white px-6 py-3 rounded-xl font-bold hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+                    className="flex items-center gap-2 px-6 py-3 rounded-xl font-bold hover:shadow-lg hover:-translate-y-1 transition-all duration-300" style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}
                 >
                     <FaPlus size={14} />
                     <span>Add Source</span>
@@ -199,7 +199,7 @@ const Datasources = () => {
                         placeholder="Search sources..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-green-500/20 font-medium text-gray-600 outline-none transition-all"
+                        className="w-full pl-10 pr-4 py-3 rounded-xl font-medium outline-none transition-all border" style={{ background: 'rgba(7,24,37,0.6)', borderColor: 'rgba(52,232,158,0.15)', color: '#e2f8f0' }}
                     />
                 </div>
             </div>
@@ -209,12 +209,11 @@ const Datasources = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead>
-                            <tr className="bg-gray-50/50 border-b border-gray-100">
-                                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Group Name</th>
-                                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Platform</th>
-                                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Group ID</th>
-
-                                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Actions</th>
+                            <tr className="border-b" style={{ borderColor: 'rgba(52,232,158,0.08)' }}>
+                            <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(226,248,240,0.4)' }}>Group Name</th>
+                                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(226,248,240,0.4)' }}>Platform</th>
+                                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(226,248,240,0.4)' }}>Group ID</th>
+                                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-right" style={{ color: 'rgba(226,248,240,0.4)' }}>Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -224,15 +223,15 @@ const Datasources = () => {
                                 <tr><td colSpan="5" className="p-8 text-center text-gray-500">No datasources found.</td></tr>
                             ) : (
                                 filteredGroups.map((group) => (
-                                    <tr key={group.groupID} className="hover:bg-gray-50/50 transition-colors group">
-                                        <td className="px-6 py-4 font-bold text-gray-800">{group.name || "Unnamed Group"}</td>
+                                    <tr key={group.groupID} className="transition-colors group" style={{ borderBottom: '1px solid rgba(52,232,158,0.08)' }}>
+                                        <td className="px-6 py-4 font-bold" style={{ color: '#e2f8f0' }}>{group.name || "Unnamed Group"}</td>
                                         <td className="px-6 py-4">
-                                            <div className="flex items-center gap-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 px-3 py-1 rounded-lg w-fit shadow-sm">
+                                            <div className="flex items-center gap-2 text-sm font-medium px-3 py-1 rounded-lg w-fit shadow-sm border" style={{ background: 'rgba(15,52,67,0.6)', color: '#34e89e', borderColor: 'rgba(52,232,158,0.2)' }}>
                                                 {getPlatformIcon(group.platformType)}
                                                 {group.platformType || "Unknown"}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 font-mono text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded w-fit">{group.groupID}</td>
+                                        <td className="px-6 py-4 font-mono text-xs" style={{ color: 'rgba(226,248,240,0.5)' }}>{group.groupID}</td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <button onClick={() => handleEditClick(group)} className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors">
@@ -255,16 +254,16 @@ const Datasources = () => {
             <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Add New Datasource">
                 <form onSubmit={handleAddSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-bold text-gray-600 mb-1">Group ID</label>
-                        <input required name="groupID" value={formData.groupID} onChange={handleInputChange} className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-transparent focus:bg-white focus:border-green-500/30 focus:ring-4 focus:ring-green-500/10 transition-all outline-none text-sm font-medium" placeholder="e.g. 1942419502675158" />
+                        <label className="block text-sm font-bold mb-1" style={{ color: 'rgba(226,248,240,0.7)' }}>Group ID</label>
+                        <input required name="groupID" value={formData.groupID} onChange={handleInputChange} className="w-full px-4 py-3 rounded-xl text-sm font-medium outline-none transition-all" style={{ background: 'rgba(7,24,37,0.7)', border: '1px solid rgba(52,232,158,0.2)', color: '#e2f8f0' }} placeholder="e.g. 1942419502675158" />
                     </div>
                     <div>
-                        <label className="block text-sm font-bold text-gray-600 mb-1">Name</label>
-                        <input required name="name" value={formData.name} onChange={handleInputChange} className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-transparent focus:bg-white focus:border-green-500/30 focus:ring-4 focus:ring-green-500/10 transition-all outline-none text-sm font-medium" placeholder="e.g. Remote Jobs Group" />
+                        <label className="block text-sm font-bold mb-1" style={{ color: 'rgba(226,248,240,0.7)' }}>Name</label>
+                        <input required name="name" value={formData.name} onChange={handleInputChange} className="w-full px-4 py-3 rounded-xl text-sm font-medium outline-none transition-all" style={{ background: 'rgba(7,24,37,0.7)', border: '1px solid rgba(52,232,158,0.2)', color: '#e2f8f0' }} placeholder="e.g. Remote Jobs Group" />
                     </div>
                     <div>
-                        <label className="block text-sm font-bold text-gray-600 mb-1">Platform</label>
-                        <select name="platformType" value={formData.platformType} onChange={handleInputChange} className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-transparent focus:bg-white focus:border-green-500/30 focus:ring-4 focus:ring-green-500/10 transition-all outline-none text-sm font-medium">
+                        <label className="block text-sm font-bold mb-1" style={{ color: 'rgba(226,248,240,0.7)' }}>Platform</label>
+                        <select name="platformType" value={formData.platformType} onChange={handleInputChange} className="w-full px-4 py-3 rounded-xl text-sm font-medium outline-none transition-all" style={{ background: 'rgba(7,24,37,0.7)', border: '1px solid rgba(52,232,158,0.2)', color: '#e2f8f0' }}>
                             <option>Facebook Group</option>
                             <option>LinkedIn</option>
                             <option>Website</option>
@@ -275,8 +274,8 @@ const Datasources = () => {
                         <input name="APIFY_API_TOKEN" value={formData.APIFY_API_TOKEN} onChange={handleInputChange} className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-transparent focus:bg-white focus:border-green-500/30 focus:ring-4 focus:ring-green-500/10 transition-all outline-none text-sm font-medium" placeholder="Optional: Override global token" />
                     </div>
                     <div className="pt-4 flex gap-3">
-                        <button type="button" onClick={() => setIsAddModalOpen(false)} className="flex-1 px-4 py-3 rounded-xl font-bold text-gray-500 hover:bg-gray-100 transition-colors">Cancel</button>
-                        <button type="submit" className="flex-1 px-4 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-[#0f172a] to-[#334155] shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">Create Source</button>
+                        <button type="button" onClick={() => setIsAddModalOpen(false)} className="flex-1 px-4 py-3 rounded-xl font-bold transition-colors" style={{ color: 'rgba(226,248,240,0.5)' }}>Cancel</button>
+                        <button type="submit" className="flex-1 px-4 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all" style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}>Create Source</button>
                     </div>
                 </form>
             </Modal>

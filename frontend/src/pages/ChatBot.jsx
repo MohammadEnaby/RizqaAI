@@ -197,14 +197,14 @@ export default function ChatBot() {
 
             {/* Sidebar Navigation */}
             <aside className={`
-                fixed md:relative z-30 h-full w-80 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl text-gray-800 dark:text-white border-r border-teal-100/50 dark:border-gray-800 transform transition-transform duration-300 ease-in-out flex flex-col shadow-xl
+                fixed md:relative z-30 h-full w-80 backdrop-blur-xl text-white border-r transform transition-transform duration-300 ease-in-out flex flex-col shadow-xl
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
             `}>
                 {/* Sidebar Header */}
-                <div className="py-4 border-b border-teal-100/50 dark:border-gray-800">
+                <div className="py-4 border-b" style={{ borderColor: 'rgba(52,232,158,0.15)' }}>
                     <button
                         onClick={createNewSession}
-                        className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-xl font-bold shadow-sm hover:shadow-md transition-all active:scale-95 group"
+                        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold shadow-sm hover:shadow-md transition-all active:scale-95 group" style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}
                     >
                         <FiPlus className="text-xl group-hover:rotate-90 transition-transform" />
                         <span>New Conversation</span>
@@ -230,8 +230,7 @@ export default function ChatBot() {
                             className={`
                                 group flex items-center justify-between p-3.5 rounded-xl cursor-pointer transition-all border
                                 ${currentSessionId === session.id
-                                    ? 'bg-gradient-to-r from-teal-50 to-emerald-50 dark:from-teal-900/20 dark:to-emerald-900/20 border-teal-200 dark:border-teal-800/50 text-teal-900 dark:text-teal-100 shadow-sm'
-                                    : 'border-transparent hover:bg-white/60 dark:hover:bg-gray-800/60 text-gray-600 dark:text-gray-400 hover:text-gray-900'}
+                                    ? 'border shadow-sm' : 'border-transparent'
                             `}
                         >
                             <div className="flex items-center gap-3 min-w-0">
@@ -256,16 +255,16 @@ export default function ChatBot() {
                 </div>
 
                 {/* User Profile / Lower Sidebar */}
-                <div className="p-5 border-t border-teal-100/50 dark:border-gray-800 bg-white/50 dark:bg-gray-800/50">
+                <div className="p-5 border-t" style={{ borderColor: 'rgba(52,232,158,0.15)', background: 'rgba(7,24,37,0.4)' }}>
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-green-400 to-teal-500 flex items-center justify-center text-white font-bold shadow-sm">
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-sm" style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}>
                             {(userProfile?.name || currentUser?.displayName || currentUser?.email || '?')[0].toUpperCase()}
                         </div>
                         <div className="flex-1 min-w-0">
-                            <div className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                            <div className="text-sm font-semibold truncate" style={{ color: '#e2f8f0' }}>
                                 {userProfile?.name || currentUser?.displayName || 'User'}
                             </div>
-                            <div className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                            <div className="text-xs truncate" style={{ color: 'rgba(226,248,240,0.5)' }}>
                                 {currentUser?.email}
                             </div>
                         </div>
@@ -277,7 +276,7 @@ export default function ChatBot() {
             <main className="flex-1 flex flex-col h-full min-w-0 relative w-full bg-transparent z-40">
 
                 {/* Header */}
-                <header className="bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl border-b border-teal-100/50 dark:border-gray-800 px-6 py-4 flex items-center justify-between sticky top-0 z-10 shrink-0">
+                <header className="backdrop-blur-xl border-b px-6 py-4 flex items-center justify-between sticky top-0 z-10 shrink-0" style={{ background: 'rgba(7,24,37,0.85)', borderColor: 'rgba(52,232,158,0.15)' }}>
                     <div className="flex items-center gap-3">
                         {/* Mobile Menu Toggle */}
                         <button
@@ -291,20 +290,20 @@ export default function ChatBot() {
                             className="flex items-center gap-3 cursor-pointer group"
                             onClick={() => navigate('/')}
                         >
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-green-500 to-teal-600 flex items-center justify-center text-white shadow-lg shadow-green-500/30 group-hover:scale-105 transition-transform duration-300">
+                            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300" style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}>
                                 <FaLeaf size={20} />
                             </div>
                             <div>
-                                <h1 className="text-lg font-extrabold text-gray-900 dark:text-white leading-tight">
-                                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-teal-600">Rizqa</span>
-                                    <span className="text-gray-700 dark:text-gray-300">AI</span>
+                                <h1 className="text-lg font-extrabold leading-tight">
+                                    <span className="bg-clip-text text-transparent" style={{ backgroundImage: 'linear-gradient(135deg, #34e89e, #1aad72)' }}>Rizqa</span>
+                                    <span style={{ color: '#e2f8f0' }}>AI</span>
                                 </h1>
                                 <div className="flex items-center gap-1.5">
                                     <span className="relative flex h-2 w-2">
                                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                                         <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                                     </span>
-                                    <span className="text-[10px] font-medium text-teal-600 uppercase tracking-wider">Online</span>
+                                    <span className="text-[10px] font-medium uppercase tracking-wider" style={{ color: '#34e89e' }}>Online</span>
                                 </div>
                             </div>
                         </div>
@@ -315,7 +314,7 @@ export default function ChatBot() {
                         {userProfile?.role === 'admin' && (
                             <Link
                                 to="/admin"
-                                className="flex items-center gap-2 px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-gray-800/50 rounded-lg text-sm font-medium transition-all"
+                                className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all" style={{ color: 'rgba(226,248,240,0.7)' }}
                             >
                                 <FiSettings className="text-lg" />
                                 <span className="hidden md:inline">Dashboard</span>
@@ -324,7 +323,7 @@ export default function ChatBot() {
 
                         <button
                             onClick={handleLogout}
-                            className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border-2 border-red-100 dark:border-red-900/50 text-red-500 rounded-xl text-xs sm:text-sm font-semibold hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-200 dark:hover:border-red-900/80 hover:shadow-md transition-all shrink-0"
+                            className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold hover:shadow-md transition-all shrink-0" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#f87171' }}
                             title="Sign Out"
                         >
                             <FiLogOut className="text-lg" />
@@ -343,7 +342,7 @@ export default function ChatBot() {
                             >
                                 {/* Bot Icon for Bot Messages */}
                                 {message.sender === 'bot' && (
-                                    <div className="w-8 h-8 rounded-full bg-teal-100 dark:bg-teal-900/50 flex items-center justify-center text-teal-600 dark:text-teal-400 mr-3 mt-1 shrink-0 shadow-sm border border-teal-200 dark:border-teal-800">
+                                    <div className="w-8 h-8 rounded-full flex items-center justify-center mr-3 mt-1 shrink-0 shadow-sm border" style={{ background: 'rgba(52,232,158,0.15)', color: '#34e89e', borderColor: 'rgba(52,232,158,0.3)' }}>
                                         <FaBrain size={14} />
                                     </div>
                                 )}
@@ -352,17 +351,18 @@ export default function ChatBot() {
                                     <div className={`
                                         p-4 rounded-2xl shadow-sm text-sm md:text-base leading-relaxed whitespace-pre-wrap
                                         ${message.sender === 'user'
-                                            ? 'bg-gradient-to-br from-teal-600 to-emerald-600 text-white rounded-br-sm'
-                                            : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-teal-100 dark:border-gray-700 rounded-bl-sm shadow-[0_4px_20px_-10px_rgba(20,184,166,0.15)]'
+                                            ? 'rounded-br-sm text-[#071825]' : 'rounded-bl-sm border'
                                         }
-                                    `}>
+                                    `}
+                                    style={message.sender === 'user' ? { background: 'linear-gradient(135deg, #34e89e, #1aad72)' } : { background: 'rgba(15,52,67,0.85)', borderColor: 'rgba(52,232,158,0.2)', color: '#e2f8f0' }}
+                                    >
                                         {message.text}
                                     </div>
 
                                     {/* Jobs Display */}
                                     {message.jobs && message.jobs.length > 0 && (
                                         <div className="mt-4 w-full space-y-3">
-                                            <div className="flex items-center gap-2 text-xs font-bold text-teal-700 uppercase tracking-wider px-1">
+                                            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider px-1" style={{ color: '#34e89e' }}>
                                                 <FiSearch />
                                                 <span>{message.jobs.length} Found</span>
                                             </div>
@@ -370,10 +370,10 @@ export default function ChatBot() {
                                                 <div
                                                     key={idx}
                                                     onClick={() => setSelectedJob(job)}
-                                                    className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-xl p-4 shadow-md border border-white/40 dark:border-gray-700 hover:border-teal-400 dark:hover:border-teal-500 hover:shadow-lg transition-all cursor-pointer group/job relative overflow-hidden"
+                                                    className="backdrop-blur-md rounded-xl p-4 shadow-md border hover:shadow-lg transition-all cursor-pointer group/job relative overflow-hidden" style={{ background: 'rgba(15,52,67,0.8)', borderColor: 'rgba(52,232,158,0.2)' }}
                                                 >
                                                     <div className="absolute top-0 right-0 p-3">
-                                                        <div className="bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400 text-[10px] font-bold px-2 py-1 rounded-full border border-green-200 dark:border-green-800 shadow-sm">
+                                                        <div className="text-[10px] font-bold px-2 py-1 rounded-full shadow-sm" style={{ background: 'rgba(52,232,158,0.15)', color: '#34e89e', border: '1px solid rgba(52,232,158,0.3)' }}>
                                                             {(90 + (idx * 2))}% Match
                                                         </div>
                                                     </div>
@@ -392,7 +392,7 @@ export default function ChatBot() {
                                                                     <span className="truncate max-w-[100px] font-medium">{job.location}</span>
                                                                 </div>
                                                                 {job.salary && job.salary !== 'Not specified' && (
-                                                                    <div className="flex items-center gap-1.5 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 px-2 py-1 rounded-md font-bold">
+                                                                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-md font-bold" style={{ background: 'rgba(52,232,158,0.1)', color: '#34e89e' }}>
                                                                         <FaMoneyBillWave />
                                                                         <span>{job.salary}</span>
                                                                     </div>
@@ -414,7 +414,7 @@ export default function ChatBot() {
 
                         {isTyping && (
                             <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 mt-1 shadow-sm border border-teal-200">
+                                <div className="w-8 h-8 rounded-full flex items-center justify-center mt-1 shadow-sm border" style={{ background: 'rgba(52,232,158,0.15)', color: '#34e89e', borderColor: 'rgba(52,232,158,0.3)' }}>
                                     <FaBrain size={14} />
                                 </div>
                                 <div className="glass-panel border border-teal-400/20 rounded-2xl rounded-tl-none px-4 py-3 flex gap-1.5 items-center">
@@ -443,7 +443,7 @@ export default function ChatBot() {
                                     <button
                                         key={idx}
                                         onClick={() => handleSuggestedClick(query)}
-                                        className="px-3 sm:px-4 py-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-full text-xs sm:text-sm font-semibold text-[#064e3b] dark:text-teal-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-[#064e3b] transition-all whitespace-nowrap hover:scale-105 shadow-sm"
+                                        className="px-3 sm:px-4 py-2 backdrop-blur-sm rounded-full text-xs sm:text-sm font-semibold transition-all whitespace-nowrap hover:scale-105 shadow-sm" style={{ background: 'rgba(15,52,67,0.8)', border: '1px solid rgba(52,232,158,0.2)', color: '#34e89e' }}
                                     >
                                         {query}
                                     </button>
@@ -455,19 +455,19 @@ export default function ChatBot() {
 
                 {/* Input Area (Floating Style) */}
                 <div className="shrink-0 px-4 sm:px-8 pb-6 pt-2 z-20">
-                    <div className="w-full max-w-[95%] xl:max-w-[1200px] mx-auto flex gap-3 relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl p-2 rounded-2xl shadow-[0_8px_30px_-10px_rgba(20,184,166,0.2)] border border-teal-100 dark:border-gray-700">
+                    <div className="w-full max-w-[95%] xl:max-w-[1200px] mx-auto flex gap-3 relative backdrop-blur-xl p-2 rounded-2xl border" style={{ background: 'rgba(15,52,67,0.9)', boxShadow: '0 8px 30px -10px rgba(52,232,158,0.15)', borderColor: 'rgba(52,232,158,0.2)' }}>
                         <input
                             type="text"
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                             placeholder="Type a message..."
-                            className="flex-1 px-5 py-3.5 bg-transparent text-sm md:text-base text-gray-900 dark:text-white focus:outline-none transition-all pl-5"
+                            className="flex-1 px-5 py-3.5 bg-transparent text-sm md:text-base focus:outline-none transition-all pl-5" style={{ color: '#e2f8f0' }}
                         />
                         <button
                             onClick={handleSend}
                             disabled={!inputValue.trim() || isTyping}
-                            className="px-5 md:px-8 py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md active:scale-95 flex items-center gap-2"
+                            className="px-5 md:px-8 py-3.5 rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md active:scale-95 flex items-center gap-2" style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}
                         >
                             <span className="hidden md:inline">Send</span>
                             <FaPaperPlane className="transform -rotate-0 translate-y-[1px]" />
@@ -483,7 +483,7 @@ export default function ChatBot() {
                     onClick={() => setSelectedJob(null)}
                 >
                     <div
-                        className="glass-panel rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden animate-scale-in border border-white/50 dark:border-gray-600/50 bg-white/80 dark:bg-gray-900/80"
+                        className="glass-panel rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden animate-scale-in"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Modal Header */}

@@ -151,7 +151,7 @@ const Admin = () => {
     };
 
     return (
-        <div className="min-h-screen p-4 md:p-12 font-sans text-[#0f172a]">
+        <div className="min-h-screen p-4 md:p-12 font-sans" style={{ color: '#e2f8f0' }}>
 
             <AdminHeader
                 groupId={groupId}

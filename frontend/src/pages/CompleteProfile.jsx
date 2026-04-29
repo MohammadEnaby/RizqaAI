@@ -46,22 +46,22 @@ export default function CompleteProfile() {
   const defaultLastName = currentUser?.displayName?.split(' ').slice(1).join(' ') || '';
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 dark:from-indigo-900 dark:to-purple-900 p-5 py-10 transition-colors">
-      <div className="w-full max-w-2xl bg-white dark:bg-gray-800 p-8 sm:p-10 rounded-2xl shadow-2xl transition-colors">
+    <div className="min-h-screen flex items-center justify-center p-5 py-10" style={{ background: 'linear-gradient(135deg, #071825 0%, #0f3443 50%, #071825 100%)' }}>
+      <div className="w-full max-w-2xl p-8 sm:p-10 rounded-2xl shadow-2xl border" style={{ background: 'rgba(10,30,46,0.97)', borderColor: 'rgba(52,232,158,0.2)' }}>
         <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-5 text-4xl shadow-lg">
+          <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 text-4xl shadow-lg" style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}>
             ✨
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          <h2 className="text-3xl font-bold mb-2" style={{ color: '#e2f8f0' }}>
             Complete Your Profile
           </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm" style={{ color: 'rgba(226,248,240,0.55)' }}>
             Welcome! Please provide a few more details
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg mb-5 text-sm font-medium">
+          <div className="px-4 py-3 rounded-lg mb-5 text-sm font-medium border" style={{ background: 'rgba(239,68,68,0.1)', borderColor: 'rgba(239,68,68,0.3)', color: '#f87171' }}>
             {error}
           </div>
         )}
@@ -70,7 +70,7 @@ export default function CompleteProfile() {
           {/* Name Fields */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'rgba(226,248,240,0.8)' }}>
                 First Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -81,7 +81,7 @@ export default function CompleteProfile() {
                 type="text"
                 defaultValue={defaultFirstName}
                 placeholder="John"
-                className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 transition-colors"
+                className="w-full px-4 py-3 border-2 rounded-lg text-sm focus:outline-none transition-colors" style={{ background: 'rgba(7,24,37,0.7)', borderColor: 'rgba(52,232,158,0.2)', color: '#e2f8f0' }}
               />
               {errors.firstName && (
                 <p className="text-red-500 text-xs mt-1.5">{errors.firstName.message}</p>
@@ -89,7 +89,7 @@ export default function CompleteProfile() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'rgba(226,248,240,0.8)' }}>
                 Last Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -100,7 +100,7 @@ export default function CompleteProfile() {
                 type="text"
                 defaultValue={defaultLastName}
                 placeholder="Doe"
-                className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 transition-colors"
+                className="w-full px-4 py-3 border-2 rounded-lg text-sm focus:outline-none transition-colors" style={{ background: 'rgba(7,24,37,0.7)', borderColor: 'rgba(52,232,158,0.2)', color: '#e2f8f0' }}
               />
               {errors.lastName && (
                 <p className="text-red-500 text-xs mt-1.5">{errors.lastName.message}</p>
@@ -268,11 +268,12 @@ export default function CompleteProfile() {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-3.5 rounded-lg text-white font-semibold text-base transition-all shadow-lg ${
-              loading 
-                ? 'bg-gray-400 cursor-not-allowed' 
-                : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 hover:-translate-y-0.5 shadow-indigo-500/30'
+            className={`w-full py-3.5 rounded-lg font-semibold text-base transition-all shadow-lg ${
+              loading
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'hover:-translate-y-0.5'
             }`}
+            style={!loading ? { background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' } : {}}
           >
             {loading ? 'Completing Profile...' : 'Complete Profile'}
           </button>

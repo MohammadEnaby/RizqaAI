@@ -8,25 +8,25 @@ const StatCard = ({ title, description, icon: Icon, value, subtext, progressValu
         className={`glass-panel z-0 rounded-2xl p-6 relative overflow-hidden transition-all duration-300 flex flex-col h-full ${isActive ? 'ring-2 ring-[#14b8a6]' : ''}`}
     >
         {isLive && (
-            <div className="absolute top-4 right-4 flex items-center space-x-2 bg-[#ecfdf5] px-3 py-1 rounded-full border border-[#22c55e]/20">
+            <div className="absolute top-4 right-4 flex items-center space-x-2 px-3 py-1 rounded-full border" style={{ background: 'rgba(52,232,158,0.1)', borderColor: 'rgba(52,232,158,0.3)' }}>
                 <motion.div
                     animate={{ opacity: [1, 0.5, 1] }}
                     transition={{ duration: 1.5, repeat: Infinity }}
                     className="w-2 h-2 rounded-full bg-[#22c55e]"
                 />
-                <span className="text-[#22c55e] text-[10px] font-bold tracking-wider">LIVE</span>
+                <span className="text-[10px] font-bold tracking-wider" style={{ color: '#34e89e' }}>LIVE</span>
             </div>
         )}
 
-        <div className={`w-12 h-12 rounded-xl theme-green-blue flex items-center justify-center mb-4 ${isActive ? 'theme-btn-primary text-white' : 'bg-gray-100 text-gray-500'}`}>
+        <div className={`w-12 h-12 rounded-xl theme-green-blue flex items-center justify-center mb-4 ${isActive ? 'theme-btn-primary' : 'border'}`} style={!isActive ? { background: 'rgba(15,52,67,0.6)', borderColor: 'rgba(52,232,158,0.15)' } : {}}>
             <Icon size={20} color="white" />
         </div>
 
-        <h3 className="text-[16px] font-bold text-[#0f172a] mb-2">{title}</h3>
-        <p className="text-[#6b7280] text-[13px] leading-relaxed mb-6 flex-grow">{description}</p>
+        <h3 className="text-[16px] font-bold mb-2" style={{ color: '#e2f8f0' }}>{title}</h3>
+        <p className="text-[13px] leading-relaxed mb-6 flex-grow" style={{ color: 'rgba(226,248,240,0.5)' }}>{description}</p>
 
         <div className="flex justify-between items-end mb-3">
-            <div className="text-[32px] font-extrabold text-[#0f172a] tracking-tight leading-none">
+            <div className="text-[32px] font-extrabold tracking-tight leading-none" style={{ color: '#e2f8f0' }}>
                 {value.toLocaleString()}
             </div>
             {progressValue > 0 && (
@@ -34,7 +34,7 @@ const StatCard = ({ title, description, icon: Icon, value, subtext, progressValu
             )}
         </div>
 
-        <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
+        <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(52,232,158,0.1)' }}>
             <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${progressValue}%` }}

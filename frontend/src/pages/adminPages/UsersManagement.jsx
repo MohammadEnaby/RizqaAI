@@ -107,12 +107,12 @@ const UsersManagement = () => {
     };
 
     return (
-        <div className="min-h-screen p-4 md:p-12 font-sans text-[#0f172a]">
+        <div className="min-h-screen p-4 md:p-12 font-sans" style={{ color: '#e2f8f0' }}>
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
                     <h1 className="text-3xl md:text-[42px] font-extrabold title-color tracking-tight leading-none mb-3">Users Management</h1>
-                    <p className="text-gray-500 font-medium">Manage platform users, roles, and view their activity stats.</p>
+                    <p className="font-medium" style={{ color: 'rgba(226,248,240,0.5)' }}>Manage platform users, roles, and view their activity stats.</p>
                 </div>
             </div>
 
@@ -121,10 +121,10 @@ const UsersManagement = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div className="glass-panel p-6 rounded-2xl flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">Total Users</p>
-                            <p className="text-3xl font-extrabold text-[#134e4a] mt-1">{users.length}</p>
+                            <p className="text-sm font-bold uppercase tracking-wider" style={{ color: 'rgba(226,248,240,0.4)' }}>Total Users</p>
+                            <p className="text-3xl font-extrabold mt-1" style={{ color: '#34e89e' }}>{users.length}</p>
                         </div>
-                        <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600">
+                        <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: 'rgba(52,232,158,0.15)', color: '#34e89e' }}>
                             <FaUsers size={24} />
                         </div>
                     </div>
@@ -143,13 +143,13 @@ const UsersManagement = () => {
 
                 <div className="glass-panel rounded-2xl overflow-hidden shadow-sm border border-white/40">
                     {/* Toolbar */}
-                    <div className="p-6 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/50">
+                    <div className="p-6 border-b flex flex-col md:flex-row md:items-center justify-between gap-4" style={{ borderColor: 'rgba(52,232,158,0.1)', background: 'rgba(7,24,37,0.4)' }}>
                         <div className="relative flex-1 max-w-md">
                             <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                             <input
                                 type="text"
                                 placeholder="Search users by name, email..."
-                                className="w-full pl-11 pr-4 py-3 bg-white border-0 rounded-xl focus:ring-2 focus:ring-green-500/20 shadow-sm text-sm"
+                                className="w-full pl-11 pr-4 py-3 border-0 rounded-xl shadow-sm text-sm outline-none" style={{ background: 'rgba(7,24,37,0.6)', color: '#e2f8f0' }}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
@@ -160,13 +160,13 @@ const UsersManagement = () => {
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
-                                <tr className="bg-gray-50/50 border-b border-gray-100">
-                                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">User</th>
-                                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Role</th>
-                                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Applied Jobs</th>
-                                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Satisfaction</th>
-                                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Suggestions</th>
-                                    <th className="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Actions</th>
+                                <tr className="border-b" style={{ borderColor: 'rgba(52,232,158,0.08)' }}>
+                                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(226,248,240,0.4)' }}>User</th>
+                                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(226,248,240,0.4)' }}>Role</th>
+                                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(226,248,240,0.4)' }}>Applied Jobs</th>
+                                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(226,248,240,0.4)' }}>Satisfaction</th>
+                                    <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(226,248,240,0.4)' }}>Suggestions</th>
+                                    <th className="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(226,248,240,0.4)' }}>Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
@@ -194,8 +194,8 @@ const UsersManagement = () => {
                                                         {user.name ? user.name.substring(0, 2).toUpperCase() : '??'}
                                                     </div>
                                                     <div className="ml-4">
-                                                        <div className="text-sm font-bold text-gray-900">{user.name || 'Unknown Name'}</div>
-                                                        <div className="text-sm text-gray-500">{user.email}</div>
+                                                        <div className="text-sm font-bold" style={{ color: '#e2f8f0' }}>{user.name || 'Unknown Name'}</div>
+                                                        <div className="text-sm" style={{ color: 'rgba(226,248,240,0.5)' }}>{user.email}</div>
                                                     </div>
                                                 </div>
                                             </td>
@@ -249,9 +249,9 @@ const UsersManagement = () => {
             {/* Edit Modal */}
             {isEditModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-                        <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                            <h3 className="text-lg font-bold text-gray-800">Edit User</h3>
+                    <div className="rounded-2xl shadow-xl w-full max-w-md overflow-hidden border" style={{ background: 'rgba(10,30,46,0.98)', borderColor: 'rgba(52,232,158,0.2)' }}>
+                        <div className="p-6 border-b flex justify-between items-center" style={{ borderColor: 'rgba(52,232,158,0.15)', background: 'rgba(7,24,37,0.5)' }}>
+                            <h3 className="text-lg font-bold" style={{ color: '#e2f8f0' }}>Edit User</h3>
                             <button
                                 onClick={() => setIsEditModalOpen(false)}
                                 className="text-gray-400 hover:text-gray-600 transition-colors"

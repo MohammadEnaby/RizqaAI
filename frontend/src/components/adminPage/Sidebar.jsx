@@ -36,7 +36,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
             initial={{ x: -40, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.4 }}
-            className={`w-72 h-screen bg-white/95 dark:bg-gray-900/95 md:bg-transparent dark:md:bg-transparent backdrop-blur-xl shadow-2xl flex flex-col fixed md:sticky top-0 z-50 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 overflow-y-auto`}
+            className={`w-72 h-screen backdrop-blur-xl shadow-2xl flex flex-col fixed md:sticky top-0 z-50 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 overflow-y-auto`} style={{ background: 'rgba(7,24,37,0.97)', borderRight: '1px solid rgba(52,232,158,0.12)' }}
             onClick={handleSidebarClick}
         >
             {/* ✅ LOGO HEADER */}
@@ -49,13 +49,13 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                         <h1 className="text-3xl font-extrabold title-color tracking-tight">
                             Rizqa
                         </h1>
-                        <p className="text-[11px] uppercase tracking-widest text-green-500 font-bold">
+                        <p className="text-[11px] uppercase tracking-widest font-bold" style={{ color: '#34e89e' }}>
                             Automation
                         </p>
                     </div>
                 </Link>
                 <button 
-                    className="md:hidden text-gray-400 hover:text-gray-600 p-2 -mr-2"
+                    className="md:hidden p-2 -mr-2 transition-colors" style={{ color: 'rgba(226,248,240,0.5)' }}
                     onClick={() => setIsOpen && setIsOpen(false)}
                 >
                     <FaTimes size={20} />
@@ -64,7 +64,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 
             {/* ✅ NAVIGATION */}
             <nav className="flex-1 px-6 py-8 flex flex-col gap-3">
-                <p className="px-3 text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4">
+                <p className="px-3 text-[11px] font-bold uppercase tracking-widest mb-4" style={{ color: 'rgba(226,248,240,0.35)' }}>
                     System
                 </p>
 
@@ -74,8 +74,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                     onClick={handleLinkClick}
                     className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
             ${isActive('/admin/users')
-                            ? 'bg-gradient-to-r from-green-100 to-teal-100 dark:from-green-900/50 dark:to-teal-900/50 text-[#134e4a] dark:text-teal-100 shadow-lg'
-                            : 'text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md'
+                            ? 'border shadow-sm' : 'border-transparent'
                         }`}
                 >
                     <FaUsers
@@ -91,8 +90,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                     onClick={handleLinkClick}
                     className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
             ${isActive('/admin/pipeline')
-                            ? 'bg-gradient-to-r from-green-100 to-teal-100 dark:from-green-900/50 dark:to-teal-900/50 text-[#134e4a] dark:text-teal-100 shadow-lg'
-                            : 'text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md'
+                            ? 'border shadow-sm' : 'border-transparent'
                         }`}
                 >
                     <FaCogs
@@ -108,8 +106,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                     onClick={handleLinkClick}
                     className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
             ${isActive('/admin/datasources')
-                            ? 'bg-gradient-to-r from-green-100 to-teal-100 dark:from-green-900/50 dark:to-teal-900/50 text-[#134e4a] dark:text-teal-100 shadow-lg'
-                            : 'text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md'
+                            ? 'border shadow-sm' : 'border-transparent'
                         }`}
                 >
                     <FaDatabase
@@ -125,8 +122,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                     onClick={handleLinkClick}
                     className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
             ${isActive('/admin/schedules')
-                            ? 'bg-gradient-to-r from-green-100 to-teal-100 dark:from-green-900/50 dark:to-teal-900/50 text-[#134e4a] dark:text-teal-100 shadow-lg'
-                            : 'text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md'
+                            ? 'border shadow-sm' : 'border-transparent'
                         }`}
                 >
                     <FaClock
@@ -142,8 +138,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                     onClick={handleLinkClick}
                     className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
             ${isActive('/chatbot')
-                            ? 'bg-gradient-to-r from-green-100 to-teal-100 dark:from-green-900/50 dark:to-teal-900/50 text-[#134e4a] dark:text-teal-100 shadow-lg'
-                            : 'text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md'
+                            ? 'border shadow-sm' : 'border-transparent'
                         }`}
                 >
                     <FaRobot
@@ -154,8 +149,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                 </Link>
 
                 {/* ✅ ACCOUNT */}
-                <div className="mt-auto pt-7 border-t border-white/20">
-                    <p className="px-3 text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4">
+                <div className="mt-auto pt-7 border-t" style={{ borderColor: 'rgba(52,232,158,0.12)' }}>
+                    <p className="px-3 text-[11px] font-bold uppercase tracking-widest mb-4" style={{ color: 'rgba(226,248,240,0.35)' }}>
                         Account
                     </p>
 
@@ -163,7 +158,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.96 }}
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl font-medium text-gray-500 dark:text-gray-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 dark:hover:text-red-400 transition"
+                        className="w-full flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl font-medium transition" style={{ color: 'rgba(226,248,240,0.5)' }}
                     >
                         <FaSignOutAlt />
                         <span>Logout</span>
