@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaPlus, FaEdit, FaTrash, FaDatabase, FaFacebook, FaLinkedin, FaGlobe, FaSearch, FaTimes } from 'react-icons/fa';
-import { auth } from '../../firebase';
+import { auth, db } from '../../firebase';
+import { collection, getDocs } from 'firebase/firestore';
+
 
 const Modal = ({ isOpen, onClose, title, children }) => {
     if (!isOpen) return null;
@@ -48,17 +50,12 @@ const Datasources = () => {
     const fetchGroups = async () => {
         setLoading(true);
         try {
-            let headers = {};
-            if (auth.currentUser) {
-                const token = await auth.currentUser.getIdToken();
-                headers['Authorization'] = `Bearer ${token}`;
-            }
-
-            const response = await fetch(`${apiUrl}/api/platform-groups`, { headers });
-            if (response.ok) {
-                const data = await response.json();
-                setGroups(data);
-            }
+            const querySnapshot = await getDocs(collection(db, 'platformGroups'));
+            const groupsData = querySnapshot.docs.map(doc => ({
+                ...doc.data(),
+                groupID: doc.id
+            }));
+            setGroups(groupsData);
         } catch (error) {
             console.error("Failed to fetch groups:", error);
         } finally {
