@@ -33,17 +33,17 @@ const HeroCarousel = ({ quotes }) => {
   }, [quotes.length]);
 
   return (
-    <div className="hidden lg:flex lg:w-2/5 relative bg-[#064e3b] items-center justify-center overflow-hidden">
+    <div className="hidden lg:flex lg:w-2/5 relative items-center justify-center overflow-hidden" style={{ background: '#071825' }}>
       {/* Animated Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full opacity-30 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-teal-500 rounded-full mix-blend-screen filter blur-[100px] opacity-50 animate-pulse"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-green-500 rounded-full mix-blend-screen filter blur-[100px] opacity-40 animate-pulse delay-1000"></div>
+        <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full mix-blend-screen filter blur-[100px] animate-pulse" style={{ background: '#34e89e', opacity: 0.15 }}></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full mix-blend-screen filter blur-[100px] animate-pulse delay-1000" style={{ background: '#0f3443', opacity: 0.5 }}></div>
       </div>
       
       {/* Hero Content */}
       <div className="relative z-10 flex flex-col justify-center p-16 max-w-xl h-full w-full">
         <div className="flex items-center gap-3 mb-auto">
-          <div className="w-10 h-10 bg-gradient-to-tr from-green-400 to-teal-400 rounded-lg flex items-center justify-center text-white shadow-lg">
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}>
             <FaLeaf className="w-5 h-5" />
           </div>
           <span className="text-xl font-bold tracking-tight text-white">Rizqa AI</span>
@@ -62,7 +62,7 @@ const HeroCarousel = ({ quotes }) => {
           {quotes.map((_, i) => (
             <div 
               key={i} 
-              className={`h-1.5 rounded-full transition-all duration-500 ${i === currentQuoteIndex ? 'w-8 bg-teal-400' : 'w-2 bg-teal-700'}`}
+              style={{ height: '6px', borderRadius: '9999px', transition: 'all 0.5s', width: i === currentQuoteIndex ? '32px' : '8px', background: i === currentQuoteIndex ? '#34e89e' : 'rgba(52,232,158,0.25)' }}
             ></div>
           ))}
         </div>
@@ -72,12 +72,12 @@ const HeroCarousel = ({ quotes }) => {
 };
 
 const SplitScreenLayout = ({ children, isResetFlow = false }) => (
-  <div className="min-h-screen max-h-screen w-full flex bg-white dark:bg-gray-900 overflow-hidden">
+  <div className="min-h-screen max-h-screen w-full flex overflow-hidden" style={{ background: '#0f3443' }}>
     {/* Left Panel */}
     <HeroCarousel quotes={LOGIN_QUOTES} />
 
     {/* Right Panel - Form Area */}
-    <div className="w-full lg:w-3/5 flex flex-col p-6 sm:p-10 relative overflow-y-auto custom-scrollbar">
+    <div className="w-full lg:w-3/5 flex flex-col p-6 sm:p-10 relative overflow-y-auto custom-scrollbar" style={{ background: '#0a1e2e' }}>
       <div className="w-full max-w-md mx-auto my-auto animate-fade-in-up py-4">
         {children}
       </div>
@@ -173,25 +173,25 @@ export default function Login() {
       <SplitScreenLayout isResetFlow={true}>
         {/* Mobile Header (Only visible on small screens) */}
         <div className="lg:hidden mb-8 flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-tr from-green-500 to-teal-600 rounded-lg flex items-center justify-center text-white shadow-md">
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center shadow-md" style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}>
             <FaLeaf className="w-5 h-5" />
           </div>
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white">Rizqa AI</h1>
+          <h1 className="text-xl font-bold" style={{ color: '#e2f8f0' }}>Rizqa AI</h1>
         </div>
 
         <div className="mb-8">
-          <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2 tracking-tight">Reset Password</h2>
-          <p className="text-gray-500 dark:text-gray-400 text-sm">Enter your email to receive a secure reset link.</p>
+          <h2 className="text-3xl font-extrabold mb-2 tracking-tight" style={{ color: '#e2f8f0' }}>Reset Password</h2>
+          <p className="text-sm" style={{ color: 'rgba(226,248,240,0.55)' }}>Enter your email to receive a secure reset link.</p>
         </div>
 
         {resetSuccess ? (
-          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-8 text-center">
-            <div className="w-12 h-12 bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center mx-auto mb-4 text-xl">✓</div>
-            <h3 className="text-lg font-bold text-green-800 dark:text-green-400 mb-2">Check your inbox</h3>
-            <p className="text-green-700 dark:text-green-500 text-sm mb-6">We've sent a password reset link to your email address.</p>
+          <div className="rounded-xl p-8 text-center border" style={{ background: 'rgba(52,232,158,0.08)', borderColor: 'rgba(52,232,158,0.25)' }}>
+            <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 text-xl" style={{ background: 'rgba(52,232,158,0.15)', color: '#34e89e' }}>✓</div>
+            <h3 className="text-lg font-bold mb-2" style={{ color: '#34e89e' }}>Check your inbox</h3>
+            <p className="text-sm mb-6" style={{ color: 'rgba(226,248,240,0.65)' }}>We've sent a password reset link to your email address.</p>
             <button
               onClick={() => setShowForgotPassword(false)}
-              className="w-full py-2.5 text-sm font-semibold text-teal-700 bg-green-100/50 hover:bg-green-100 rounded-lg transition-colors"
+              className="w-full py-2.5 text-sm font-semibold rounded-lg transition-colors" style={{ color: '#34e89e', background: 'rgba(52,232,158,0.1)' }}
             >
               Back to Login
             </button>
@@ -199,22 +199,22 @@ export default function Login() {
         ) : (
           <div className="flex flex-col space-y-5 w-full">
             {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm font-medium flex items-center gap-2">
+              <div className="px-4 py-3 rounded-lg text-sm font-medium flex items-center gap-2" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#f87171' }}>
                 <span className="font-bold">!</span> {error}
               </div>
             )}
             
             <div className="group">
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Email</label>
+              <label className="block text-sm font-semibold mb-1.5" style={{ color: 'rgba(226,248,240,0.8)' }}>Email</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-teal-600 dark:group-focus-within:text-teal-400">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none" style={{ color: 'rgba(52,232,158,0.5)' }}>
                   <FiMail className="w-5 h-5"/>
                 </div>
                 <input
                   type="email"
                   value={resetEmail}
                   onChange={(e) => setResetEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm font-medium hover:border-gray-400 dark:hover:border-gray-600"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 transition-all text-sm font-medium" style={{ background: 'rgba(7,24,37,0.8)', border: '1px solid rgba(52,232,158,0.2)', color: '#e2f8f0', outlineColor: '#34e89e' }}
                   placeholder="name@example.com"
                 />
               </div>
@@ -223,7 +223,7 @@ export default function Login() {
             <button
               onClick={handleForgotPassword}
               disabled={loading}
-              className="w-full py-2.5 rounded-lg font-semibold text-white bg-teal-600 hover:bg-teal-700 transition-colors disabled:opacity-70 flex justify-center items-center mt-2 text-sm shadow-sm"
+              className="w-full py-2.5 rounded-lg font-semibold transition-colors disabled:opacity-70 flex justify-center items-center mt-2 text-sm shadow-sm" style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}
             >
               {loading ? 'Sending Link...' : 'Send Reset Link'}
             </button>
@@ -232,7 +232,7 @@ export default function Login() {
                  setError('');
                  setShowForgotPassword(false);
                }}
-              className="w-full py-2.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white font-semibold transition-colors mt-2"
+              className="w-full py-2.5 text-sm font-semibold transition-colors mt-2" style={{ color: 'rgba(226,248,240,0.5)' }}
             >
               Cancel
             </button>
@@ -246,30 +246,30 @@ export default function Login() {
     <SplitScreenLayout>
       {/* Mobile Header */}
       <div className="lg:hidden mb-10 flex items-center gap-3">
-        <div className="w-10 h-10 bg-gradient-to-tr from-green-500 to-teal-600 rounded-lg flex items-center justify-center text-white shadow-md">
+        <div className="w-10 h-10 rounded-lg flex items-center justify-center shadow-md" style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}>
           <FaLeaf className="w-5 h-5" />
         </div>
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white">Rizqa AI</h1>
+        <h1 className="text-xl font-bold" style={{ color: '#e2f8f0' }}>Rizqa AI</h1>
       </div>
 
       <div className="mb-6 sm:mb-8">
-        <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl mb-8 border border-gray-200 dark:border-gray-700">
-          <Link to="/login" className="flex-1 text-center py-2.5 text-sm font-bold rounded-lg bg-white dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white transition-all">
+        <div className="flex p-1 rounded-xl mb-8 border" style={{ background: 'rgba(7,24,37,0.6)', borderColor: 'rgba(52,232,158,0.15)' }}>
+          <Link to="/login" className="flex-1 text-center py-2.5 text-sm font-bold rounded-lg shadow-sm transition-all" style={{ background: '#34e89e', color: '#071825' }}>
             Log In
           </Link>
-          <Link to="/signup" className="flex-1 text-center py-2.5 text-sm font-bold rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
+          <Link to="/signup" className="flex-1 text-center py-2.5 text-sm font-bold rounded-lg transition-all" style={{ color: 'rgba(226,248,240,0.5)' }}>
             Sign Up
           </Link>
         </div>
 
-        <h2 className="text-3xl lg:text-4xl font-extrabold text-gray-900 dark:text-white mb-2 tracking-tight">Login to your account</h2>
-        <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">Welcome back! Please enter your details.</p>
+        <h2 className="text-3xl lg:text-4xl font-extrabold mb-2 tracking-tight" style={{ color: '#e2f8f0' }}>Login to your account</h2>
+        <p className="text-sm font-medium" style={{ color: 'rgba(226,248,240,0.5)' }}>Welcome back! Please enter your details.</p>
       </div>
 
       <div className="w-full flex flex-col space-y-4 sm:space-y-6">
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm font-medium flex items-center gap-2">
+          <div className="px-4 py-3 rounded-lg text-sm font-medium flex items-center gap-2" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#f87171' }}>
             <span className="font-bold">!</span> {error}
           </div>
         )}
@@ -278,9 +278,9 @@ export default function Login() {
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col space-y-4 sm:space-y-5">
           {/* Email Field */}
           <div className="group">
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Email</label>
+            <label className="block text-sm font-semibold mb-1.5" style={{ color: 'rgba(226,248,240,0.8)' }}>Email</label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-teal-600 dark:group-focus-within:text-teal-400">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none" style={{ color: 'rgba(52,232,158,0.5)' }}>
                 <FiMail className="w-5 h-5"/>
               </div>
               <input
@@ -292,7 +292,7 @@ export default function Login() {
                   }
                 })}
                 type="email"
-                className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm font-medium hover:border-gray-400 dark:hover:border-gray-600"
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg focus:outline-none transition-all text-sm font-medium" style={{ background: 'rgba(7,24,37,0.8)', border: '1px solid rgba(52,232,158,0.2)', color: '#e2f8f0' }}
                 placeholder="name@example.com"
               />
             </div>
@@ -302,7 +302,7 @@ export default function Login() {
           {/* Password Field */}
           <div className="group">
             <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Password</label>
+              <label className="block text-sm font-semibold" style={{ color: 'rgba(226,248,240,0.8)' }}>Password</label>
               <button
                 type="button"
                 onClick={() => {
@@ -310,19 +310,19 @@ export default function Login() {
                   if (currentEmail) setResetEmail(currentEmail);
                   setShowForgotPassword(true);
                 }}
-                className="text-xs text-teal-600 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-300 font-semibold transition-colors"
+                className="text-xs font-semibold transition-colors" style={{ color: '#34e89e' }}
               >
                 Forgot password?
               </button>
             </div>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-teal-600 dark:group-focus-within:text-teal-400">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none" style={{ color: 'rgba(52,232,158,0.5)' }}>
                 <FiLock className="w-5 h-5"/>
               </div>
               <input
                 {...register("password", { required: "Password is required" })}
                 type="password"
-                className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm font-medium hover:border-gray-400 dark:hover:border-gray-600"
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg focus:outline-none transition-all text-sm font-medium" style={{ background: 'rgba(7,24,37,0.8)', border: '1px solid rgba(52,232,158,0.2)', color: '#e2f8f0' }}
                 placeholder="••••••••"
               />
             </div>
@@ -333,7 +333,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 mt-1 sm:mt-2 rounded-lg font-semibold text-white bg-teal-600 hover:bg-teal-700 active:bg-teal-800 transition-colors disabled:opacity-70 flex items-center justify-center gap-2 text-sm shadow-sm"
+            className="w-full py-2.5 mt-1 sm:mt-2 rounded-lg font-semibold transition-colors disabled:opacity-70 flex items-center justify-center gap-2 text-sm shadow-sm" style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}
           >
             {loading ? 'Signing In...' : 'Sign In'}
           </button>
@@ -341,16 +341,16 @@ export default function Login() {
 
         {/* Divider */}
         <div className="flex items-center gap-4 py-1">
-          <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
-          <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">OR</span>
-          <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
+          <div className="flex-1 h-px" style={{ background: 'rgba(52,232,158,0.15)' }}></div>
+          <span className="text-xs font-medium" style={{ color: 'rgba(226,248,240,0.4)' }}>OR</span>
+          <div className="flex-1 h-px" style={{ background: 'rgba(52,232,158,0.15)' }}></div>
         </div>
 
         {/* Google Sign In */}
         <button
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-2.5 flex items-center justify-center gap-3 font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors active:bg-gray-100 dark:active:bg-gray-600 disabled:opacity-70 text-sm"
+          className="w-full rounded-lg px-4 py-2.5 flex items-center justify-center gap-3 font-semibold transition-colors disabled:opacity-70 text-sm" style={{ background: 'rgba(7,24,37,0.8)', border: '1px solid rgba(52,232,158,0.2)', color: '#e2f8f0' }}
         >
           <FcGoogle className="w-5 h-5" />
           <span>Continue with Google</span>

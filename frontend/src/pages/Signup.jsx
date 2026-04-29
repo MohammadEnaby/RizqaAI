@@ -3,25 +3,24 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { FaLeaf } from 'react-icons/fa';
-import { FiMail, FiLock, FiUser, FiPhone } from 'react-icons/fi';
+import { FiMail, FiLock, FiUser } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 
 const SIGNUP_QUOTES = [
   {
-    title: <>Start Your <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-green-300 font-extrabold">Future Today</span></>,
+    title: <>Start Your <br /><span style={{ backgroundImage: 'linear-gradient(135deg, #34e89e, #1aad72)' }} className="text-transparent bg-clip-text font-extrabold">Future Today</span></>,
     text: "Join Rizqa AI and discover opportunities that match your unique profile. Set up your account in seconds."
   },
   {
-    title: <>Stand Out <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-green-300 font-extrabold">To Employers</span></>,
+    title: <>Stand Out <br /><span style={{ backgroundImage: 'linear-gradient(135deg, #34e89e, #1aad72)' }} className="text-transparent bg-clip-text font-extrabold">To Employers</span></>,
     text: "Showcase your skills using our dynamic profile builder and let the right companies come directly to you."
   },
   {
-    title: <>Your Personal <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-green-300 font-extrabold">Career Coach</span></>,
+    title: <>Your Personal <br /><span style={{ backgroundImage: 'linear-gradient(135deg, #34e89e, #1aad72)' }} className="text-transparent bg-clip-text font-extrabold">Career Coach</span></>,
     text: "It's not just a job board. We provide you with the tools you need to prepare for interviews and grow your potential."
   }
 ];
 
-// Carousel component isolated so interval doesn't re-render the forms
 const HeroCarousel = ({ quotes }) => {
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
 
@@ -33,27 +32,25 @@ const HeroCarousel = ({ quotes }) => {
   }, [quotes.length]);
 
   return (
-    <div className="hidden lg:flex lg:w-2/5 relative bg-[#064e3b] items-center justify-center overflow-hidden">
-      {/* Animated Background Elements */}
+    <div className="hidden lg:flex lg:w-2/5 relative items-center justify-center overflow-hidden" style={{ background: '#071825' }}>
       <div className="absolute top-0 left-0 w-full h-full opacity-30 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-green-500 rounded-full mix-blend-screen filter blur-[100px] opacity-40 animate-pulse"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-teal-500 rounded-full mix-blend-screen filter blur-[100px] opacity-50 animate-pulse delay-1000"></div>
+        <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full mix-blend-screen filter blur-[100px] animate-pulse" style={{ background: '#34e89e', opacity: 0.15 }}></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full mix-blend-screen filter blur-[100px] animate-pulse delay-1000" style={{ background: '#0f3443', opacity: 0.5 }}></div>
       </div>
 
-      {/* Hero Content */}
       <div className="relative z-10 flex flex-col justify-center p-16 max-w-xl h-full w-full">
         <div className="flex items-center gap-3 mb-auto">
-          <div className="w-10 h-10 bg-gradient-to-tr from-green-400 to-teal-400 rounded-lg flex items-center justify-center text-white shadow-lg">
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}>
             <FaLeaf className="w-5 h-5" />
           </div>
-          <span className="text-xl font-bold tracking-tight text-white">Rizqa AI</span>
+          <span className="text-xl font-bold tracking-tight" style={{ color: '#e2f8f0' }}>Rizqa AI</span>
         </div>
 
         <div className="my-auto transition-opacity duration-500 ease-in-out" key={currentQuoteIndex}>
           <h1 className="text-5xl font-extrabold text-white mb-6 leading-[1.1] animate-fade-in-up">
             {quotes[currentQuoteIndex].title}
           </h1>
-          <p className="text-lg text-teal-100/80 font-medium leading-relaxed max-w-md animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+          <p className="text-lg font-medium leading-relaxed max-w-md animate-fade-in-up" style={{ color: 'rgba(226,248,240,0.7)', animationDelay: '100ms' }}>
             {quotes[currentQuoteIndex].text}
           </p>
         </div>
@@ -62,7 +59,7 @@ const HeroCarousel = ({ quotes }) => {
           {quotes.map((_, i) => (
             <div
               key={i}
-              className={`h-1.5 rounded-full transition-all duration-500 ${i === currentQuoteIndex ? 'w-8 bg-teal-400' : 'w-2 bg-teal-700'}`}
+              style={{ height: '6px', borderRadius: '9999px', transition: 'all 0.5s', width: i === currentQuoteIndex ? '32px' : '8px', background: i === currentQuoteIndex ? '#34e89e' : 'rgba(52,232,158,0.25)' }}
             ></div>
           ))}
         </div>
@@ -72,12 +69,9 @@ const HeroCarousel = ({ quotes }) => {
 };
 
 const SplitScreenLayout = ({ children }) => (
-  <div className="min-h-screen max-h-screen w-full flex bg-white dark:bg-gray-900 overflow-hidden">
-    {/* Left Panel */}
+  <div className="min-h-screen max-h-screen w-full flex overflow-hidden" style={{ background: '#0f3443' }}>
     <HeroCarousel quotes={SIGNUP_QUOTES} />
-
-    {/* Right Panel - Form Area */}
-    <div className="w-full lg:w-3/5 flex flex-col p-4 sm:p-6 lg:p-8 overflow-y-auto custom-scrollbar">
+    <div className="w-full lg:w-3/5 flex flex-col p-4 sm:p-6 lg:p-8 overflow-y-auto custom-scrollbar" style={{ background: '#0a1e2e' }}>
       <div className="w-full max-w-[420px] mx-auto my-auto animate-fade-in-up py-4">
         {children}
       </div>
@@ -107,7 +101,6 @@ export default function Signup() {
   const password = watch('password', '');
   const confirmPassword = watch('confirmPassword', '');
 
-  // Password strength checks
   const hasMinLength = password.length >= 8;
   const hasUpperCase = /[A-Z]/.test(password);
   const hasLowerCase = /[a-z]/.test(password);
@@ -161,80 +154,83 @@ export default function Signup() {
     }
   };
 
+  const inputStyle = { background: 'rgba(7,24,37,0.8)', border: '1px solid rgba(52,232,158,0.2)', color: '#e2f8f0' };
+  const labelStyle = { color: 'rgba(226,248,240,0.8)' };
+  const iconStyle = { color: 'rgba(52,232,158,0.5)' };
+
   return (
     <SplitScreenLayout>
-      {/* Mobile Header (Only visible on small screens) */}
+      {/* Mobile Header */}
       <div className="lg:hidden mb-6 flex items-center gap-3 mt-4">
-        <div className="w-10 h-10 bg-gradient-to-tr from-green-500 to-teal-600 rounded-lg flex items-center justify-center text-white shadow-md">
+        <div className="w-10 h-10 rounded-lg flex items-center justify-center shadow-md" style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}>
           <FaLeaf className="w-5 h-5" />
         </div>
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white">Rizqa AI</h1>
+        <h1 className="text-xl font-bold" style={{ color: '#e2f8f0' }}>Rizqa AI</h1>
       </div>
 
       <div className="mb-5 sm:mb-6">
-        <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl mb-6 lg:mb-8 border border-gray-200 dark:border-gray-700">
-          <Link to="/login" className="flex-1 text-center py-2.5 text-sm font-bold rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
+        <div className="flex p-1 rounded-xl mb-6 lg:mb-8 border" style={{ background: 'rgba(7,24,37,0.6)', borderColor: 'rgba(52,232,158,0.15)' }}>
+          <Link to="/login" className="flex-1 text-center py-2.5 text-sm font-bold rounded-lg transition-all" style={{ color: 'rgba(226,248,240,0.5)' }}>
             Log In
           </Link>
-          <Link to="/signup" className="flex-1 text-center py-2.5 text-sm font-bold rounded-lg bg-white dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white transition-all">
+          <Link to="/signup" className="flex-1 text-center py-2.5 text-sm font-bold rounded-lg shadow-sm transition-all" style={{ background: '#34e89e', color: '#071825' }}>
             Sign Up
           </Link>
         </div>
 
-        <h2 className="text-2xl lg:text-3xl font-extrabold text-gray-900 dark:text-white mb-1 lg:mb-2 tracking-tight">Create an account</h2>
-        <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">Join us today to launch your career.</p>
+        <h2 className="text-2xl lg:text-3xl font-extrabold mb-1 lg:mb-2 tracking-tight" style={{ color: '#e2f8f0' }}>Create an account</h2>
+        <p className="text-sm font-medium" style={{ color: 'rgba(226,248,240,0.5)' }}>Join us today to launch your career.</p>
       </div>
 
       <div className="w-full flex flex-col space-y-4">
-        {/* Error Message */}
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+          <div className="px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#f87171' }}>
             <span className="font-bold">!</span> {error}
           </div>
         )}
 
-        {/* Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col space-y-3 lg:space-y-4">
-
           {/* Name Fields */}
           <div className="grid grid-cols-2 gap-3">
             <div className="group">
-              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">First Name</label>
+              <label className="block text-xs font-semibold mb-1" style={labelStyle}>First Name</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-teal-600 dark:group-focus-within:text-teal-400">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style={iconStyle}>
                   <FiUser className="w-4 h-4" />
                 </div>
                 <input
                   {...register("firstName", { required: "Required", minLength: { value: 2, message: "Min 2 chars" } })}
                   type="text"
-                  className="w-full pl-8 pr-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm hover:border-gray-400 dark:hover:border-gray-600 font-medium"
+                  className="w-full pl-8 pr-3 py-2 rounded-lg focus:outline-none transition-all text-sm font-medium"
+                  style={inputStyle}
                   placeholder="First"
                 />
               </div>
-              {errors.firstName && <p className="text-red-500 text-[10px] mt-0.5 font-medium">{errors.firstName.message}</p>}
+              {errors.firstName && <p className="text-red-400 text-[10px] mt-0.5 font-medium">{errors.firstName.message}</p>}
             </div>
             <div className="group">
-              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Last Name</label>
+              <label className="block text-xs font-semibold mb-1" style={labelStyle}>Last Name</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-teal-600 dark:group-focus-within:text-teal-400">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style={iconStyle}>
                   <FiUser className="w-4 h-4" />
                 </div>
                 <input
                   {...register("lastName", { required: "Required", minLength: { value: 2, message: "Min 2 chars" } })}
                   type="text"
-                  className="w-full pl-8 pr-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm hover:border-gray-400 dark:hover:border-gray-600 font-medium"
+                  className="w-full pl-8 pr-3 py-2 rounded-lg focus:outline-none transition-all text-sm font-medium"
+                  style={inputStyle}
                   placeholder="Last"
                 />
               </div>
-              {errors.lastName && <p className="text-red-500 text-[10px] mt-0.5 font-medium">{errors.lastName.message}</p>}
+              {errors.lastName && <p className="text-red-400 text-[10px] mt-0.5 font-medium">{errors.lastName.message}</p>}
             </div>
           </div>
 
-          {/* Email Drop */}
+          {/* Email */}
           <div className="group">
-            <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Email</label>
+            <label className="block text-xs font-semibold mb-1" style={labelStyle}>Email</label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-teal-600 dark:group-focus-within:text-teal-400">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style={iconStyle}>
                 <FiMail className="w-4 h-4" />
               </div>
               <input
@@ -246,18 +242,20 @@ export default function Signup() {
                   }
                 })}
                 type="email"
-                className="w-full pl-8 pr-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm hover:border-gray-400 dark:hover:border-gray-600 font-medium"
+                className="w-full pl-8 pr-3 py-2 rounded-lg focus:outline-none transition-all text-sm font-medium"
+                style={inputStyle}
                 placeholder="name@example.com"
               />
             </div>
-            {errors.email && <p className="text-red-500 mt-0.5 text-[10px] font-medium">{errors.email.message}</p>}
+            {errors.email && <p className="text-red-400 mt-0.5 text-[10px] font-medium">{errors.email.message}</p>}
           </div>
+
           {/* Password Fields */}
           <div className="grid grid-cols-2 gap-3">
             <div className="group">
-              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Password</label>
+              <label className="block text-xs font-semibold mb-1" style={labelStyle}>Password</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-teal-600 dark:group-focus-within:text-teal-400">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style={iconStyle}>
                   <FiLock className="w-4 h-4" />
                 </div>
                 <input
@@ -272,24 +270,26 @@ export default function Signup() {
                     }
                   })}
                   type={showPassword ? "text" : "password"}
-                  className="w-full pl-8 pr-9 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm hover:border-gray-400 dark:hover:border-gray-600 font-medium"
+                  className="w-full pl-8 pr-9 py-2 rounded-lg focus:outline-none transition-all text-sm font-medium"
+                  style={inputStyle}
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors text-[10px] font-semibold"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 transition-colors text-[10px] font-semibold"
+                  style={{ color: 'rgba(52,232,158,0.6)' }}
                 >
                   {showPassword ? 'HIDE' : 'SHOW'}
                 </button>
               </div>
-              {errors.password && <p className="text-red-500 mt-0.5 text-[10px] font-medium">{errors.password.message}</p>}
+              {errors.password && <p className="text-red-400 mt-0.5 text-[10px] font-medium">{errors.password.message}</p>}
             </div>
 
             <div className="group">
-              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Confirm</label>
+              <label className="block text-xs font-semibold mb-1" style={labelStyle}>Confirm</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-teal-600 dark:group-focus-within:text-teal-400">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style={iconStyle}>
                   <FiLock className="w-4 h-4" />
                 </div>
                 <input
@@ -298,26 +298,27 @@ export default function Signup() {
                     validate: value => value === password || "Passwords don't match"
                   })}
                   type={showConfirmPassword ? "text" : "password"}
-                  className="w-full pl-8 pr-9 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm hover:border-gray-400 dark:hover:border-gray-600 font-medium"
+                  className="w-full pl-8 pr-9 py-2 rounded-lg focus:outline-none transition-all text-sm font-medium"
+                  style={inputStyle}
                   placeholder="••••••••"
                 />
               </div>
-              {errors.confirmPassword && <p className="text-red-500 mt-0.5 text-[10px] font-medium">{errors.confirmPassword.message}</p>}
+              {errors.confirmPassword && <p className="text-red-400 mt-0.5 text-[10px] font-medium">{errors.confirmPassword.message}</p>}
             </div>
           </div>
 
           {/* Password Strength Indicator */}
           {password && passwordStrength < 5 && (
-            <div className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 mt-0.5">
+            <div className="rounded-lg px-2 py-1.5 mt-0.5 border" style={{ background: 'rgba(7,24,37,0.6)', borderColor: 'rgba(52,232,158,0.15)' }}>
               <div className="flex items-center justify-between text-[10px]">
-                <span className="font-semibold text-gray-600 dark:text-gray-400">Strength:</span>
+                <span className="font-semibold" style={{ color: 'rgba(226,248,240,0.6)' }}>Strength:</span>
                 <div className="flex gap-1.5">
-                  <span className={`font-semibold ${hasMinLength ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-600'}`}>{hasMinLength ? '✓' : '○'} 8+</span>
-                  <span className={`font-semibold ${hasUpperCase ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-600'}`}>{hasUpperCase ? '✓' : '○'} A</span>
-                  <span className={`font-semibold ${hasLowerCase ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-600'}`}>{hasLowerCase ? '✓' : '○'} a</span>
-                  <span className={`font-semibold ${hasNumber ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-600'}`}>{hasNumber ? '✓' : '○'} #</span>
-                  <span className={`font-semibold ${hasSpecialChar ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-600'}`}>{hasSpecialChar ? '✓' : '○'} !</span>
-                  <span className={`font-semibold ${passwordsMatch ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-600'}`}>{passwordsMatch ? '✓' : '○'} =</span>
+                  <span className="font-semibold" style={{ color: hasMinLength ? '#34e89e' : 'rgba(226,248,240,0.3)' }}>{hasMinLength ? '✓' : '○'} 8+</span>
+                  <span className="font-semibold" style={{ color: hasUpperCase ? '#34e89e' : 'rgba(226,248,240,0.3)' }}>{hasUpperCase ? '✓' : '○'} A</span>
+                  <span className="font-semibold" style={{ color: hasLowerCase ? '#34e89e' : 'rgba(226,248,240,0.3)' }}>{hasLowerCase ? '✓' : '○'} a</span>
+                  <span className="font-semibold" style={{ color: hasNumber ? '#34e89e' : 'rgba(226,248,240,0.3)' }}>{hasNumber ? '✓' : '○'} #</span>
+                  <span className="font-semibold" style={{ color: hasSpecialChar ? '#34e89e' : 'rgba(226,248,240,0.3)' }}>{hasSpecialChar ? '✓' : '○'} !</span>
+                  <span className="font-semibold" style={{ color: passwordsMatch ? '#34e89e' : 'rgba(226,248,240,0.3)' }}>{passwordsMatch ? '✓' : '○'} =</span>
                 </div>
               </div>
             </div>
@@ -325,32 +326,35 @@ export default function Signup() {
 
           {/* Role Selection */}
           <div className="grid grid-cols-2 gap-3 pt-1">
-            <label className="flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:border-teal-400 dark:hover:border-teal-500 transition-all py-1.5 px-3">
+            <label className="flex items-center justify-center gap-2 rounded-lg cursor-pointer transition-all py-1.5 px-3 border" style={{ background: 'rgba(7,24,37,0.6)', borderColor: 'rgba(52,232,158,0.2)' }}>
               <input
                 {...register("role", { required: true })}
                 type="radio"
                 value="user"
-                className="w-3.5 h-3.5 text-teal-600 focus:ring-teal-500 border-gray-300 dark:border-gray-600"
+                className="w-3.5 h-3.5"
+                style={{ accentColor: '#34e89e' }}
               />
-              <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">Job Seeker</span>
+              <span className="text-xs font-semibold" style={{ color: 'rgba(226,248,240,0.8)' }}>Job Seeker</span>
             </label>
-            <label className="flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:border-teal-400 dark:hover:border-teal-500 transition-all py-1.5 px-3">
+            <label className="flex items-center justify-center gap-2 rounded-lg cursor-pointer transition-all py-1.5 px-3 border" style={{ background: 'rgba(7,24,37,0.6)', borderColor: 'rgba(52,232,158,0.2)' }}>
               <input
                 {...register("role", { required: true })}
                 type="radio"
                 value="employer"
-                className="w-3.5 h-3.5 text-teal-600 focus:ring-teal-500 border-gray-300 dark:border-gray-600"
+                className="w-3.5 h-3.5"
+                style={{ accentColor: '#34e89e' }}
               />
-              <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">Employer</span>
+              <span className="text-xs font-semibold" style={{ color: 'rgba(226,248,240,0.8)' }}>Employer</span>
             </label>
           </div>
-          {errors.role && <p className="text-red-500 text-[10px] text-center font-medium">Please select a role</p>}
+          {errors.role && <p className="text-red-400 text-[10px] text-center font-medium">Please select a role</p>}
 
           {/* Sign Up Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 mt-1 rounded-lg font-semibold text-white bg-teal-600 hover:bg-teal-700 active:bg-teal-800 transition-colors disabled:opacity-70 flex items-center justify-center gap-2 text-sm shadow-sm"
+            className="w-full py-2.5 mt-1 rounded-lg font-semibold disabled:opacity-70 flex items-center justify-center gap-2 text-sm shadow-sm"
+            style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}
           >
             {loading ? 'Creating Account...' : 'Create Account'}
           </button>
@@ -358,16 +362,17 @@ export default function Signup() {
 
         {/* Divider */}
         <div className="flex items-center gap-4 py-1">
-          <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
-          <span className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase">OR</span>
-          <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
+          <div className="flex-1 h-px" style={{ background: 'rgba(52,232,158,0.15)' }}></div>
+          <span className="text-[10px] font-bold uppercase" style={{ color: 'rgba(226,248,240,0.4)' }}>OR</span>
+          <div className="flex-1 h-px" style={{ background: 'rgba(52,232,158,0.15)' }}></div>
         </div>
 
         {/* Google Sign In */}
         <button
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-2 flex items-center justify-center gap-3 font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors active:bg-gray-100 dark:active:bg-gray-600 disabled:opacity-70 text-sm"
+          className="w-full rounded-lg px-4 py-2 flex items-center justify-center gap-3 font-semibold transition-colors disabled:opacity-70 text-sm"
+          style={{ background: 'rgba(7,24,37,0.8)', border: '1px solid rgba(52,232,158,0.2)', color: '#e2f8f0' }}
         >
           <FcGoogle className="w-4 h-4" />
           <span>Continue with Google</span>
