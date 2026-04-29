@@ -101,13 +101,23 @@ const SplitScreenLayout = ({ children, isResetFlow = false }) => (
 
 export default function Login() {
   const { register, handleSubmit, formState: { errors }, getValues } = useForm();
-  const { login, initiateGoogleSignIn, resetPassword } = useAuth();
+  const { login, initiateGoogleSignIn, resetPassword, currentUser, userProfile } = useAuth();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const [resetSuccess, setResetSuccess] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (currentUser) {
+      if (userProfile?.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/chatbot');
+      }
+    }
+  }, [currentUser, userProfile, navigate]);
 
   const onSubmit = async (data) => {
     try {

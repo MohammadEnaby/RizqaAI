@@ -99,12 +99,22 @@ const SplitScreenLayout = ({ children }) => (
 
 export default function Signup() {
   const { register, handleSubmit, formState: { errors }, watch } = useForm({ defaultValues: { role: 'user' } });
-  const { signup, initiateGoogleSignIn } = useAuth();
+  const { signup, initiateGoogleSignIn, currentUser, userProfile } = useAuth();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (currentUser) {
+      if (userProfile?.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/chatbot');
+      }
+    }
+  }, [currentUser, userProfile, navigate]);
 
   const password = watch('password', '');
   const confirmPassword = watch('confirmPassword', '');
@@ -351,7 +361,7 @@ export default function Signup() {
               <input
                 {...register("role", { required: true })}
                 type="radio"
-                value="admin"
+                value="employer"
                 className="w-3.5 h-3.5 text-teal-600 focus:ring-teal-500 border-gray-300 dark:border-gray-600"
               />
               <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">Employer</span>
