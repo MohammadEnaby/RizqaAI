@@ -13,91 +13,87 @@ import Welcome from './pages/adminPages/Welcome';
 import Layout from './components/adminPage/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import MainPage from './pages/mainPage';
-import { ThemeProvider } from './contexts/ThemeContext';
-import ThemeToggle from './components/ThemeToggle';
+
 
 
 function App() {
   return (
-    <ThemeProvider>
-      <ThemeToggle />
-      <Router>
-        <AuthProvider>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route
-              path="/complete-profile"
-              element={
-                <ProtectedRoute>
-                  <CompleteProfile />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/" element={<MainPage />} />
-            <Route
-              path="/chatbot"
-              element={
-                <ProtectedRoute>
-                  <ChatBot />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <Layout>
-                    <Welcome />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/pipeline"
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <Layout>
-                    <Admin />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/users"
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <Layout>
-                    <UsersManagement />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/datasources"
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <Layout>
-                    <Datasources />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/schedules"
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <Layout>
-                    <ScheduledPipelines />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
-        </AuthProvider>
-      </Router>
-    </ThemeProvider>
+    <Router>
+      <AuthProvider>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route
+            path="/complete-profile"
+            element={
+              <ProtectedRoute>
+                <CompleteProfile />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/" element={<MainPage />} />
+          <Route
+            path="/chatbot"
+            element={
+              <ProtectedRoute>
+                <ChatBot />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <Layout>
+                  <Welcome />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/pipeline"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <Layout>
+                  <Admin />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <Layout>
+                  <UsersManagement />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/datasources"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <Layout>
+                  <Datasources />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/schedules"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <Layout>
+                  <ScheduledPipelines />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </AuthProvider>
+    </Router>
   );
 }
 
