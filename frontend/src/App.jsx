@@ -14,13 +14,13 @@ import Layout from './components/adminPage/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import MainPage from './pages/mainPage';
 import { ThemeProvider } from './contexts/ThemeContext';
-import ThemeToggle from './components/ThemeToggle';
+
 
 
 function App() {
   return (
     <ThemeProvider>
-      <ThemeToggle />
+
       <Router>
         <AuthProvider>
         <Routes>
