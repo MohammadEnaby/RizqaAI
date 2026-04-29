@@ -227,11 +227,9 @@ export default function ChatBot() {
                                 setCurrentSessionId(session.id);
                                 setIsSidebarOpen(false);
                             }}
-                            className={`
-                                group flex items-center justify-between p-3.5 rounded-xl cursor-pointer transition-all border
-                                ${currentSessionId === session.id
+                            className={`group flex items-center justify-between p-3.5 rounded-xl cursor-pointer transition-all border ${currentSessionId === session.id
                                     ? 'border shadow-sm' : 'border-transparent'
-                            `}
+                                }`}
                         >
                             <div className="flex items-center gap-3 min-w-0">
                                 <FiMessageSquare className={`shrink-0 ${currentSessionId === session.id ? 'text-teal-600 dark:text-teal-400' : 'text-gray-400 dark:text-gray-500'}`} />
