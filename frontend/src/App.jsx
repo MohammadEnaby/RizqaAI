@@ -6,7 +6,6 @@ import Signup from './pages/Signup';
 import CompleteProfile from './pages/CompleteProfile';
 import ChatBot from './pages/ChatBot';
 import Admin from './pages/adminPages/Pipeline';
-import Dashboard from './pages/adminPages/Dashboard';
 import Datasources from './pages/adminPages/Datasources';
 import ScheduledPipelines from './pages/adminPages/ScheduledPipelines';
 import UsersManagement from './pages/adminPages/UsersManagement';
@@ -14,12 +13,16 @@ import Welcome from './pages/adminPages/Welcome';
 import Layout from './components/adminPage/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import MainPage from './pages/mainPage';
+import { ThemeProvider } from './contexts/ThemeContext';
+import ThemeToggle from './components/ThemeToggle';
 
 
 function App() {
   return (
-    <Router>
-      <AuthProvider>
+    <ThemeProvider>
+      <ThemeToggle />
+      <Router>
+        <AuthProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
@@ -61,16 +64,6 @@ function App() {
             }
           />
           <Route
-            path="/admin/dashboard"
-            element={
-              <ProtectedRoute requiredRole="admin">
-                <Layout>
-                  <Dashboard />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
             path="/admin/users"
             element={
               <ProtectedRoute requiredRole="admin">
@@ -104,6 +97,7 @@ function App() {
         </Routes>
       </AuthProvider>
     </Router>
+    </ThemeProvider>
   );
 }
 

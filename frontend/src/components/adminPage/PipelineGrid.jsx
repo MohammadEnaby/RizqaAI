@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 const StatCard = ({ title, description, icon: Icon, value, subtext, progressValue, isActive, isLive }) => (
     <motion.div
         whileHover={{ y: -4, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
-        className={`glass-panel z-0 rounded-2xl p-6 relative overflow-hidden transition-all duration-300 ${isActive ? 'ring-2 ring-[#14b8a6]' : ''}`}
+        className={`glass-panel z-0 rounded-2xl p-6 relative overflow-hidden transition-all duration-300 flex flex-col h-full ${isActive ? 'ring-2 ring-[#14b8a6]' : ''}`}
     >
         {isLive && (
             <div className="absolute top-4 right-4 flex items-center space-x-2 bg-[#ecfdf5] px-3 py-1 rounded-full border border-[#22c55e]/20">
@@ -23,7 +23,7 @@ const StatCard = ({ title, description, icon: Icon, value, subtext, progressValu
         </div>
 
         <h3 className="text-[16px] font-bold text-[#0f172a] mb-2">{title}</h3>
-        <p className="text-[#6b7280] text-[13px] leading-relaxed mb-6 h-10">{description}</p>
+        <p className="text-[#6b7280] text-[13px] leading-relaxed mb-6 flex-grow">{description}</p>
 
         <div className="flex justify-between items-end mb-3">
             <div className="text-[32px] font-extrabold text-[#0f172a] tracking-tight leading-none">

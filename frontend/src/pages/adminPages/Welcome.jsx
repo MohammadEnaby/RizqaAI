@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 const Welcome = () => {
     return (
-        <div className="flex-1 p-8 space-y-6 overflow-y-auto h-screen bg-transparent">
+        <div className="flex-1 p-4 md:p-8 space-y-6 overflow-y-auto h-screen bg-transparent">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

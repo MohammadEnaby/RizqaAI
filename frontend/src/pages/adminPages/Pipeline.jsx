@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { auth } from '../../firebase';
 import AdminHeader from '../../components/adminPage/AdminHeader';
 import PipelineGrid from '../../components/adminPage/PipelineGrid';
@@ -151,7 +151,7 @@ const Admin = () => {
     };
 
     return (
-        <div className="min-h-screen p-6 md:p-12 font-sans text-[#0f172a]">
+        <div className="min-h-screen p-4 md:p-12 font-sans text-[#0f172a]">
 
             <AdminHeader
                 groupId={groupId}

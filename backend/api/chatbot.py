@@ -98,6 +98,7 @@ def extract_search_filters(user_query: str) -> dict:
         
         Keys:
         - intent: "search" if user mentions a job role, looking for work, or job related keywords. Default to "general" if it is just a greeting, a question not about jobs, or unclear.
+        - language: "en", "ar", or "he". Detect the language of the user's query.
         - keywords: List of strings. Include the exact term, plus SYNONYMS, RELATED ROLES, and TRANSLATIONS (Hebrew/Arabic). 
           Example: "Food" -> ["food", "waiter", "chef", "cook", "restaurant", "מלצר", "טבח", "מסעדה"]
         - location: String or List. The main city/region. If a major city is mentioned, also include nearby cities in the same district.
@@ -158,10 +159,21 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
     print(f"DEBUG [search_jobs_in_db]: keyword_list={keyword_list}")
     print(f"DEBUG [search_jobs_in_db]: location_list={location_list}")
     
+    user_lang = filters.get("language", "en")
+    
     for doc in docs:
         data = doc.to_dict()
-        title = data.get("job_title", "").lower()
-        if not title: continue
+        job_title_data = data.get("job_title")
+        if not job_title_data: continue
+        
+        if isinstance(job_title_data, dict):
+            titles_to_check = [str(v).lower() for v in job_title_data.values() if v]
+            display_title = job_title_data.get(user_lang) or job_title_data.get("en") or list(job_title_data.values())[0] if job_title_data else ""
+        else:
+            titles_to_check = [str(job_title_data).lower()]
+            display_title = str(job_title_data)
+            
+        if not display_title: continue
         
         # Smart match logic
         match_score = 0
@@ -169,16 +181,25 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
         # Check against ALL related keywords
         if keyword_list:
             for k in keyword_list:
-                if k in title:
+                if any(k in t for t in titles_to_check):
                     match_score += 2
                     break # Matched one keyword, good enough for keyword score
         
+        location_data = data.get("location")
+        if isinstance(location_data, dict):
+            locations_to_check = [str(v).lower() for v in location_data.values() if v]
+            display_location = location_data.get(user_lang) or location_data.get("en") or list(location_data.values())[0] if location_data else "Not specified"
+        elif location_data:
+            locations_to_check = [str(location_data).lower()]
+            display_location = str(location_data)
+        else:
+            locations_to_check = []
+            display_location = "Not specified"
+
         if location_list:
             # Flexible location match - check against all locations in the list
-            doc_loc = data.get("location") or ""
-            doc_loc = doc_loc.lower() if doc_loc else ""
             for loc in location_list:
-                if loc in doc_loc or doc_loc in loc:
+                if any(loc in doc_loc or doc_loc in loc for doc_loc in locations_to_check):
                     match_score += 1
                     break  # One match is enough
             
@@ -215,13 +236,21 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
              pass # Return all (recent)
 
 
+        company_data = data.get("company")
+        if isinstance(company_data, dict):
+            display_company = company_data.get(user_lang) or company_data.get("en") or list(company_data.values())[0] if company_data else "Unknown"
+        elif company_data:
+            display_company = str(company_data)
+        else:
+            display_company = "Unknown"
+
         # Map to JobResult structure
         found_jobs.append({
             "score": match_score,
             "id": doc.id,
-            "title": data.get("job_title"),
-            "company": data.get("company") or "Unknown", 
-            "location": data.get("location") or "Not specified",
+            "title": display_title,
+            "company": display_company, 
+            "location": display_location,
             "salary": data.get("wage_per_hour", "Not specified"),
             "link": data.get("post_link") or data.get("contact_info")
         })
@@ -406,7 +435,7 @@ async def chat_query(request: ChatMessage):
             print(f"DEBUG: Found {len(found_jobs)} jobs for query '{request.message}'")
 
         # 2. Generate AI Response with Context
-        model = genai.GenerativeModel('gemini-2.5-flash')
+        model = genai.GenerativeModel('gemma-3-12b-it')
         
         jobs_context = ""
         if found_jobs:
