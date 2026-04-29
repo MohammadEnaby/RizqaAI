@@ -198,7 +198,7 @@ export default function ChatBot() {
 
             {/* Sidebar Navigation */}
             <aside className={`
-                fixed md:relative z-30 h-full w-80 border-r border-teal-400/20 transform transition-transform duration-300 ease-in-out flex flex-col
+                fixed md:relative z-30 h-full w-80 glass-panel border-r border-teal-400/20 transform transition-transform duration-300 ease-in-out flex flex-col
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
             `}>
                 {/* Sidebar Header */}
@@ -278,7 +278,7 @@ export default function ChatBot() {
             <main className="flex-1 flex flex-col h-full min-w-0 relative w-full">
 
                 {/* Header */}
-                <header className="bg-[#0f172ab3] border-b-2 border-teal-400/20 px-4 py-3 flex items-center justify-between sticky top-0 z-10 shrink-0">
+                <header className="glass-panel border-b-2 border-teal-400/20 px-4 py-3 flex items-center justify-between sticky top-0 z-10 shrink-0">
                     <div className="flex items-center gap-3">
                         {/* Mobile Menu Toggle */}
                         <button
