@@ -8,15 +8,15 @@ import { FcGoogle } from 'react-icons/fc';
 
 const SIGNUP_QUOTES = [
   {
-    title: <>Start Your <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-green-300 font-extrabold">Future Today</span></>,
+    title: <>Start Your <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-green-300 font-extrabold">Future Today</span></>,
     text: "Join Rizqa AI and discover opportunities that match your unique profile. Set up your account in seconds."
   },
   {
-    title: <>Stand Out <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-green-300 font-extrabold">To Employers</span></>,
+    title: <>Stand Out <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-green-300 font-extrabold">To Employers</span></>,
     text: "Showcase your skills using our dynamic profile builder and let the right companies come directly to you."
   },
   {
-    title: <>Your Personal <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-green-300 font-extrabold">Career Coach</span></>,
+    title: <>Your Personal <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-green-300 font-extrabold">Career Coach</span></>,
     text: "It's not just a job board. We provide you with the tools you need to prepare for interviews and grow your potential."
   }
 ];
@@ -39,7 +39,7 @@ const HeroCarousel = ({ quotes }) => {
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-green-500 rounded-full mix-blend-screen filter blur-[100px] opacity-40 animate-pulse"></div>
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-teal-500 rounded-full mix-blend-screen filter blur-[100px] opacity-50 animate-pulse delay-1000"></div>
       </div>
-      
+
       {/* Hero Content */}
       <div className="relative z-10 flex flex-col justify-center p-16 max-w-xl h-full w-full">
         <div className="flex items-center gap-3 mb-auto">
@@ -53,15 +53,15 @@ const HeroCarousel = ({ quotes }) => {
           <h1 className="text-5xl font-extrabold text-white mb-6 leading-[1.1] animate-fade-in-up">
             {quotes[currentQuoteIndex].title}
           </h1>
-          <p className="text-lg text-teal-100/80 font-medium leading-relaxed max-w-md animate-fade-in-up" style={{animationDelay: '100ms'}}>
+          <p className="text-lg text-teal-100/80 font-medium leading-relaxed max-w-md animate-fade-in-up" style={{ animationDelay: '100ms' }}>
             {quotes[currentQuoteIndex].text}
           </p>
         </div>
-        
+
         <div className="mt-auto flex items-center space-x-2">
           {quotes.map((_, i) => (
-            <div 
-              key={i} 
+            <div
+              key={i}
               className={`h-1.5 rounded-full transition-all duration-500 ${i === currentQuoteIndex ? 'w-8 bg-teal-400' : 'w-2 bg-teal-700'}`}
             ></div>
           ))}
@@ -196,14 +196,14 @@ export default function Signup() {
 
         {/* Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col space-y-3 lg:space-y-4">
-          
+
           {/* Name Fields */}
           <div className="grid grid-cols-2 gap-3">
             <div className="group">
               <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">First Name</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-teal-600 dark:group-focus-within:text-teal-400">
-                  <FiUser className="w-4 h-4"/>
+                  <FiUser className="w-4 h-4" />
                 </div>
                 <input
                   {...register("firstName", { required: "Required", minLength: { value: 2, message: "Min 2 chars" } })}
@@ -218,7 +218,7 @@ export default function Signup() {
               <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Last Name</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-teal-600 dark:group-focus-within:text-teal-400">
-                  <FiUser className="w-4 h-4"/>
+                  <FiUser className="w-4 h-4" />
                 </div>
                 <input
                   {...register("lastName", { required: "Required", minLength: { value: 2, message: "Min 2 chars" } })}
@@ -236,7 +236,7 @@ export default function Signup() {
             <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Email</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-teal-600 dark:group-focus-within:text-teal-400">
-                <FiMail className="w-4 h-4"/>
+                <FiMail className="w-4 h-4" />
               </div>
               <input
                 {...register("email", {
@@ -253,35 +253,13 @@ export default function Signup() {
             </div>
             {errors.email && <p className="text-red-500 mt-0.5 text-[10px] font-medium">{errors.email.message}</p>}
           </div>
-          
-          {/* Phone Drop */}
-          <div className="group">
-            <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Phone Number</label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-teal-600 dark:group-focus-within:text-teal-400">
-                <FiPhone className="w-4 h-4"/>
-              </div>
-              <input
-                {...register("phone", {
-                  required: "Required",
-                  pattern: { value: /^[0-9+\-\s()]+$/, message: "Invalid phone" },
-                  minLength: { value: 9, message: "Min 9 digits" }
-                })}
-                type="tel"
-                className="w-full pl-8 pr-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm hover:border-gray-400 dark:hover:border-gray-600 font-medium"
-                placeholder="(555) 123-4567"
-              />
-            </div>
-            {errors.phone && <p className="text-red-500 mt-0.5 text-[10px] font-medium">{errors.phone.message}</p>}
-          </div>
-
           {/* Password Fields */}
           <div className="grid grid-cols-2 gap-3">
             <div className="group">
               <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Password</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-teal-600 dark:group-focus-within:text-teal-400">
-                  <FiLock className="w-4 h-4"/>
+                  <FiLock className="w-4 h-4" />
                 </div>
                 <input
                   {...register("password", {
@@ -313,7 +291,7 @@ export default function Signup() {
               <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Confirm</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-teal-600 dark:group-focus-within:text-teal-400">
-                  <FiLock className="w-4 h-4"/>
+                  <FiLock className="w-4 h-4" />
                 </div>
                 <input
                   {...register("confirmPassword", {
