@@ -13,13 +13,13 @@ import Welcome from './pages/adminPages/Welcome';
 import Layout from './components/adminPage/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import MainPage from './pages/mainPage';
-import { ThemeProvider } from './contexts/ThemeContext';
+
 
 
 
 function App() {
   return (
-    <ThemeProvider>
+
 
       <Router>
         <AuthProvider>
@@ -97,7 +97,7 @@ function App() {
         </Routes>
       </AuthProvider>
     </Router>
-    </ThemeProvider>
+
   );
 }
 
