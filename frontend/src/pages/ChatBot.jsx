@@ -198,7 +198,7 @@ export default function ChatBot() {
 
             {/* Sidebar Navigation */}
             <aside className={`
-                fixed md:relative z-30 h-full w-80 glass-panel border-r border-teal-400/20 transform transition-transform duration-300 ease-in-out flex flex-col
+                fixed md:relative z-30 h-full w-80 border-r border-teal-400/20 transform transition-transform duration-300 ease-in-out flex flex-col
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
             `}>
                 {/* Sidebar Header */}
