@@ -147,6 +147,11 @@ export default function Login() {
       setError('Please enter your email address.');
       return;
     }
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(resetEmail)) {
+      setError('Please enter a valid email address (e.g., name@example.com).');
+      return;
+    }
     try {
       setError('');
       setLoading(true);
@@ -279,7 +284,13 @@ export default function Login() {
                 <FiMail className="w-5 h-5"/>
               </div>
               <input
-                {...register("email", { required: "Email is required" })}
+                {...register("email", {
+                  required: "Email is required",
+                  pattern: {
+                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                    message: "Please enter a valid email address"
+                  }
+                })}
                 type="email"
                 className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm font-medium hover:border-gray-400 dark:hover:border-gray-600"
                 placeholder="name@example.com"
