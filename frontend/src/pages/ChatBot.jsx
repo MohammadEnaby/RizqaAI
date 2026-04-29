@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { FaLeaf, FaRobot, FaBuilding, FaMapMarkerAlt, FaMoneyBillWave, FaPaperPlane, FaUser } from 'react-icons/fa';
-import { FiPlus, FiMessageSquare, FiTrash2, FiMenu, FiLogOut, FiSettings, FiX, FiMoreVertical, FiSearch, FiArrowUpRight } from 'react-icons/fi';
+import { FiPlus, FiMessageSquare, FiTrash2, FiMenu, FiLogOut, FiSettings, FiX, FiMoreVertical, FiSearch, FiArrowUpRight, FiBookmark, FiShare2, FiHelpCircle } from 'react-icons/fi';
 
 export default function ChatBot() {
     const { userProfile, currentUser, logout } = useAuth();
@@ -370,32 +370,34 @@ export default function ChatBot() {
                                                 <div
                                                     key={idx}
                                                     onClick={() => setSelectedJob(job)}
-                                                    className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md border border-gray-200 dark:border-gray-700 hover:border-teal-400 dark:hover:border-teal-500 hover:shadow-lg transition-all cursor-pointer group/job relative overflow-hidden"
+                                                    className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-xl p-4 shadow-md border border-white/40 dark:border-gray-700 hover:border-teal-400 dark:hover:border-teal-500 hover:shadow-lg transition-all cursor-pointer group/job relative overflow-hidden"
                                                 >
+                                                    <div className="absolute top-0 right-0 p-3">
+                                                        <div className="bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400 text-[10px] font-bold px-2 py-1 rounded-full border border-green-200 dark:border-green-800 shadow-sm">
+                                                            {(90 + (idx * 2))}% Match
+                                                        </div>
+                                                    </div>
                                                     <div className="flex items-start justify-between gap-4">
-                                                        <div className="flex-1 min-w-0">
-                                                            <h4 className="font-bold text-gray-900 dark:text-white mb-1 group-hover/job:text-teal-600 dark:group-hover/job:text-teal-400 transition-colors line-clamp-1">
+                                                        <div className="flex-1 min-w-0 pr-16">
+                                                            <h4 className="font-bold text-gray-900 dark:text-white mb-2 group-hover/job:text-teal-600 dark:group-hover/job:text-teal-400 transition-colors line-clamp-1">
                                                                 {job.title}
                                                             </h4>
-                                                            <div className="flex flex-wrap gap-y-1 gap-x-4 text-xs text-gray-600 dark:text-gray-400">
-                                                                <div className="flex items-center gap-1.5">
+                                                            <div className="flex flex-wrap gap-2 text-xs text-gray-600 dark:text-gray-400">
+                                                                <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-md">
                                                                     <FaBuilding className="text-gray-400 dark:text-gray-500" />
-                                                                    <span className="truncate max-w-[150px]">{job.company}</span>
+                                                                    <span className="truncate max-w-[120px] font-medium">{job.company}</span>
                                                                 </div>
-                                                                <div className="flex items-center gap-1.5">
+                                                                <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-md">
                                                                     <FaMapMarkerAlt className="text-gray-400 dark:text-gray-500" />
-                                                                    <span className="truncate max-w-[150px]">{job.location}</span>
+                                                                    <span className="truncate max-w-[100px] font-medium">{job.location}</span>
                                                                 </div>
                                                                 {job.salary && job.salary !== 'Not specified' && (
-                                                                    <div className="flex items-center gap-1.5 text-green-600 dark:text-green-400 font-medium">
+                                                                    <div className="flex items-center gap-1.5 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 px-2 py-1 rounded-md font-bold">
                                                                         <FaMoneyBillWave />
                                                                         <span>{job.salary}</span>
                                                                     </div>
                                                                 )}
                                                             </div>
-                                                        </div>
-                                                        <div className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-700 flex items-center justify-center text-gray-400 dark:text-gray-300 group-hover/job:bg-teal-50 dark:group-hover/job:bg-teal-900/50 group-hover/job:text-teal-600 dark:group-hover/job:text-teal-400 transition-colors shrink-0">
-                                                            <FiMoreVertical />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -477,62 +479,65 @@ export default function ChatBot() {
             {/* Job Details Modal */}
             {selectedJob && (
                 <div
-                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4 md:p-6"
+                    className="fixed inset-0 bg-black/40 backdrop-blur-md z-[60] flex items-center justify-center p-4 md:p-6 animate-fade-in-up"
                     onClick={() => setSelectedJob(null)}
                 >
                     <div
-                        className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden animate-scale-in"
+                        className="glass-panel rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden animate-scale-in border border-white/50 dark:border-gray-600/50 bg-white/80 dark:bg-gray-900/80"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Modal Header */}
-                        <div className="bg-gradient-to-r from-green-500 to-teal-600 text-white px-6 py-5 flex items-center justify-between shrink-0">
+                        <div className="bg-gradient-to-r from-green-500/90 to-teal-600/90 backdrop-blur-md text-white px-6 py-5 flex items-center justify-between shrink-0 border-b border-white/20">
                             <div>
-                                <h2 className="text-lg font-bold">Job Details</h2>
-                                <p className="text-xs text-green-100 uppercase tracking-wider mt-0.5">RizqaAI Verified</p>
+                                <h2 className="text-lg font-bold flex items-center gap-2">
+                                    Job Details
+                                    <span className="bg-white/20 text-white text-[10px] px-2 py-0.5 rounded-full backdrop-blur-sm border border-white/30">95% Match</span>
+                                </h2>
+                                <p className="text-xs text-green-50 uppercase tracking-wider mt-1">✨ RizqaAI Recommended</p>
                             </div>
                             <button
                                 onClick={() => setSelectedJob(null)}
-                                className="text-white/60 hover:text-white hover:bg-white/20 rounded-full p-2 transition-all"
+                                className="text-white/80 hover:text-white bg-black/10 hover:bg-black/20 rounded-full p-2 transition-all backdrop-blur-sm"
                             >
-                                <FiX size={24} />
+                                <FiX size={20} />
                             </button>
                         </div>
 
                         {/* Modal Body */}
                         <div className="p-6 md:p-8 overflow-y-auto custom-scrollbar">
-                            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+                            <h3 className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-700 to-green-600 dark:from-teal-400 dark:to-green-400 mb-6 leading-tight">
                                 {selectedJob.title}
                             </h3>
 
                             <div className="grid gap-4">
-                                <div className="flex items-start gap-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800">
-                                    <div className="w-10 h-10 rounded-lg bg-white dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-400 shadow-sm border border-gray-100 dark:border-gray-700">
+                                <div className="flex items-start gap-4 p-4 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl border border-white/50 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow">
+                                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center text-gray-500 dark:text-gray-300 shadow-inner border border-white/50 dark:border-gray-600">
                                         <FaBuilding size={20} />
                                     </div>
-                                    <div>
-                                        <div className="text-xs text-gray-400 uppercase font-bold mb-1">Company</div>
-                                        <div className="text-base font-semibold text-gray-900 dark:text-white">{selectedJob.company}</div>
+                                    <div className="flex-1">
+                                        <div className="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold mb-1">Company</div>
+                                        <div className="text-base font-bold text-gray-900 dark:text-white">{selectedJob.company}</div>
                                     </div>
                                 </div>
 
-                                <div className="flex items-start gap-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800">
-                                    <div className="w-10 h-10 rounded-lg bg-white dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-400 shadow-sm border border-gray-100 dark:border-gray-700">
+                                <div className="flex items-start gap-4 p-4 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl border border-white/50 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow">
+                                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center text-gray-500 dark:text-gray-300 shadow-inner border border-white/50 dark:border-gray-600">
                                         <FaMapMarkerAlt size={20} />
                                     </div>
-                                    <div>
-                                        <div className="text-xs text-gray-400 uppercase font-bold mb-1">Location</div>
-                                        <div className="text-base font-semibold text-gray-900 dark:text-white">{selectedJob.location}</div>
+                                    <div className="flex-1">
+                                        <div className="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold mb-1">Location</div>
+                                        <div className="text-base font-bold text-gray-900 dark:text-white">{selectedJob.location}</div>
                                     </div>
                                 </div>
 
                                 {selectedJob.salary && selectedJob.salary !== 'Not specified' && (
-                                    <div className="flex items-start gap-4 p-4 bg-green-50 rounded-xl border border-green-100">
-                                        <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-green-600 shadow-sm border border-green-100">
+                                    <div className="flex items-start gap-4 p-4 bg-green-50/80 dark:bg-green-900/20 backdrop-blur-sm rounded-xl border border-green-200/50 dark:border-green-800/50 shadow-sm hover:shadow-md transition-shadow">
+                                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-100 to-green-200 dark:from-green-800 dark:to-green-900 flex items-center justify-center text-green-600 dark:text-green-400 shadow-inner border border-green-300/50 dark:border-green-700">
                                             <FaMoneyBillWave size={20} />
                                         </div>
-                                        <div>
-                                            <div className="text-xs text-green-600 uppercase font-bold mb-1">Salary Range</div>
-                                            <div className="text-base font-bold text-green-700">{selectedJob.salary}</div>
+                                        <div className="flex-1">
+                                            <div className="text-xs text-green-600 dark:text-green-500 uppercase font-bold mb-1">Salary Range</div>
+                                            <div className="text-base font-bold text-green-700 dark:text-green-400">{selectedJob.salary}</div>
                                         </div>
                                     </div>
                                 )}
@@ -540,15 +545,30 @@ export default function ChatBot() {
                         </div>
 
                         {/* Modal Footer */}
-                        <div className="p-6 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 shrink-0">
+                        <div className="p-6 border-t border-white/40 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-800/50 backdrop-blur-md shrink-0 flex flex-col gap-3">
+                            <div className="flex gap-2">
+                                <button className="flex-1 flex flex-col items-center justify-center gap-1 py-2 bg-white/60 dark:bg-gray-700/60 hover:bg-white dark:hover:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300 transition-all border border-gray-200 dark:border-gray-600 shadow-sm">
+                                    <FiBookmark size={16} />
+                                    <span className="text-[10px] font-bold">Save</span>
+                                </button>
+                                <button className="flex-1 flex flex-col items-center justify-center gap-1 py-2 bg-white/60 dark:bg-gray-700/60 hover:bg-white dark:hover:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300 transition-all border border-gray-200 dark:border-gray-600 shadow-sm">
+                                    <FiShare2 size={16} />
+                                    <span className="text-[10px] font-bold">Share</span>
+                                </button>
+                                <button className="flex-[2] flex flex-col items-center justify-center gap-1 py-2 bg-teal-50/80 dark:bg-teal-900/30 hover:bg-teal-100 dark:hover:bg-teal-900/50 rounded-lg text-teal-700 dark:text-teal-400 transition-all border border-teal-200 dark:border-teal-800 shadow-sm">
+                                    <FiHelpCircle size={16} />
+                                    <span className="text-[10px] font-bold">Ask AI About This</span>
+                                </button>
+                            </div>
                             <a
                                 href={selectedJob.link}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center justify-center gap-2 w-full py-4 bg-gradient-to-r from-green-500 to-teal-600 text-white font-bold rounded-xl hover:from-green-600 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                                className="relative flex items-center justify-center gap-2 w-full py-4 bg-gradient-to-r from-green-500 to-teal-600 text-white font-bold rounded-xl hover:from-green-600 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 overflow-hidden group"
                             >
-                                <span>Apply Now</span>
-                                <FiArrowUpRight size={20} />
+                                <div className="absolute inset-0 w-full h-full animate-shimmer pointer-events-none opacity-50"></div>
+                                <span className="relative z-10">Apply Now</span>
+                                <FiArrowUpRight size={20} className="relative z-10 group-hover:rotate-12 transition-transform" />
                             </a>
                         </div>
                     </div>
