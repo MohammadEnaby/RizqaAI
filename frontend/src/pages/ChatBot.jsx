@@ -25,7 +25,7 @@ export default function ChatBot() {
     // Initial greeting message
     const initialMessage = {
         id: 1,
-        text: "Hello! I'm RizqaAI, your intelligent job assistant.\n\nI can help you find the perfect job from our live database. Try asking for specific roles and locations.\n\nExamples:\n• \"Find me a Waiter job in Jerusalem\"\n• \"Show Python developer roles in Tel Aviv\"",
+        text: "Hello! I'm RizqaAI. / שלום! אני RizqaAI. / مرحباً! أنا RizqaAI.\n\nI can help you find the perfect job. Try asking for specific roles and locations in English, Hebrew, or Arabic!\n\nExamples:\n• \"Find me a Waiter job in Jerusalem\"\n• \"דרוש מפתח תוכנה בתל אביב\"\n• \"ابحث عن عمل كطباخ في حيفا\"",
         sender: 'bot',
         timestamp: new Date()
     };
@@ -117,11 +117,12 @@ export default function ChatBot() {
         }
     };
 
-    const handleSend = async () => {
-        if (!inputValue.trim()) return;
+    const handleSend = async (overrideText = null) => {
+        const textToSend = typeof overrideText === 'string' ? overrideText : inputValue;
+        if (!textToSend.trim()) return;
 
         const timestamp = new Date();
-        const userText = inputValue;
+        const userText = textToSend;
 
         const userMessage = {
             id: Date.now(),
@@ -182,7 +183,7 @@ export default function ChatBot() {
 
     const handleSuggestedClick = (query) => {
         const cleanQuery = query.replace(/^[^a-zA-Z0-9]+/, '');
-        setInputValue(query);
+        handleSend(cleanQuery);
     };
 
     return (
@@ -433,10 +434,10 @@ export default function ChatBot() {
                             <div className="flex gap-2 overflow-x-auto pb-2 justify-center hide-scrollbar flex-wrap">
                                 {[
                                     "Waiter in Jerusalem",
-                                    "Driver in Tel Aviv",
+                                    "דרוש נהג בתל אביב",
+                                    "مطور برامج في حيفا",
                                     "Student Job",
-                                    "Full Stack Developer",
-                                    "Part time retail"
+                                    "עבודה במשרה חלקית"
                                 ].map((query, idx) => (
                                     <button
                                         key={idx}

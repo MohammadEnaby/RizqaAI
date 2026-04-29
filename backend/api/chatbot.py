@@ -446,11 +446,14 @@ async def chat_query(request: ChatMessage):
              jobs_context = f"NO MATCHES FOUND. The user searched for: {analysis}. I checked the database but found nothing."
 
         # System Prompt for natural, helpful responses
+        user_lang = analysis.get("language", "en")
+        
         system_prompt = f"""
         Result of database search:
         {jobs_context}
 
         User Query: "{request.message}"
+        Detected Language: "{user_lang}"
 
         Task: Provide a brief, conversational response in the SAME LANGUAGE as the user's query.
         
@@ -461,7 +464,7 @@ async def chat_query(request: ChatMessage):
         - If this is a GREETING, respond warmly and ask how you can help
         - If NO jobs were found, apologize briefly and suggest trying different keywords or locations
         - Keep your response SHORT (1-2 sentences maximum)
-        - MATCH THE USER'S LANGUAGE: If they write in Arabic, respond in Arabic. If Hebrew, respond in Hebrew. If English, respond in English.
+        - YOU MUST RESPOND IN THE DETECTED LANGUAGE ({user_lang}). If 'ar', respond in Arabic. If 'he', respond in Hebrew. If 'en', respond in English.
         """
         
         response = model.generate_content(system_prompt)
