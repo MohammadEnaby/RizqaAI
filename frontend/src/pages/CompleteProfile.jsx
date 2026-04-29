@@ -31,7 +31,7 @@ export default function CompleteProfile() {
       setError('');
       setLoading(true);
       const fullName = `${data.firstName} ${data.lastName}`;
-      await completeGoogleProfile(currentUser.uid, fullName, data.role, data.password, data.phone);
+      await completeGoogleProfile(currentUser.uid, fullName, data.role, data.password);
       navigate('/chatbot');
     } catch (err) {
       console.error(err);
@@ -124,25 +124,7 @@ export default function CompleteProfile() {
             </p>
           </div>
 
-          {/* Phone Number */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-              Phone Number <span className="text-red-500">*</span>
-            </label>
-            <input
-              {...register("phone", {
-                required: "Phone number is required",
-                pattern: { value: /^[0-9+\-\s()]+$/, message: "Invalid phone number" },
-                minLength: { value: 9, message: "Phone number must be at least 9 digits" }
-              })}
-              type="tel"
-              placeholder="+1 (555) 123-4567"
-              className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 transition-colors"
-            />
-            {errors.phone && (
-              <p className="text-red-500 text-xs mt-1.5">{errors.phone.message}</p>
-            )}
-          </div>
+
 
           {/* Account Type */}
           <div>

@@ -49,7 +49,6 @@ export function AuthProvider({ children }) {
             firstName: profileData.firstName,
             lastName: profileData.lastName,
             email: email,
-            phone: profileData.phone,
             role: profileData.role,
             createdAt: new Date().toISOString()
           });
@@ -58,7 +57,6 @@ export function AuthProvider({ children }) {
             firstName: profileData.firstName,
             lastName: profileData.lastName,
             email: email,
-            phone: profileData.phone,
             role: profileData.role
           });
           console.log("✅ User profile saved to Firestore");
@@ -170,7 +168,6 @@ export function AuthProvider({ children }) {
       await setDoc(doc(db, "users", uid), {
         name: name,
         email: currentUser.email,
-        phone: phone,
         role: role,
         hasCustomPassword: !!password,
         createdAt: new Date().toISOString()

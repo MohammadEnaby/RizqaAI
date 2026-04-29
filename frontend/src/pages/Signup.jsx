@@ -124,7 +124,6 @@ export default function Signup() {
       await signup(data.email, data.password, {
         firstName: data.firstName,
         lastName: data.lastName,
-        phone: data.phone,
         role: data.role
       });
       navigate('/chatbot');

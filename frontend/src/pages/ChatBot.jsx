@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { FaLeaf, FaRobot, FaBuilding, FaMapMarkerAlt, FaMoneyBillWave, FaPaperPlane, FaUser } from 'react-icons/fa';
+import { FaLeaf, FaBrain, FaBuilding, FaMapMarkerAlt, FaMoneyBillWave, FaPaperPlane, FaUser } from 'react-icons/fa';
 import { FiPlus, FiMessageSquare, FiTrash2, FiMenu, FiLogOut, FiSettings, FiX, FiMoreVertical, FiSearch, FiArrowUpRight, FiBookmark, FiShare2, FiHelpCircle } from 'react-icons/fi';
 
 export default function ChatBot() {
@@ -25,7 +25,7 @@ export default function ChatBot() {
     // Initial greeting message
     const initialMessage = {
         id: 1,
-        text: "Hello! I'm RizqaAI. / שלום! אני RizqaAI. / مرحباً! أنا RizqaAI.\n\nI can help you find the perfect job. Try asking for specific roles and locations in English, Hebrew, or Arabic!\n\nExamples:\n• \"Find me a Waiter job in Jerusalem\"\n• \"דרוש מפתח תוכנה בתל אביב\"\n• \"ابحث عن عمل كطباخ في حيفا\"",
+        text: "Welcome to RizqaAI! 🌟\n\nI'm your professional AI assistant dedicated to helping you find the perfect career opportunity. I can assist you fluently in English, Hebrew, or Arabic.\n\nHow can I help you today? You can try:\n\n📍 Find me a Waiter job in Jerusalem\n💼 דרוש מפתח תוכנה בתל אביב\n🔍 ابحث عن وظائف هندسة في حيفا",
         sender: 'bot',
         timestamp: new Date()
     };
@@ -344,13 +344,13 @@ export default function ChatBot() {
                                 {/* Bot Icon for Bot Messages */}
                                 {message.sender === 'bot' && (
                                     <div className="w-8 h-8 rounded-full bg-teal-100 dark:bg-teal-900/50 flex items-center justify-center text-teal-600 dark:text-teal-400 mr-3 mt-1 shrink-0 shadow-sm border border-teal-200 dark:border-teal-800">
-                                        <FaRobot size={14} />
+                                        <FaBrain size={14} />
                                     </div>
                                 )}
 
                                 <div className={`flex flex-col max-w-[90%] md:max-w-[75%] lg:max-w-[60%] ${message.sender === 'user' ? 'items-end' : 'items-start'}`}>
                                     <div className={`
-                                        p-4 rounded-2xl shadow-sm text-sm md:text-base leading-relaxed
+                                        p-4 rounded-2xl shadow-sm text-sm md:text-base leading-relaxed whitespace-pre-wrap
                                         ${message.sender === 'user'
                                             ? 'bg-gradient-to-br from-teal-600 to-emerald-600 text-white rounded-br-sm'
                                             : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-teal-100 dark:border-gray-700 rounded-bl-sm shadow-[0_4px_20px_-10px_rgba(20,184,166,0.15)]'
@@ -415,7 +415,7 @@ export default function ChatBot() {
                         {isTyping && (
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 mt-1 shadow-sm border border-teal-200">
-                                    <FaRobot size={14} />
+                                    <FaBrain size={14} />
                                 </div>
                                 <div className="glass-panel border border-teal-400/20 rounded-2xl rounded-tl-none px-4 py-3 flex gap-1.5 items-center">
                                     <div className="w-1.5 h-1.5 bg-teal-500 rounded-full animate-bounce"></div>
