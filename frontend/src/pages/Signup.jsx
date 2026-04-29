@@ -33,7 +33,7 @@ const HeroCarousel = ({ quotes }) => {
   }, [quotes.length]);
 
   return (
-    <div className="hidden lg:flex lg:w-1/2 relative bg-[#064e3b] items-center justify-center overflow-hidden">
+    <div className="hidden lg:flex lg:w-2/5 relative bg-[#064e3b] items-center justify-center overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full opacity-30 pointer-events-none">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-green-500 rounded-full mix-blend-screen filter blur-[100px] opacity-40 animate-pulse"></div>
@@ -77,20 +77,8 @@ const SplitScreenLayout = ({ children }) => (
     <HeroCarousel quotes={SIGNUP_QUOTES} />
 
     {/* Right Panel - Form Area */}
-    <div className="w-full lg:w-1/2 flex flex-col p-4 sm:p-6 lg:p-8 overflow-y-auto custom-scrollbar">
-      <div className="w-full flex justify-end mb-4 shrink-0">
-         <div className="flex items-center gap-3">
-           <span className="text-sm font-medium text-gray-500 dark:text-gray-400 hidden sm:inline">Already have an account?</span>
-           <Link
-            to="/login"
-            className="px-5 py-2 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-semibold transition-all text-sm border border-gray-200 dark:border-gray-700"
-          >
-            Log in
-          </Link>
-        </div>
-      </div>
-
-      <div className="w-full max-w-[420px] mx-auto my-auto animate-fade-in-up pb-8">
+    <div className="w-full lg:w-3/5 flex flex-col p-4 sm:p-6 lg:p-8 overflow-y-auto custom-scrollbar">
+      <div className="w-full max-w-[420px] mx-auto my-auto animate-fade-in-up py-4">
         {children}
       </div>
     </div>
@@ -99,12 +87,22 @@ const SplitScreenLayout = ({ children }) => (
 
 export default function Signup() {
   const { register, handleSubmit, formState: { errors }, watch } = useForm({ defaultValues: { role: 'user' } });
-  const { signup, initiateGoogleSignIn } = useAuth();
+  const { signup, initiateGoogleSignIn, currentUser, userProfile } = useAuth();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (currentUser) {
+      if (userProfile?.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/chatbot');
+      }
+    }
+  }, [currentUser, userProfile, navigate]);
 
   const password = watch('password', '');
   const confirmPassword = watch('confirmPassword', '');
@@ -175,6 +173,15 @@ export default function Signup() {
       </div>
 
       <div className="mb-5 sm:mb-6">
+        <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl mb-6 lg:mb-8 border border-gray-200 dark:border-gray-700">
+          <Link to="/login" className="flex-1 text-center py-2.5 text-sm font-bold rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
+            Log In
+          </Link>
+          <Link to="/signup" className="flex-1 text-center py-2.5 text-sm font-bold rounded-lg bg-white dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white transition-all">
+            Sign Up
+          </Link>
+        </div>
+
         <h2 className="text-2xl lg:text-3xl font-extrabold text-gray-900 dark:text-white mb-1 lg:mb-2 tracking-tight">Create an account</h2>
         <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">Join us today to launch your career.</p>
       </div>
@@ -234,7 +241,10 @@ export default function Signup() {
               <input
                 {...register("email", {
                   required: "Required",
-                  pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, message: "Invalid email" }
+                  pattern: {
+                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                    message: "Please enter a valid email address"
+                  }
                 })}
                 type="email"
                 className="w-full pl-8 pr-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm hover:border-gray-400 dark:hover:border-gray-600 font-medium"
@@ -351,7 +361,7 @@ export default function Signup() {
               <input
                 {...register("role", { required: true })}
                 type="radio"
-                value="admin"
+                value="employer"
                 className="w-3.5 h-3.5 text-teal-600 focus:ring-teal-500 border-gray-300 dark:border-gray-600"
               />
               <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">Employer</span>

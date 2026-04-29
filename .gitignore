@@ -26,3 +26,5 @@ serviceAccountKey.json
 secrets.py
 __pycache__
 .env
+# Temporary data files used by the scraping pipeline
+backend/Data/*.json
