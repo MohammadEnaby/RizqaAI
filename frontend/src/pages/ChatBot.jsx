@@ -182,8 +182,7 @@ export default function ChatBot() {
     };
 
     const handleSuggestedClick = (query) => {
-        const cleanQuery = query.replace(/^[^a-zA-Z0-9]+/, '');
-        handleSend(cleanQuery);
+        handleSend(query);
     };
 
     return (
