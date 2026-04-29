@@ -3,17 +3,31 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-  const [theme] = useState('dark');
+  const [theme, setTheme] = useState(() => {
+    const savedTheme = localStorage.getItem('theme');
+    // Default to dark mode or system preference if preferred
+    if (savedTheme) {
+      return savedTheme;
+    }
+    // Optional: detect system preference
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark';
+    }
+    return 'light';
+  });
 
   useEffect(() => {
     const root = window.document.documentElement;
-    root.classList.add('dark');
-    localStorage.setItem('theme', 'dark');
-  }, []);
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   const toggleTheme = () => {
-    // No-op to prevent errors if called
-    console.log('Theme is locked to dark mode');
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
   };
 
   return (
