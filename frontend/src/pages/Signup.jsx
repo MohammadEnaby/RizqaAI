@@ -33,7 +33,7 @@ const HeroCarousel = ({ quotes }) => {
   }, [quotes.length]);
 
   return (
-    <div className="hidden lg:flex lg:w-1/2 relative bg-[#064e3b] items-center justify-center overflow-hidden">
+    <div className="hidden lg:flex lg:w-2/5 relative bg-[#064e3b] items-center justify-center overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full opacity-30 pointer-events-none">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-green-500 rounded-full mix-blend-screen filter blur-[100px] opacity-40 animate-pulse"></div>
@@ -77,20 +77,8 @@ const SplitScreenLayout = ({ children }) => (
     <HeroCarousel quotes={SIGNUP_QUOTES} />
 
     {/* Right Panel - Form Area */}
-    <div className="w-full lg:w-1/2 flex flex-col p-4 sm:p-6 lg:p-8 overflow-y-auto custom-scrollbar">
-      <div className="w-full flex justify-end mb-4 shrink-0">
-         <div className="flex items-center gap-3">
-           <span className="text-sm font-medium text-gray-500 dark:text-gray-400 hidden sm:inline">Already have an account?</span>
-           <Link
-            to="/login"
-            className="px-5 py-2 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-semibold transition-all text-sm border border-gray-200 dark:border-gray-700"
-          >
-            Log in
-          </Link>
-        </div>
-      </div>
-
-      <div className="w-full max-w-[420px] mx-auto my-auto animate-fade-in-up pb-8">
+    <div className="w-full lg:w-3/5 flex flex-col p-4 sm:p-6 lg:p-8 overflow-y-auto custom-scrollbar">
+      <div className="w-full max-w-[420px] mx-auto my-auto animate-fade-in-up py-4">
         {children}
       </div>
     </div>
@@ -185,6 +173,15 @@ export default function Signup() {
       </div>
 
       <div className="mb-5 sm:mb-6">
+        <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl mb-6 lg:mb-8 border border-gray-200 dark:border-gray-700">
+          <Link to="/login" className="flex-1 text-center py-2.5 text-sm font-bold rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
+            Log In
+          </Link>
+          <Link to="/signup" className="flex-1 text-center py-2.5 text-sm font-bold rounded-lg bg-white dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white transition-all">
+            Sign Up
+          </Link>
+        </div>
+
         <h2 className="text-2xl lg:text-3xl font-extrabold text-gray-900 dark:text-white mb-1 lg:mb-2 tracking-tight">Create an account</h2>
         <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">Join us today to launch your career.</p>
       </div>
