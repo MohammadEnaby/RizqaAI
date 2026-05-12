@@ -81,7 +81,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                         className={`${isActive('/admin/users') ? 'text-green-500' : 'text-gray-400'
                             }`}
                     />
-                    <span>Users</span>
+                    <span className={`${isActive('/admin/users') ? 'text-green-500' : 'text-gray-400'}` }>Users</span>
                 </Link>
 
                 {/* ✅ PIPELINE */}
@@ -97,7 +97,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                         className={`${isActive('/admin/pipeline') ? 'text-green-500' : 'text-gray-400'
                             }`}
                     />
-                    <span>Pipeline</span>
+                    <span className={`${isActive('/admin/pipeline') ? 'text-green-500' : 'text-gray-400'}` }>Pipeline</span>
                 </Link>
 
                 {/* ✅ DATASOURCES */}
@@ -113,7 +113,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                         className={`${isActive('/admin/datasources') ? 'text-green-500' : 'text-gray-400'
                             }`}
                     />
-                    <span>Datasources</span>
+                    <span className={`${isActive('/admin/datasources') ? 'text-green-500' : 'text-gray-400'}` }>Datasources</span>
                 </Link>
 
                 {/* ✅ SCHEDULED PIPELINES */}
@@ -129,7 +129,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                         className={`${isActive('/admin/schedules') ? 'text-green-500' : 'text-gray-400'
                             }`}
                     />
-                    <span>Schedules</span>
+                    <span className={`${isActive('/admin/schedules') ? 'text-green-500' : 'text-gray-400'}` }>Schedules</span>
                 </Link>
 
                 {/* ✅ CHATBOT */}
@@ -145,7 +145,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                         className={`${isActive('/chatbot') ? 'text-green-500' : 'text-gray-400'
                             }`}
                     />
-                    <span>Chatbot</span>
+                    <span className={`${isActive('/chatbot') ? 'text-green-500' : 'text-gray-400'}` }>Chatbot</span>
                 </Link>
 
                 {/* ✅ ACCOUNT */}
@@ -161,7 +161,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                         className="w-full flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl font-medium transition" style={{ color: 'rgba(226,248,240,0.5)' }}
                     >
                         <FaSignOutAlt />
-                        <span>Logout</span>
+                        <span >Logout</span>
                     </motion.button>
                 </div>
             </nav>
