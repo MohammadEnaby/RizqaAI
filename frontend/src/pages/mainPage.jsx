@@ -3,9 +3,6 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaRobot, FaSearch, FaPaperPlane, FaArrowRight, FaLeaf } from 'react-icons/fa';
 
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { FaLeaf, FaArrowRight, FaSearch, FaRobot, FaPaperPlane } from "react-icons/fa";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 22 },
