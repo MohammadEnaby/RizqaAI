@@ -15,9 +15,9 @@ const Modal = ({ isOpen, onClose, title, children }) => {
                 exit={{ opacity: 0, scale: 0.95 }}
                 className="rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border" style={{ background: 'rgba(10,30,46,0.98)', borderColor: 'rgba(52,232,158,0.2)' }}
             >
-                <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                    <h3 className="text-lg font-bold text-gray-800">{title}</h3>
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+                <div className="px-6 py-4 border-b flex justify-between items-center" style={{ borderColor: 'rgba(52,232,158,0.15)', background: 'rgba(7,24,37,0.4)' }}>
+                    <h3 className="text-lg font-bold" style={{ color: '#e2f8f0' }}>{title}</h3>
+                    <button onClick={onClose} className="transition-colors hover:text-white" style={{ color: 'rgba(226,248,240,0.5)' }}>
                         <FaTimes />
                     </button>
                 </div>
@@ -163,7 +163,7 @@ const Datasources = () => {
         switch (type) {
             case 'Facebook Group': return <FaFacebook className="text-blue-600" />;
             case 'LinkedIn': return <FaLinkedin className="text-blue-700" />;
-            default: return <FaGlobe className="text-gray-500" />;
+            default: return <FaGlobe className="text-gray-400" />;
         }
     };
 
@@ -218,9 +218,9 @@ const Datasources = () => {
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {loading ? (
-                                <tr><td colSpan="5" className="p-8 text-center text-gray-500">Loading datasources...</td></tr>
+                                <tr><td colSpan="5" className="p-8 text-center" style={{ color: 'rgba(226,248,240,0.5)' }}>Loading datasources...</td></tr>
                             ) : filteredGroups.length === 0 ? (
-                                <tr><td colSpan="5" className="p-8 text-center text-gray-500">No datasources found.</td></tr>
+                                <tr><td colSpan="5" className="p-8 text-center" style={{ color: 'rgba(226,248,240,0.5)' }}>No datasources found.</td></tr>
                             ) : (
                                 filteredGroups.map((group) => (
                                     <tr key={group.groupID} className="transition-colors group" style={{ borderBottom: '1px solid rgba(52,232,158,0.08)' }}>
@@ -270,8 +270,8 @@ const Datasources = () => {
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-bold text-gray-600 mb-1">Apify API Token</label>
-                        <input name="APIFY_API_TOKEN" value={formData.APIFY_API_TOKEN} onChange={handleInputChange} className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-transparent focus:bg-white focus:border-green-500/30 focus:ring-4 focus:ring-green-500/10 transition-all outline-none text-sm font-medium" placeholder="Optional: Override global token" />
+                        <label className="block text-sm font-bold mb-1" style={{ color: 'rgba(226,248,240,0.7)' }}>Apify API Token</label>
+                        <input name="APIFY_API_TOKEN" value={formData.APIFY_API_TOKEN} onChange={handleInputChange} className="w-full px-4 py-3 rounded-xl text-sm font-medium outline-none transition-all" style={{ background: 'rgba(7,24,37,0.7)', border: '1px solid rgba(52,232,158,0.2)', color: '#e2f8f0' }} placeholder="Optional: Override global token" />
                     </div>
                     <div className="pt-4 flex gap-3">
                         <button type="button" onClick={() => setIsAddModalOpen(false)} className="flex-1 px-4 py-3 rounded-xl font-bold transition-colors" style={{ color: 'rgba(226,248,240,0.5)' }}>Cancel</button>
@@ -284,29 +284,29 @@ const Datasources = () => {
             <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="Edit Datasource">
                 <form onSubmit={handleEditSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-bold text-gray-400 mb-1 uppercase tracking-wider text-[10px]">Group ID (Read-only)</label>
-                        <input disabled value={formData.groupID} className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-transparent text-gray-400 cursor-not-allowed font-mono text-sm" />
+                        <label className="block text-sm font-bold mb-1 uppercase tracking-wider text-[10px]" style={{ color: 'rgba(226,248,240,0.5)' }}>Group ID (Read-only)</label>
+                        <input disabled value={formData.groupID} className="w-full px-4 py-3 rounded-xl cursor-not-allowed font-mono text-sm" style={{ background: 'rgba(7,24,37,0.4)', border: '1px solid rgba(52,232,158,0.1)', color: 'rgba(226,248,240,0.4)' }} />
                     </div>
                     <div>
-                        <label className="block text-sm font-bold text-gray-600 mb-1">Name</label>
-                        <input required name="name" value={formData.name} onChange={handleInputChange} className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-transparent focus:bg-white focus:border-green-500/30 focus:ring-4 focus:ring-green-500/10 transition-all outline-none text-sm font-medium" />
+                        <label className="block text-sm font-bold mb-1" style={{ color: 'rgba(226,248,240,0.7)' }}>Name</label>
+                        <input required name="name" value={formData.name} onChange={handleInputChange} className="w-full px-4 py-3 rounded-xl text-sm font-medium outline-none transition-all" style={{ background: 'rgba(7,24,37,0.7)', border: '1px solid rgba(52,232,158,0.2)', color: '#e2f8f0' }} />
                     </div>
                     <div>
-                        <label className="block text-sm font-bold text-gray-600 mb-1">Platform</label>
-                        <select name="platformType" value={formData.platformType} onChange={handleInputChange} className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-transparent focus:bg-white focus:border-green-500/30 focus:ring-4 focus:ring-green-500/10 transition-all outline-none text-sm font-medium">
+                        <label className="block text-sm font-bold mb-1" style={{ color: 'rgba(226,248,240,0.7)' }}>Platform</label>
+                        <select name="platformType" value={formData.platformType} onChange={handleInputChange} className="w-full px-4 py-3 rounded-xl text-sm font-medium outline-none transition-all" style={{ background: 'rgba(7,24,37,0.7)', border: '1px solid rgba(52,232,158,0.2)', color: '#e2f8f0' }}>
                             <option>Facebook Group</option>
                             <option>LinkedIn</option>
                             <option>Website</option>
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-bold text-gray-600 mb-1">Apify API Token</label>
-                        <input name="APIFY_API_TOKEN" value={formData.APIFY_API_TOKEN} onChange={handleInputChange} className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-transparent focus:bg-white focus:border-green-500/30 focus:ring-4 focus:ring-green-500/10 transition-all outline-none text-sm font-medium" placeholder="Optional: Override global token" />
+                        <label className="block text-sm font-bold mb-1" style={{ color: 'rgba(226,248,240,0.7)' }}>Apify API Token</label>
+                        <input name="APIFY_API_TOKEN" value={formData.APIFY_API_TOKEN} onChange={handleInputChange} className="w-full px-4 py-3 rounded-xl text-sm font-medium outline-none transition-all" style={{ background: 'rgba(7,24,37,0.7)', border: '1px solid rgba(52,232,158,0.2)', color: '#e2f8f0' }} placeholder="Optional: Override global token" />
                     </div>
 
                     <div className="pt-4 flex gap-3">
-                        <button type="button" onClick={() => setIsEditModalOpen(false)} className="flex-1 px-4 py-3 rounded-xl font-bold text-gray-500 hover:bg-gray-100 transition-colors">Cancel</button>
-                        <button type="submit" className="flex-1 px-4 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-green-600 to-teal-600 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">Save Changes</button>
+                        <button type="button" onClick={() => setIsEditModalOpen(false)} className="flex-1 px-4 py-3 rounded-xl font-bold transition-colors hover:bg-white/5" style={{ color: 'rgba(226,248,240,0.5)' }}>Cancel</button>
+                        <button type="submit" className="flex-1 px-4 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all" style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}>Save Changes</button>
                     </div>
                 </form>
             </Modal>

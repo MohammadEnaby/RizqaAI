@@ -12,10 +12,10 @@ const Welcome = () => {
             >
                 {/* Header */}
                 <div className="mb-10 text-center">
-                    <h1 className="text-4xl font-extrabold text-[#134e4a] mb-4">
+                    <h1 className="text-4xl font-extrabold title-color mb-4">
                         Welcome to Rizqa Admin
                     </h1>
-                    <p className="text-gray-500 text-lg">
+                    <p className="text-gray-300 text-lg">
                         Select a module from the sidebar to get started.
                     </p>
                 </div>
@@ -26,8 +26,8 @@ const Welcome = () => {
                         whileHover={{ y: -5 }}
                         className="glass-panel p-6 rounded-2xl border-white/40 shadow-xl"
                     >
-                        <h3 className="text-xl font-bold text-[#134e4a] mb-2">Pipeline</h3>
-                        <p className="text-gray-500 text-sm">
+                        <h3 className="text-xl font-bold title-color mb-2">Pipeline</h3>
+                        <p className="text-gray-300 text-sm">
                             Manage and monitor your data extraction pipelines.
                         </p>
                     </motion.div>
@@ -36,8 +36,8 @@ const Welcome = () => {
                         whileHover={{ y: -5 }}
                         className="glass-panel p-6 rounded-2xl border-white/40 shadow-xl"
                     >
-                        <h3 className="text-xl font-bold text-[#134e4a] mb-2">Dashboard</h3>
-                        <p className="text-gray-500 text-sm">
+                        <h3 className="text-xl font-bold title-color mb-2">Dashboard</h3>
+                        <p className="text-gray-300 text-sm">
                             View system analytics and performance metrics.
                         </p>
                     </motion.div>
@@ -46,8 +46,8 @@ const Welcome = () => {
                         whileHover={{ y: -5 }}
                         className="glass-panel p-6 rounded-2xl border-white/40 shadow-xl"
                     >
-                        <h3 className="text-xl font-bold text-[#134e4a] mb-2">Datasources</h3>
-                        <p className="text-gray-500 text-sm">
+                        <h3 className="text-xl font-bold title-color mb-2">Datasources</h3>
+                        <p className="text-gray-300 text-sm">
                             Configure and manage your data sources and groups.
                         </p>
                     </motion.div>

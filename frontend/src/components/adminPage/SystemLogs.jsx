@@ -20,7 +20,7 @@ const SystemLogs = ({ logs, logsEndRef, isRunning }) => {
                 </div>
             </div>
                 {logs.length === 0 ? (
-                    <div className="h-full flex flex-col items-center justify-center text-gray-700">
+                    <div className="h-full flex flex-col items-center justify-center text-gray-400">
                         <p className="opacity-50">Waiting for pipeline initiation...</p>
                     </div>
                 ) : (
@@ -33,7 +33,7 @@ const SystemLogs = ({ logs, logsEndRef, isRunning }) => {
                                 transition={{ duration: 0.2 }}
                                 className="flex"
                             >
-                                <span className="text-gray-600 mr-3 select-none w-[80px] shrink-0">
+                                <span className="text-gray-500 mr-3 select-none w-[80px] shrink-0">
                                     {new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                                 </span>
                                 <span className={`${log.includes("[ERROR]") ? "text-[#ef4444]" :

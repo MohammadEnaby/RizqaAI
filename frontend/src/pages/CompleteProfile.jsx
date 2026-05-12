@@ -110,16 +110,17 @@ export default function CompleteProfile() {
 
           {/* Email (Read-only from Google) */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-semibold mb-2" style={{ color: 'rgba(226,248,240,0.8)' }}>
               Email Address
             </label>
             <input
               type="email"
               value={currentUser?.email || ''}
               disabled
-              className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-500 cursor-not-allowed"
+              className="w-full px-4 py-3 rounded-lg text-sm cursor-not-allowed"
+              style={{ background: 'rgba(7,24,37,0.4)', border: '1px solid rgba(52,232,158,0.1)', color: 'rgba(226,248,240,0.5)' }}
             />
-            <p className="text-gray-500 dark:text-gray-400 text-xs mt-1.5">
+            <p className="text-xs mt-1.5" style={{ color: 'rgba(226,248,240,0.5)' }}>
               This email is from your Google account
             </p>
           </div>
@@ -128,34 +129,34 @@ export default function CompleteProfile() {
 
           {/* Account Type */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-semibold mb-2" style={{ color: 'rgba(226,248,240,0.8)' }}>
               Account Type <span className="text-red-500">*</span>
             </label>
             <div className="flex flex-col sm:flex-row gap-3">
-              <label className="flex-1 p-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer flex items-center gap-3 hover:border-indigo-500 dark:hover:border-indigo-400 transition-colors group">
+              <label className="flex-1 p-3 rounded-lg cursor-pointer flex items-center gap-3 hover:border-[#34e89e] transition-colors group" style={{ border: '2px solid rgba(52,232,158,0.2)', background: 'rgba(7,24,37,0.4)' }}>
                 <input
                   {...register("role", { required: "Please select an account type" })}
                   type="radio"
                   value="user"
                   defaultChecked
-                  className="w-4 h-4 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                  className="w-4 h-4 text-[#34e89e] focus:ring-[#34e89e] cursor-pointer"
                 />
                 <div>
-                  <div className="font-semibold text-sm text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">User</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">Browse & apply for jobs</div>
+                  <div className="font-semibold text-sm text-white group-hover:text-[#34e89e] transition-colors">User</div>
+                  <div className="text-xs" style={{ color: 'rgba(226,248,240,0.5)' }}>Browse & apply for jobs</div>
                 </div>
               </label>
 
-              <label className="flex-1 p-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer flex items-center gap-3 hover:border-indigo-500 dark:hover:border-indigo-400 transition-colors group">
+              <label className="flex-1 p-3 rounded-lg cursor-pointer flex items-center gap-3 hover:border-[#34e89e] transition-colors group" style={{ border: '2px solid rgba(52,232,158,0.2)', background: 'rgba(7,24,37,0.4)' }}>
                 <input
                   {...register("role")}
                   type="radio"
                   value="admin"
-                  className="w-4 h-4 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                  className="w-4 h-4 text-[#34e89e] focus:ring-[#34e89e] cursor-pointer"
                 />
                 <div>
-                  <div className="font-semibold text-sm text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Admin</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">Manage the platform</div>
+                  <div className="font-semibold text-sm text-white group-hover:text-[#34e89e] transition-colors">Admin</div>
+                  <div className="text-xs" style={{ color: 'rgba(226,248,240,0.5)' }}>Manage the platform</div>
                 </div>
               </label>
             </div>
@@ -166,7 +167,7 @@ export default function CompleteProfile() {
 
           {/* Password */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-semibold mb-2" style={{ color: 'rgba(226,248,240,0.8)' }}>
               Create a Password <span className="text-red-500">*</span>
             </label>
             <div className="relative">
@@ -183,12 +184,13 @@ export default function CompleteProfile() {
                 })}
                 type={showPassword ? "text" : "password"}
                 placeholder="Create a strong password for your account"
-                className="w-full px-4 pr-12 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 transition-colors"
+                className="w-full px-4 pr-12 py-3 rounded-lg text-sm focus:outline-none transition-colors"
+                style={{ background: 'rgba(7,24,37,0.7)', border: '2px solid rgba(52,232,158,0.2)', color: '#e2f8f0' }}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white p-2"
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
@@ -196,16 +198,16 @@ export default function CompleteProfile() {
             {errors.password && (
               <p className="text-red-500 text-xs mt-1.5">{errors.password.message}</p>
             )}
-            <p className="text-gray-500 dark:text-gray-400 text-xs mt-1.5">
+            <p className="text-xs mt-1.5" style={{ color: 'rgba(226,248,240,0.5)' }}>
               This will be your RizqaAI password (separate from Google)
             </p>
           </div>
 
           {/* Password Strength Indicator */}
           {password && (
-            <div className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+            <div className="rounded-lg p-4" style={{ background: 'rgba(7,24,37,0.4)', border: '1px solid rgba(52,232,158,0.2)' }}>
               <div className="flex justify-between items-center mb-3">
-                <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                <span className="text-sm font-semibold" style={{ color: 'rgba(226,248,240,0.8)' }}>
                   Password Strength
                 </span>
                 <span className={`text-xs font-bold ${passwordStrength >= 4 ? 'text-green-500' : passwordStrength >= 3 ? 'text-yellow-500' : 'text-red-500'}`}>
@@ -215,23 +217,23 @@ export default function CompleteProfile() {
               <div className="grid gap-2 text-xs">
                 <div className="flex items-center gap-2">
                   {hasMinLength ? <FaCheck className="text-green-500" /> : <FaTimes className="text-red-500" />}
-                  <span className={hasMinLength ? 'text-green-500' : 'text-gray-500 dark:text-gray-400'}>At least 8 characters</span>
+                  <span className={hasMinLength ? 'text-green-500' : 'text-gray-400'}>At least 8 characters</span>
                 </div>
                 <div className="flex items-center gap-2">
                   {hasUpperCase ? <FaCheck className="text-green-500" /> : <FaTimes className="text-red-500" />}
-                  <span className={hasUpperCase ? 'text-green-500' : 'text-gray-500 dark:text-gray-400'}>One uppercase letter (A-Z)</span>
+                  <span className={hasUpperCase ? 'text-green-500' : 'text-gray-400'}>One uppercase letter (A-Z)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   {hasLowerCase ? <FaCheck className="text-green-500" /> : <FaTimes className="text-red-500" />}
-                  <span className={hasLowerCase ? 'text-green-500' : 'text-gray-500 dark:text-gray-400'}>One lowercase letter (a-z)</span>
+                  <span className={hasLowerCase ? 'text-green-500' : 'text-gray-400'}>One lowercase letter (a-z)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   {hasNumber ? <FaCheck className="text-green-500" /> : <FaTimes className="text-red-500" />}
-                  <span className={hasNumber ? 'text-green-500' : 'text-gray-500 dark:text-gray-400'}>One number (0-9)</span>
+                  <span className={hasNumber ? 'text-green-500' : 'text-gray-400'}>One number (0-9)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   {hasSpecialChar ? <FaCheck className="text-green-500" /> : <FaTimes className="text-red-500" />}
-                  <span className={hasSpecialChar ? 'text-green-500' : 'text-gray-500 dark:text-gray-400'}>One special character (!@#$%...)</span>
+                  <span className={hasSpecialChar ? 'text-green-500' : 'text-gray-400'}>One special character (!@#$%...)</span>
                 </div>
               </div>
             </div>
@@ -239,7 +241,7 @@ export default function CompleteProfile() {
 
           {/* Confirm Password */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-semibold mb-2" style={{ color: 'rgba(226,248,240,0.8)' }}>
               Confirm Password <span className="text-red-500">*</span>
             </label>
             <div className="relative">
@@ -250,12 +252,13 @@ export default function CompleteProfile() {
                 })}
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="Re-enter your password"
-                className="w-full px-4 pr-12 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 transition-colors"
+                className="w-full px-4 pr-12 py-3 rounded-lg text-sm focus:outline-none transition-colors"
+                style={{ background: 'rgba(7,24,37,0.7)', border: '2px solid rgba(52,232,158,0.2)', color: '#e2f8f0' }}
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white p-2"
               >
                 {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
               </button>

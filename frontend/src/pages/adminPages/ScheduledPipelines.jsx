@@ -128,13 +128,13 @@ const ScheduledPipelines = () => {
                                             {groupNames[schedule.groupID] || schedule.groupID}
                                         </h3>
                                         {(groupNames[schedule.groupID] && groupNames[schedule.groupID] !== schedule.groupID) && (
-                                            <p className="text-xs text-gray-400 truncate">{schedule.groupID}</p>
+                                            <p className="text-xs truncate" style={{ color: 'rgba(226,248,240,0.4)' }}>{schedule.groupID}</p>
                                         )}
                                     </div>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4 mb-6">
-                                    <div className="bg-white/50 p-3 rounded-xl border border-gray-100 relative group/edit">
+                                    <div className="p-3 rounded-xl border relative group/edit" style={{ background: 'rgba(7,24,37,0.4)', borderColor: 'rgba(52,232,158,0.1)' }}>
                                         <div className="flex items-center gap-2 mb-1" style={{ color: 'rgba(226,248,240,0.4)' }}>
                                             <FaClock size={10} />
                                             <span className="text-[10px] uppercase font-bold tracking-wider">Interval</span>
@@ -145,7 +145,8 @@ const ScheduledPipelines = () => {
                                                 <select
                                                     value={editValue}
                                                     onChange={(e) => setEditValue(e.target.value)}
-                                                    className="w-full text-xs p-1 rounded border border-green-200 outline-none focus:border-green-500"
+                                                    className="w-full text-xs p-1 rounded outline-none transition-all"
+                                                    style={{ background: 'rgba(7,24,37,0.9)', border: '1px solid #34e89e', color: '#e2f8f0' }}
                                                     autoFocus
                                                 >
                                                     <option value="1440">Daily</option>
@@ -162,7 +163,7 @@ const ScheduledPipelines = () => {
                                                 <p className="font-semibold" style={{ color: '#e2f8f0' }}>{formatInterval(schedule.interval)}</p>
                                                 <button
                                                     onClick={() => startEditing(schedule)}
-                                                    className="opacity-0 group-hover/edit:opacity-100 transition-opacity text-gray-400 hover:text-[#134e4a]"
+                                                    className="opacity-0 group-hover/edit:opacity-100 transition-opacity text-gray-400 hover:text-[#34e89e]"
                                                     title="Edit Interval"
                                                 >
                                                     <FaEdit size={12} />
@@ -173,17 +174,17 @@ const ScheduledPipelines = () => {
                                 </div>
 
                                 {/* Results Section */}
-                                < div className="pt-4 border-t border-gray-100" >
+                                < div className="pt-4 border-t" style={{ borderColor: 'rgba(52,232,158,0.1)' }} >
                                     <div className="flex items-center gap-2 mb-3">
-                                        <FaHistory className="text-[#107884]" size={12} />
-                                        <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Last Run Results</span>
+                                        <FaHistory className="text-[#34e89e]" size={12} />
+                                        <span className="text-xs font-bold uppercase tracking-wide" style={{ color: 'rgba(226,248,240,0.5)' }}>Last Run Results</span>
                                     </div>
 
                                     {(schedule.lastRunStats !== undefined || schedule.lastRunMetadata) ? (
                                         <div>
                                             <div className="flex justify-between items-center mb-2">
-                                                <span className="text-sm font-medium text-gray-600">Total Jobs Found</span>
-                                                <span className="text-lg font-bold text-[#134e4a]">
+                                                <span className="text-sm font-medium" style={{ color: 'rgba(226,248,240,0.7)' }}>Total Jobs Found</span>
+                                                <span className="text-lg font-bold" style={{ color: '#34e89e' }}>
                                                     {typeof schedule.lastRunStats === 'object'
                                                         ? (schedule.lastRunStats?.totalJobs || 0)
                                                         : (schedule.lastRunStats || 0)}
@@ -195,13 +196,13 @@ const ScheduledPipelines = () => {
                                                 <div className="space-y-1.5 max-h-32 overflow-y-auto custom-scrollbar pr-1">
                                                     {Object.entries(schedule.lastRunMetadata?.breakdown || schedule.lastRunStats.breakdown).map(([title, count]) => (
                                                         <div key={title} className="flex justify-between items-center text-xs">
-                                                            <span className="text-gray-500 truncate max-w-[150px]" title={title}>{title}</span>
-                                                            <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md font-medium">{count}</span>
+                                                            <span className="truncate max-w-[150px]" style={{ color: 'rgba(226,248,240,0.6)' }} title={title}>{title}</span>
+                                                            <span className="px-2 py-0.5 rounded-md font-medium" style={{ background: 'rgba(52,232,158,0.1)', color: '#34e89e' }}>{count}</span>
                                                         </div>
                                                     ))}
                                                 </div>
                                             )}
-                                            <div className="mt-3 text-[10px] text-right text-gray-400">
+                                            <div className="mt-3 text-[10px] text-right" style={{ color: 'rgba(226,248,240,0.4)' }}>
                                                 {(() => {
                                                     const ts = schedule.lastRunMetadata?.timestamp || schedule.lastRunStats?.timestamp;
                                                     if (!ts) return 'Just now';
@@ -212,8 +213,8 @@ const ScheduledPipelines = () => {
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="text-center py-4 bg-gray-50/50 rounded-xl border border-dashed border-gray-200">
-                                            <span className="text-xs text-gray-400 italic">Waiting for first execution...</span>
+                                        <div className="text-center py-4 rounded-xl border border-dashed" style={{ background: 'rgba(7,24,37,0.4)', borderColor: 'rgba(52,232,158,0.2)' }}>
+                                            <span className="text-xs italic" style={{ color: 'rgba(226,248,240,0.5)' }}>Waiting for first execution...</span>
                                         </div>
                                     )}
                                 </div>

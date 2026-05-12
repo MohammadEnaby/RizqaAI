@@ -169,10 +169,10 @@ const UsersManagement = () => {
                                     <th className="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(226,248,240,0.4)' }}>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-50">
+                            <tbody className="divide-y divide-white/10">
                                 {loading ? (
                                     <tr>
-                                        <td colSpan="6" className="px-6 py-12 text-center text-gray-500">
+                                        <td colSpan="6" className="px-6 py-12 text-center" style={{ color: 'rgba(226,248,240,0.5)' }}>
                                             <div className="flex flex-col items-center justify-center gap-2">
                                                 <FaSpinner className="animate-spin text-green-500" size={24} />
                                                 <p>Loading users...</p>
@@ -181,13 +181,13 @@ const UsersManagement = () => {
                                     </tr>
                                 ) : filteredUsers.length === 0 ? (
                                     <tr>
-                                        <td colSpan="6" className="px-6 py-12 text-center text-gray-500">
+                                        <td colSpan="6" className="px-6 py-12 text-center" style={{ color: 'rgba(226,248,240,0.5)' }}>
                                             No users found matching your search.
                                         </td>
                                     </tr>
                                 ) : (
                                     filteredUsers.map((user) => (
-                                        <tr key={user.id} className="hover:bg-white/60 transition-colors group">
+                                        <tr key={user.id} className="hover:bg-white/5 transition-colors group">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center">
                                                     <div className="h-10 w-10 rounded-full bg-gradient-to-br from-green-400 to-teal-500 flex items-center justify-center text-white font-bold text-sm shadow-sm">
@@ -200,38 +200,35 @@ const UsersManagement = () => {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${user.role === 'admin'
-                                                    ? 'bg-purple-100 text-purple-800'
-                                                    : 'bg-green-100 text-green-800'
-                                                    }`}>
+                                                <span className="px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full" style={user.role === 'admin' ? { background: 'rgba(168,85,247,0.2)', color: '#d8b4fe' } : { background: 'rgba(52,232,158,0.2)', color: '#34e89e' }}>
                                                     {user.role}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'rgba(226,248,240,0.8)' }}>
                                                 {user.appliedJobs}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                 <div className="flex items-center">
-                                                    <span className={`font-bold ${user.satisfaction >= 8 ? 'text-green-600' :
-                                                        user.satisfaction >= 5 ? 'text-yellow-600' : 'text-red-600'
+                                                    <span className={`font-bold ${user.satisfaction >= 8 ? 'text-green-500' :
+                                                        user.satisfaction >= 5 ? 'text-yellow-500' : 'text-red-500'
                                                         }`}>{user.satisfaction}</span>
-                                                    <span className="text-gray-400 text-xs ml-1">/ 10</span>
+                                                    <span className="text-xs ml-1" style={{ color: 'rgba(226,248,240,0.4)' }}>/ 10</span>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate" title={user.enhancementSuggestions}>
+                                            <td className="px-6 py-4 text-sm max-w-xs truncate" style={{ color: 'rgba(226,248,240,0.8)' }} title={user.enhancementSuggestions}>
                                                 {user.enhancementSuggestions || '-'}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <button
                                                     onClick={() => handleEditClick(user)}
-                                                    className="text-indigo-600 hover:text-indigo-900 p-2 hover:bg-indigo-50 rounded-lg transition-colors mr-2"
+                                                    className="p-2 rounded-lg transition-colors mr-2 hover:bg-white/10" style={{ color: '#34e89e' }}
                                                     title="Edit"
                                                 >
                                                     <FaEdit size={16} />
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(user.id)}
-                                                    className="text-red-600 hover:text-red-900 p-2 hover:bg-red-50 rounded-lg transition-colors"
+                                                    className="text-red-400 hover:text-red-300 p-2 hover:bg-white/10 rounded-lg transition-colors"
                                                     title="Delete"
                                                 >
                                                     <FaTrash size={16} />
@@ -254,7 +251,7 @@ const UsersManagement = () => {
                             <h3 className="text-lg font-bold" style={{ color: '#e2f8f0' }}>Edit User</h3>
                             <button
                                 onClick={() => setIsEditModalOpen(false)}
-                                className="text-gray-400 hover:text-gray-600 transition-colors"
+                                className="transition-colors hover:text-white" style={{ color: 'rgba(226,248,240,0.5)' }}
                             >
                                 <FaTimes />
                             </button>
@@ -262,12 +259,12 @@ const UsersManagement = () => {
 
                         <form onSubmit={handleUpdateUser} className="p-6 space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                                <label className="block text-sm font-bold mb-1" style={{ color: 'rgba(226,248,240,0.7)' }}>Role</label>
                                 <select
                                     name="role"
                                     value={formData.role}
                                     onChange={handleInputChange}
-                                    className="w-full rounded-xl border-gray-300 bg-gray-50/50 focus:border-green-500 focus:ring-green-500/20 py-2.5"
+                                    className="w-full rounded-xl outline-none py-2.5 px-4 text-sm transition-all" style={{ background: 'rgba(7,24,37,0.7)', border: '1px solid rgba(52,232,158,0.2)', color: '#e2f8f0' }}
                                 >
                                     <option value="user">User</option>
                                     <option value="admin">Admin</option>
@@ -275,19 +272,19 @@ const UsersManagement = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Applied Jobs Count</label>
+                                <label className="block text-sm font-bold mb-1" style={{ color: 'rgba(226,248,240,0.7)' }}>Applied Jobs Count</label>
                                 <input
                                     type="number"
                                     name="appliedJobs"
                                     value={formData.appliedJobs}
                                     onChange={handleInputChange}
                                     min="0"
-                                    className="w-full rounded-xl border-gray-300 bg-gray-50/50 focus:border-green-500 focus:ring-green-500/20 py-2.5"
+                                    className="w-full rounded-xl outline-none py-2.5 px-4 text-sm transition-all" style={{ background: 'rgba(7,24,37,0.7)', border: '1px solid rgba(52,232,158,0.2)', color: '#e2f8f0' }}
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Satisfaction (0-10)</label>
+                                <label className="block text-sm font-bold mb-1" style={{ color: 'rgba(226,248,240,0.7)' }}>Satisfaction (0-10)</label>
                                 <input
                                     type="number"
                                     name="satisfaction"
@@ -295,18 +292,18 @@ const UsersManagement = () => {
                                     onChange={handleInputChange}
                                     min="0"
                                     max="10"
-                                    className="w-full rounded-xl border-gray-300 bg-gray-50/50 focus:border-green-500 focus:ring-green-500/20 py-2.5"
+                                    className="w-full rounded-xl outline-none py-2.5 px-4 text-sm transition-all" style={{ background: 'rgba(7,24,37,0.7)', border: '1px solid rgba(52,232,158,0.2)', color: '#e2f8f0' }}
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Enhancement Suggestions</label>
+                                <label className="block text-sm font-bold mb-1" style={{ color: 'rgba(226,248,240,0.7)' }}>Enhancement Suggestions</label>
                                 <textarea
                                     name="enhancementSuggestions"
                                     value={formData.enhancementSuggestions}
                                     onChange={handleInputChange}
                                     rows="3"
-                                    className="w-full rounded-xl border-gray-300 bg-gray-50/50 focus:border-green-500 focus:ring-green-500/20 py-2.5"
+                                    className="w-full rounded-xl outline-none py-2.5 px-4 text-sm transition-all custom-scrollbar" style={{ background: 'rgba(7,24,37,0.7)', border: '1px solid rgba(52,232,158,0.2)', color: '#e2f8f0' }}
                                     placeholder="Enter suggestions..."
                                 />
                             </div>
@@ -315,13 +312,13 @@ const UsersManagement = () => {
                                 <button
                                     type="button"
                                     onClick={() => setIsEditModalOpen(false)}
-                                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                                    className="px-4 py-2.5 text-sm font-bold rounded-xl transition-colors hover:bg-white/5" style={{ color: 'rgba(226,248,240,0.5)' }}
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 border border-transparent rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-sm shadow-green-600/20"
+                                    className="px-4 py-2.5 text-sm font-bold rounded-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5" style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}
                                 >
                                     Save Changes
                                 </button>

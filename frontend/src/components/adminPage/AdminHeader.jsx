@@ -123,7 +123,7 @@ const AdminHeader = ({
                                             }}
                                         >
                                             <div className="font-bold">{group.name || group.id}</div>
-                                            {group.name && <div className="text-[10px] text-gray-500 dark:text-gray-400">{group.id}</div>}
+                                            {group.name && <div className="text-[10px]" style={{ color: 'rgba(226,248,240,0.5)' }}>{group.id}</div>}
                                         </div>
                                     ))}
                                 </div>
