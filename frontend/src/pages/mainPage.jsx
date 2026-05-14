@@ -12,7 +12,7 @@ const fadeUp = {
 const MainPage = () => {
   return (
     <div
-      className="min-h-screen relative overflow-x-hidden"
+      className="h-screen relative overflow-x-hidden overflow-y-auto scrollbar-hide"
       style={{ background: "#071825", fontFamily: "'Inter', sans-serif" }}
     >
       {/* ── Google Fonts ── */}

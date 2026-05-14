@@ -54,12 +54,12 @@ const HeroCarousel = ({ quotes }) => {
       
       {/* Hero Content */}
       <div className="relative z-10 flex flex-col justify-center p-16 max-w-xl h-full w-full">
-        <div className="flex items-center gap-3 mb-auto">
+        <Link to="/" className="flex items-center gap-3 mb-auto hover:opacity-80 transition-opacity">
           <div className="w-10 h-10 rounded-lg flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}>
             <FaLeaf className="w-5 h-5" />
           </div>
           <span className="text-xl font-bold tracking-tight text-white">Rizqa AI</span>
-        </div>
+        </Link>
 
         <div className="my-auto" style={{ minHeight: '180px' }}>
           <div
@@ -291,12 +291,12 @@ export default function Login() {
   return (
     <SplitScreenLayout>
       {/* Mobile Header */}
-      <div className="lg:hidden mb-6 flex items-center gap-3">
+      <Link to="/" className="lg:hidden mb-6 flex items-center gap-3 hover:opacity-80 transition-opacity">
         <div className="w-10 h-10 rounded-lg flex items-center justify-center shadow-md" style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}>
           <FaLeaf className="w-5 h-5" />
         </div>
         <h1 className="text-xl font-bold" style={{ color: '#e2f8f0' }}>Rizqa AI</h1>
-      </div>
+      </Link>
 
       <div className="mb-6 sm:mb-8">
         <div className="flex p-1 rounded-xl mb-8 border" style={{ background: 'rgba(7,24,37,0.6)', borderColor: 'rgba(52,232,158,0.15)' }}>

@@ -190,18 +190,18 @@ export default function ChatBot() {
             {/* Mobile Sidebar Overlay */}
             {isSidebarOpen && (
                 <div
-                    className="fixed inset-0 bg-black/50 z-20 md:hidden"
+                    className="fixed inset-0 bg-black/50 z-40 md:hidden"
                     onClick={() => setIsSidebarOpen(false)}
                 />
             )}
 
             {/* Sidebar Navigation */}
             <aside className={`
-                fixed md:relative z-30 h-full w-80 backdrop-blur-xl text-white border-r transform transition-transform duration-300 ease-in-out flex flex-col shadow-xl
+                fixed md:relative z-50 h-full w-80 backdrop-blur-xl text-white transform transition-transform duration-300 ease-in-out flex flex-col shadow-xl
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
             `}>
                 {/* Sidebar Header */}
-                <div className="py-4 border-b" style={{ borderColor: 'rgba(52,232,158,0.15)' }}>
+                <div className="py-4 px-4">
                     <button
                         onClick={createNewSession}
                         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold shadow-sm hover:shadow-md transition-all active:scale-95 group" style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}
@@ -212,7 +212,7 @@ export default function ChatBot() {
                 </div>
 
                 {/* Session List */}
-                <div className="flex-1 overflow-y-auto px-2 py-2 space-y-1 scrollbar-hide">
+                <div className="flex-1 overflow-y-auto px-4 py-2 space-y-2 scrollbar-hide">
                     {sessions.length === 0 && (
                         <div className="flex flex-col items-center justify-center h-40 text-gray-500 text-sm px-8 text-center">
                             <FiMessageSquare className="text-3xl mb-3 opacity-30" />
@@ -253,7 +253,7 @@ export default function ChatBot() {
                 </div>
 
                 {/* User Profile / Lower Sidebar */}
-                <div className="p-5 border-t" style={{ borderColor: 'rgba(52,232,158,0.15)', background: 'rgba(7,24,37,0.4)' }}>
+                <div className="p-5" style={{ background: 'rgba(7,24,37,0.4)' }}>
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-sm" style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}>
                             {(userProfile?.name || currentUser?.displayName || currentUser?.email || '?')[0].toUpperCase()}
@@ -271,7 +271,7 @@ export default function ChatBot() {
             </aside>
 
             {/* Main Chat Area */}
-            <main className="flex-1 flex flex-col h-full min-w-0 relative w-full bg-transparent z-40">
+            <main className="flex-1 flex flex-col h-full min-w-0 relative w-full bg-transparent z-10">
 
                 {/* Header */}
                 <header className="backdrop-blur-xl border-b px-6 py-4 flex items-center justify-between sticky top-0 z-10 shrink-0" style={{ background: 'rgba(7,24,37,0.85)', borderColor: 'rgba(52,232,158,0.15)' }}>
