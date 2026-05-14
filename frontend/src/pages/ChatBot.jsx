@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { FaLeaf, FaBrain, FaBuilding, FaMapMarkerAlt, FaMoneyBillWave, FaPaperPlane, FaUser } from 'react-icons/fa';
-import { FiPlus, FiMessageSquare, FiTrash2, FiMenu, FiLogOut, FiSettings, FiX, FiMoreVertical, FiSearch, FiArrowUpRight, FiBookmark, FiShare2, FiHelpCircle } from 'react-icons/fi';
+import { FiPlus, FiMessageSquare, FiTrash2, FiMenu, FiLogOut, FiSettings, FiX, FiMoreVertical, FiSearch, FiArrowUpRight, FiBookmark, FiShare2, FiHelpCircle, FiCheckCircle } from 'react-icons/fi';
+import confetti from 'canvas-confetti';
 
 export default function ChatBot() {
     const { userProfile, currentUser, logout } = useAuth();
@@ -18,6 +19,7 @@ export default function ChatBot() {
     const [isTyping, setIsTyping] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [selectedJob, setSelectedJob] = useState(null);
+    const [appliedJobs, setAppliedJobs] = useState([]); // Track applied jobs
     const messagesEndRef = useRef(null);
 
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -185,6 +187,28 @@ export default function ChatBot() {
         handleSend(query);
     };
 
+    const handleApply = (e, job) => {
+        e.preventDefault();
+        const jobKey = job.link || job.title; // Unique identifier for the job
+        
+        if (!appliedJobs.includes(jobKey)) {
+            // Trigger confetti
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#34e89e', '#1aad72', '#ffffff']
+            });
+            // Add to tracked jobs
+            setAppliedJobs(prev => [...prev, jobKey]);
+        }
+        
+        // Open the job link in a new tab
+        if (job.link) {
+            window.open(job.link, '_blank', 'noopener,noreferrer');
+        }
+    };
+
     return (
         <div className="h-screen flex app-bg overflow-hidden relative font-sans">
             {/* Mobile Sidebar Overlay */}
@@ -262,9 +286,14 @@ export default function ChatBot() {
                             <div className="text-sm font-semibold truncate" style={{ color: '#e2f8f0' }}>
                                 {userProfile?.name || currentUser?.displayName || 'User'}
                             </div>
-                            <div className="text-xs truncate" style={{ color: 'rgba(226,248,240,0.5)' }}>
+                            <div className="text-xs truncate mb-1" style={{ color: 'rgba(226,248,240,0.5)' }}>
                                 {currentUser?.email}
                             </div>
+                            {appliedJobs.length > 0 && (
+                                <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold animate-fade-in-up shadow-sm border" style={{ background: 'rgba(52,232,158,0.15)', color: '#34e89e', borderColor: 'rgba(52,232,158,0.3)' }}>
+                                    🎯 {appliedJobs.length} {appliedJobs.length === 1 ? 'Job' : 'Jobs'} Applied
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -558,16 +587,30 @@ export default function ChatBot() {
                                     <span className="text-[10px] font-bold">Ask AI About This</span>
                                 </button>
                             </div>
-                            <a
-                                href={selectedJob.link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="relative flex items-center justify-center gap-2 w-full py-4 bg-[#064e3b] text-white font-bold rounded-xl hover:bg-[#085a44] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 overflow-hidden group"
+                            <button
+                                onClick={(e) => handleApply(e, selectedJob)}
+                                className={`relative flex items-center justify-center gap-2 w-full py-4 font-bold rounded-xl transition-all shadow-lg overflow-hidden group ${
+                                    appliedJobs.includes(selectedJob.link || selectedJob.title)
+                                        ? 'bg-gray-700/80 text-white/90 cursor-default border border-gray-600 shadow-none'
+                                        : 'bg-[#064e3b] text-white hover:bg-[#085a44] hover:shadow-xl hover:-translate-y-0.5'
+                                }`}
                             >
-                                <div className="absolute inset-0 w-full h-full animate-shimmer pointer-events-none opacity-50"></div>
-                                <span className="relative z-10">Apply Now</span>
-                                <FiArrowUpRight size={20} className="relative z-10 group-hover:rotate-12 transition-transform" />
-                            </a>
+                                {!appliedJobs.includes(selectedJob.link || selectedJob.title) && (
+                                    <div className="absolute inset-0 w-full h-full animate-shimmer pointer-events-none opacity-50"></div>
+                                )}
+                                
+                                {appliedJobs.includes(selectedJob.link || selectedJob.title) ? (
+                                    <>
+                                        <span className="relative z-10 text-gray-300">Track Application</span>
+                                        <FiCheckCircle size={20} className="relative z-10 text-[#34e89e]" />
+                                    </>
+                                ) : (
+                                    <>
+                                        <span className="relative z-10">Apply Now</span>
+                                        <FiArrowUpRight size={20} className="relative z-10 group-hover:rotate-12 transition-transform" />
+                                    </>
+                                )}
+                            </button>
                         </div>
                     </div>
                 </div>
