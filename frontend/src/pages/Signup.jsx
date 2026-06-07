@@ -9,27 +9,39 @@ import { FcGoogle } from 'react-icons/fc';
 const SIGNUP_QUOTES = [
   {
     title: <>Start Your <br /><span style={{ backgroundImage: 'linear-gradient(135deg, #34e89e, #1aad72)' }} className="text-transparent bg-clip-text font-extrabold">Future Today</span></>,
-    text: "Join Rizqa AI and discover opportunities that match your unique profile. Set up your account in seconds."
+    text: "Create your Rizqa AI profile and unlock a world of career opportunities matched precisely to your skills, experience, and aspirations."
   },
   {
     title: <>Stand Out <br /><span style={{ backgroundImage: 'linear-gradient(135deg, #34e89e, #1aad72)' }} className="text-transparent bg-clip-text font-extrabold">To Employers</span></>,
-    text: "Showcase your skills using our dynamic profile builder and let the right companies come directly to you."
+    text: "Build a dynamic professional profile that highlights your strengths — and let our AI connect you with the companies looking for exactly what you offer."
   },
   {
     title: <>Your Personal <br /><span style={{ backgroundImage: 'linear-gradient(135deg, #34e89e, #1aad72)' }} className="text-transparent bg-clip-text font-extrabold">Career Coach</span></>,
-    text: "It's not just a job board. We provide you with the tools you need to prepare for interviews and grow your potential."
+    text: "More than a job board — Rizqa AI provides personalized guidance, interview preparation, and actionable insights to accelerate your career growth."
   }
 ];
 
 const HeroCarousel = ({ quotes }) => {
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
+  const [displayIndex, setDisplayIndex] = useState(0);
+  const [isFading, setIsFading] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentQuoteIndex((prev) => (prev + 1) % quotes.length);
+      setIsFading(true);
+      setTimeout(() => {
+        setCurrentQuoteIndex((prev) => (prev + 1) % quotes.length);
+        setIsFading(false);
+      }, 500);
     }, 6000);
     return () => clearInterval(interval);
   }, [quotes.length]);
+
+  useEffect(() => {
+    if (!isFading) {
+      setDisplayIndex(currentQuoteIndex);
+    }
+  }, [currentQuoteIndex, isFading]);
 
   return (
     <div className="hidden lg:flex lg:w-2/5 relative items-center justify-center overflow-hidden" style={{ background: '#071825' }}>
@@ -39,29 +51,63 @@ const HeroCarousel = ({ quotes }) => {
       </div>
 
       <div className="relative z-10 flex flex-col justify-center p-16 max-w-xl h-full w-full">
-        <div className="flex items-center gap-3 mb-auto">
+        <Link to="/" className="flex items-center gap-3 mb-auto hover:opacity-80 transition-opacity">
           <div className="w-10 h-10 rounded-lg flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}>
             <FaLeaf className="w-5 h-5" />
           </div>
           <span className="text-xl font-bold tracking-tight" style={{ color: '#e2f8f0' }}>Rizqa AI</span>
+        </Link>
+
+        <div className="my-auto" style={{ minHeight: '180px' }}>
+          <div
+            style={{
+              animation: isFading ? 'carousel-out 0.5s ease-in-out forwards' : 'carousel-in 0.6s ease-out forwards',
+            }}
+          >
+            <h1 className="text-5xl font-extrabold text-white mb-6 leading-[1.1]">
+              {quotes[displayIndex].title}
+            </h1>
+            <p className="text-lg font-medium leading-relaxed max-w-md" style={{ color: 'rgba(226,248,240,0.7)' }}>
+              {quotes[displayIndex].text}
+            </p>
+          </div>
         </div>
 
-        <div className="my-auto transition-opacity duration-500 ease-in-out" key={currentQuoteIndex}>
-          <h1 className="text-5xl font-extrabold text-white mb-6 leading-[1.1] animate-fade-in-up">
-            {quotes[currentQuoteIndex].title}
-          </h1>
-          <p className="text-lg font-medium leading-relaxed max-w-md animate-fade-in-up" style={{ color: 'rgba(226,248,240,0.7)', animationDelay: '100ms' }}>
-            {quotes[currentQuoteIndex].text}
-          </p>
-        </div>
-
-        <div className="mt-auto flex items-center space-x-2">
-          {quotes.map((_, i) => (
-            <div
-              key={i}
-              style={{ height: '6px', borderRadius: '9999px', transition: 'all 0.5s', width: i === currentQuoteIndex ? '32px' : '8px', background: i === currentQuoteIndex ? '#34e89e' : 'rgba(52,232,158,0.25)' }}
-            ></div>
-          ))}
+        <div className="mt-auto flex items-center space-x-3">
+          {quotes.map((_, i) => {
+            const isActive = i === currentQuoteIndex;
+            const isPast = i < currentQuoteIndex;
+            return (
+              <div
+                key={i}
+                style={{
+                  height: '4px',
+                  borderRadius: '9999px',
+                  width: isActive ? '56px' : '24px',
+                  background: 'rgba(52,232,158,0.15)',
+                  overflow: 'hidden',
+                  position: 'relative',
+                  transition: 'width 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                }}
+              >
+                <div
+                  key={`fill-${i}-${currentQuoteIndex}`}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    height: '100%',
+                    borderRadius: '9999px',
+                    background: 'linear-gradient(90deg, #34e89e, #4ffdb0)',
+                    boxShadow: isActive ? '0 0 10px rgba(52,232,158,0.8), 0 0 20px rgba(52,232,158,0.4)' : 'none',
+                    width: isActive ? '0%' : isPast ? '100%' : '0%',
+                    ...(isActive && { animation: 'progress-fill 6s linear forwards' }),
+                    transition: !isActive ? 'width 0.4s ease' : 'none',
+                  }}
+                ></div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
@@ -71,8 +117,8 @@ const HeroCarousel = ({ quotes }) => {
 const SplitScreenLayout = ({ children }) => (
   <div className="min-h-screen max-h-screen w-full flex overflow-hidden" style={{ background: '#0f3443' }}>
     <HeroCarousel quotes={SIGNUP_QUOTES} />
-    <div className="w-full lg:w-3/5 flex flex-col p-4 sm:p-6 lg:p-8 overflow-y-auto custom-scrollbar" style={{ background: '#0a1e2e' }}>
-      <div className="w-full max-w-[420px] mx-auto my-auto animate-fade-in-up py-4">
+    <div className="w-full lg:w-3/5 flex flex-col p-6 sm:p-10 relative overflow-y-auto custom-scrollbar" style={{ background: '#0a1e2e' }}>
+      <div className="w-full max-w-md mx-auto my-auto animate-fade-in-up py-4 min-h-[540px] flex flex-col justify-center">
         {children}
       </div>
     </div>
@@ -80,7 +126,7 @@ const SplitScreenLayout = ({ children }) => (
 );
 
 export default function Signup() {
-  const { register, handleSubmit, formState: { errors }, watch } = useForm({ defaultValues: { role: 'user' } });
+  const { register, handleSubmit, formState: { errors }, watch } = useForm();
   const { signup, initiateGoogleSignIn, currentUser, userProfile } = useAuth();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -117,7 +163,7 @@ export default function Signup() {
       await signup(data.email, data.password, {
         firstName: data.firstName,
         lastName: data.lastName,
-        role: data.role
+        role: 'user'
       });
       navigate('/chatbot');
     } catch (err) {
@@ -161,15 +207,15 @@ export default function Signup() {
   return (
     <SplitScreenLayout>
       {/* Mobile Header */}
-      <div className="lg:hidden mb-6 flex items-center gap-3 mt-4">
+      <Link to="/" className="lg:hidden mb-6 flex items-center gap-3 hover:opacity-80 transition-opacity">
         <div className="w-10 h-10 rounded-lg flex items-center justify-center shadow-md" style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}>
           <FaLeaf className="w-5 h-5" />
         </div>
         <h1 className="text-xl font-bold" style={{ color: '#e2f8f0' }}>Rizqa AI</h1>
-      </div>
+      </Link>
 
-      <div className="mb-5 sm:mb-6">
-        <div className="flex p-1 rounded-xl mb-6 lg:mb-8 border" style={{ background: 'rgba(7,24,37,0.6)', borderColor: 'rgba(52,232,158,0.15)' }}>
+      <div className="mb-6 sm:mb-8">
+        <div className="flex p-1 rounded-xl mb-8 border" style={{ background: 'rgba(7,24,37,0.6)', borderColor: 'rgba(52,232,158,0.15)' }}>
           <Link to="/login" className="flex-1 text-center py-2.5 text-sm font-bold rounded-lg transition-all" style={{ color: 'rgba(226,248,240,0.5)' }}>
             Log In
           </Link>
@@ -178,30 +224,30 @@ export default function Signup() {
           </Link>
         </div>
 
-        <h2 className="text-2xl lg:text-3xl font-extrabold mb-1 lg:mb-2 tracking-tight" style={{ color: '#e2f8f0' }}>Create an account</h2>
+        <h2 className="text-3xl lg:text-4xl font-extrabold mb-2 tracking-tight" style={{ color: '#e2f8f0' }}>Create an account</h2>
         <p className="text-sm font-medium" style={{ color: 'rgba(226,248,240,0.5)' }}>Join us today to launch your career.</p>
       </div>
 
-      <div className="w-full flex flex-col space-y-4">
+      <div className="w-full flex flex-col space-y-4 sm:space-y-6">
         {error && (
-          <div className="px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#f87171' }}>
+          <div className="px-4 py-3 rounded-lg text-sm font-medium flex items-center gap-2" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#f87171' }}>
             <span className="font-bold">!</span> {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col space-y-3 lg:space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col space-y-4 sm:space-y-5">
           {/* Name Fields */}
           <div className="grid grid-cols-2 gap-3">
             <div className="group">
-              <label className="block text-xs font-semibold mb-1" style={labelStyle}>First Name</label>
+              <label className="block text-sm font-semibold mb-1.5" style={labelStyle}>First Name</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style={iconStyle}>
-                  <FiUser className="w-4 h-4" />
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none" style={iconStyle}>
+                  <FiUser className="w-5 h-5" />
                 </div>
                 <input
                   {...register("firstName", { required: "Required", minLength: { value: 2, message: "Min 2 chars" } })}
                   type="text"
-                  className="w-full pl-8 pr-3 py-2 rounded-lg focus:outline-none transition-all text-sm font-medium"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg focus:outline-none transition-all text-sm font-medium"
                   style={inputStyle}
                   placeholder="First"
                 />
@@ -209,15 +255,15 @@ export default function Signup() {
               {errors.firstName && <p className="text-red-400 text-[10px] mt-0.5 font-medium">{errors.firstName.message}</p>}
             </div>
             <div className="group">
-              <label className="block text-xs font-semibold mb-1" style={labelStyle}>Last Name</label>
+              <label className="block text-sm font-semibold mb-1.5" style={labelStyle}>Last Name</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style={iconStyle}>
-                  <FiUser className="w-4 h-4" />
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none" style={iconStyle}>
+                  <FiUser className="w-5 h-5" />
                 </div>
                 <input
                   {...register("lastName", { required: "Required", minLength: { value: 2, message: "Min 2 chars" } })}
                   type="text"
-                  className="w-full pl-8 pr-3 py-2 rounded-lg focus:outline-none transition-all text-sm font-medium"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg focus:outline-none transition-all text-sm font-medium"
                   style={inputStyle}
                   placeholder="Last"
                 />
@@ -228,10 +274,10 @@ export default function Signup() {
 
           {/* Email */}
           <div className="group">
-            <label className="block text-xs font-semibold mb-1" style={labelStyle}>Email</label>
+            <label className="block text-sm font-semibold mb-1.5" style={labelStyle}>Email</label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style={iconStyle}>
-                <FiMail className="w-4 h-4" />
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none" style={iconStyle}>
+                <FiMail className="w-5 h-5" />
               </div>
               <input
                 {...register("email", {
@@ -242,7 +288,7 @@ export default function Signup() {
                   }
                 })}
                 type="email"
-                className="w-full pl-8 pr-3 py-2 rounded-lg focus:outline-none transition-all text-sm font-medium"
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg focus:outline-none transition-all text-sm font-medium"
                 style={inputStyle}
                 placeholder="name@example.com"
               />
@@ -253,10 +299,10 @@ export default function Signup() {
           {/* Password Fields */}
           <div className="grid grid-cols-2 gap-3">
             <div className="group">
-              <label className="block text-xs font-semibold mb-1" style={labelStyle}>Password</label>
+              <label className="block text-sm font-semibold mb-1.5" style={labelStyle}>Password</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style={iconStyle}>
-                  <FiLock className="w-4 h-4" />
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none" style={iconStyle}>
+                  <FiLock className="w-5 h-5" />
                 </div>
                 <input
                   {...register("password", {
@@ -270,7 +316,7 @@ export default function Signup() {
                     }
                   })}
                   type={showPassword ? "text" : "password"}
-                  className="w-full pl-8 pr-9 py-2 rounded-lg focus:outline-none transition-all text-sm font-medium"
+                  className="w-full pl-10 pr-9 py-2.5 rounded-lg focus:outline-none transition-all text-sm font-medium"
                   style={inputStyle}
                   placeholder="••••••••"
                 />
@@ -287,10 +333,10 @@ export default function Signup() {
             </div>
 
             <div className="group">
-              <label className="block text-xs font-semibold mb-1" style={labelStyle}>Confirm</label>
+              <label className="block text-sm font-semibold mb-1.5" style={labelStyle}>Confirm</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style={iconStyle}>
-                  <FiLock className="w-4 h-4" />
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none" style={iconStyle}>
+                  <FiLock className="w-5 h-5" />
                 </div>
                 <input
                   {...register("confirmPassword", {
@@ -298,7 +344,7 @@ export default function Signup() {
                     validate: value => value === password || "Passwords don't match"
                   })}
                   type={showConfirmPassword ? "text" : "password"}
-                  className="w-full pl-8 pr-9 py-2 rounded-lg focus:outline-none transition-all text-sm font-medium"
+                  className="w-full pl-10 pr-9 py-2.5 rounded-lg focus:outline-none transition-all text-sm font-medium"
                   style={inputStyle}
                   placeholder="••••••••"
                 />
@@ -324,36 +370,13 @@ export default function Signup() {
             </div>
           )}
 
-          {/* Role Selection */}
-          <div className="grid grid-cols-2 gap-3 pt-1">
-            <label className="flex items-center justify-center gap-2 rounded-lg cursor-pointer transition-all py-1.5 px-3 border" style={{ background: 'rgba(7,24,37,0.6)', borderColor: 'rgba(52,232,158,0.2)' }}>
-              <input
-                {...register("role", { required: true })}
-                type="radio"
-                value="user"
-                className="w-3.5 h-3.5"
-                style={{ accentColor: '#34e89e' }}
-              />
-              <span className="text-xs font-semibold" style={{ color: 'rgba(226,248,240,0.8)' }}>Job Seeker</span>
-            </label>
-            <label className="flex items-center justify-center gap-2 rounded-lg cursor-pointer transition-all py-1.5 px-3 border" style={{ background: 'rgba(7,24,37,0.6)', borderColor: 'rgba(52,232,158,0.2)' }}>
-              <input
-                {...register("role", { required: true })}
-                type="radio"
-                value="employer"
-                className="w-3.5 h-3.5"
-                style={{ accentColor: '#34e89e' }}
-              />
-              <span className="text-xs font-semibold" style={{ color: 'rgba(226,248,240,0.8)' }}>Employer</span>
-            </label>
-          </div>
-          {errors.role && <p className="text-red-400 text-[10px] text-center font-medium">Please select a role</p>}
+
 
           {/* Sign Up Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 mt-1 rounded-lg font-semibold disabled:opacity-70 flex items-center justify-center gap-2 text-sm shadow-sm"
+            className="w-full py-2.5 mt-1 sm:mt-2 rounded-lg font-semibold disabled:opacity-70 flex items-center justify-center gap-2 text-sm shadow-sm"
             style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}
           >
             {loading ? 'Creating Account...' : 'Create Account'}
@@ -363,7 +386,7 @@ export default function Signup() {
         {/* Divider */}
         <div className="flex items-center gap-4 py-1">
           <div className="flex-1 h-px" style={{ background: 'rgba(52,232,158,0.15)' }}></div>
-          <span className="text-[10px] font-bold uppercase" style={{ color: 'rgba(226,248,240,0.4)' }}>OR</span>
+          <span className="text-xs font-medium" style={{ color: 'rgba(226,248,240,0.4)' }}>OR</span>
           <div className="flex-1 h-px" style={{ background: 'rgba(52,232,158,0.15)' }}></div>
         </div>
 
@@ -371,10 +394,10 @@ export default function Signup() {
         <button
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="w-full rounded-lg px-4 py-2 flex items-center justify-center gap-3 font-semibold transition-colors disabled:opacity-70 text-sm"
+          className="w-full rounded-lg px-4 py-2.5 flex items-center justify-center gap-3 font-semibold transition-colors disabled:opacity-70 text-sm"
           style={{ background: 'rgba(7,24,37,0.8)', border: '1px solid rgba(52,232,158,0.2)', color: '#e2f8f0' }}
         >
-          <FcGoogle className="w-4 h-4" />
+          <FcGoogle className="w-5 h-5" />
           <span>Continue with Google</span>
         </button>
 

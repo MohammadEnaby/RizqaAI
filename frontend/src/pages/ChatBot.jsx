@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { FaLeaf, FaBrain, FaBuilding, FaMapMarkerAlt, FaMoneyBillWave, FaPaperPlane, FaUser } from 'react-icons/fa';
-import { FiPlus, FiMessageSquare, FiTrash2, FiMenu, FiLogOut, FiSettings, FiX, FiMoreVertical, FiSearch, FiArrowUpRight, FiBookmark, FiShare2, FiHelpCircle } from 'react-icons/fi';
+import { FiPlus, FiMessageSquare, FiTrash2, FiMenu, FiLogOut, FiSettings, FiX, FiMoreVertical, FiSearch, FiArrowUpRight, FiBookmark, FiShare2, FiHelpCircle, FiCheckCircle } from 'react-icons/fi';
+import confetti from 'canvas-confetti';
 
 export default function ChatBot() {
     const { userProfile, currentUser, logout } = useAuth();
@@ -18,6 +19,7 @@ export default function ChatBot() {
     const [isTyping, setIsTyping] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [selectedJob, setSelectedJob] = useState(null);
+    const [appliedJobs, setAppliedJobs] = useState([]); // Track applied jobs
     const messagesEndRef = useRef(null);
 
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -185,23 +187,45 @@ export default function ChatBot() {
         handleSend(query);
     };
 
+    const handleApply = (e, job) => {
+        e.preventDefault();
+        const jobKey = job.link || job.title; // Unique identifier for the job
+        
+        if (!appliedJobs.includes(jobKey)) {
+            // Trigger confetti
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#34e89e', '#1aad72', '#ffffff']
+            });
+            // Add to tracked jobs
+            setAppliedJobs(prev => [...prev, jobKey]);
+        }
+        
+        // Open the job link in a new tab
+        if (job.link) {
+            window.open(job.link, '_blank', 'noopener,noreferrer');
+        }
+    };
+
     return (
         <div className="h-screen flex app-bg overflow-hidden relative font-sans">
             {/* Mobile Sidebar Overlay */}
             {isSidebarOpen && (
                 <div
-                    className="fixed inset-0 bg-black/50 z-20 md:hidden"
+                    className="fixed inset-0 bg-black/50 z-40 md:hidden"
                     onClick={() => setIsSidebarOpen(false)}
                 />
             )}
 
             {/* Sidebar Navigation */}
             <aside className={`
-                fixed md:relative z-30 h-full w-80 backdrop-blur-xl text-white border-r transform transition-transform duration-300 ease-in-out flex flex-col shadow-xl
+                fixed md:relative z-50 h-full w-80 backdrop-blur-xl text-white transform transition-transform duration-300 ease-in-out flex flex-col shadow-xl
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
             `}>
                 {/* Sidebar Header */}
-                <div className="py-4 border-b" style={{ borderColor: 'rgba(52,232,158,0.15)' }}>
+                <div className="py-4 px-4">
                     <button
                         onClick={createNewSession}
                         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold shadow-sm hover:shadow-md transition-all active:scale-95 group" style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}
@@ -212,7 +236,7 @@ export default function ChatBot() {
                 </div>
 
                 {/* Session List */}
-                <div className="flex-1 overflow-y-auto px-2 py-2 space-y-1 scrollbar-hide">
+                <div className="flex-1 overflow-y-auto px-4 py-2 space-y-2 scrollbar-hide">
                     {sessions.length === 0 && (
                         <div className="flex flex-col items-center justify-center h-40 text-gray-500 text-sm px-8 text-center">
                             <FiMessageSquare className="text-3xl mb-3 opacity-30" />
@@ -253,7 +277,7 @@ export default function ChatBot() {
                 </div>
 
                 {/* User Profile / Lower Sidebar */}
-                <div className="p-5 border-t" style={{ borderColor: 'rgba(52,232,158,0.15)', background: 'rgba(7,24,37,0.4)' }}>
+                <div className="p-5" style={{ background: 'rgba(7,24,37,0.4)' }}>
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-sm" style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}>
                             {(userProfile?.name || currentUser?.displayName || currentUser?.email || '?')[0].toUpperCase()}
@@ -262,16 +286,21 @@ export default function ChatBot() {
                             <div className="text-sm font-semibold truncate" style={{ color: '#e2f8f0' }}>
                                 {userProfile?.name || currentUser?.displayName || 'User'}
                             </div>
-                            <div className="text-xs truncate" style={{ color: 'rgba(226,248,240,0.5)' }}>
+                            <div className="text-xs truncate mb-1" style={{ color: 'rgba(226,248,240,0.5)' }}>
                                 {currentUser?.email}
                             </div>
+                            {appliedJobs.length > 0 && (
+                                <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold animate-fade-in-up shadow-sm border" style={{ background: 'rgba(52,232,158,0.15)', color: '#34e89e', borderColor: 'rgba(52,232,158,0.3)' }}>
+                                    🎯 {appliedJobs.length} {appliedJobs.length === 1 ? 'Job' : 'Jobs'} Applied
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
             </aside>
 
             {/* Main Chat Area */}
-            <main className="flex-1 flex flex-col h-full min-w-0 relative w-full bg-transparent z-40">
+            <main className="flex-1 flex flex-col h-full min-w-0 relative w-full bg-transparent z-10">
 
                 {/* Header */}
                 <header className="backdrop-blur-xl border-b px-6 py-4 flex items-center justify-between sticky top-0 z-10 shrink-0" style={{ background: 'rgba(7,24,37,0.85)', borderColor: 'rgba(52,232,158,0.15)' }}>
@@ -558,16 +587,30 @@ export default function ChatBot() {
                                     <span className="text-[10px] font-bold">Ask AI About This</span>
                                 </button>
                             </div>
-                            <a
-                                href={selectedJob.link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="relative flex items-center justify-center gap-2 w-full py-4 bg-[#064e3b] text-white font-bold rounded-xl hover:bg-[#085a44] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 overflow-hidden group"
+                            <button
+                                onClick={(e) => handleApply(e, selectedJob)}
+                                className={`relative flex items-center justify-center gap-2 w-full py-4 font-bold rounded-xl transition-all shadow-lg overflow-hidden group ${
+                                    appliedJobs.includes(selectedJob.link || selectedJob.title)
+                                        ? 'bg-gray-700/80 text-white/90 cursor-default border border-gray-600 shadow-none'
+                                        : 'bg-[#064e3b] text-white hover:bg-[#085a44] hover:shadow-xl hover:-translate-y-0.5'
+                                }`}
                             >
-                                <div className="absolute inset-0 w-full h-full animate-shimmer pointer-events-none opacity-50"></div>
-                                <span className="relative z-10">Apply Now</span>
-                                <FiArrowUpRight size={20} className="relative z-10 group-hover:rotate-12 transition-transform" />
-                            </a>
+                                {!appliedJobs.includes(selectedJob.link || selectedJob.title) && (
+                                    <div className="absolute inset-0 w-full h-full animate-shimmer pointer-events-none opacity-50"></div>
+                                )}
+                                
+                                {appliedJobs.includes(selectedJob.link || selectedJob.title) ? (
+                                    <>
+                                        <span className="relative z-10 text-gray-300">Track Application</span>
+                                        <FiCheckCircle size={20} className="relative z-10 text-[#34e89e]" />
+                                    </>
+                                ) : (
+                                    <>
+                                        <span className="relative z-10">Apply Now</span>
+                                        <FiArrowUpRight size={20} className="relative z-10 group-hover:rotate-12 transition-transform" />
+                                    </>
+                                )}
+                            </button>
                         </div>
                     </div>
                 </div>

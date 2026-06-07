@@ -8,29 +8,41 @@ import { FcGoogle } from 'react-icons/fc';
 
 const LOGIN_QUOTES = [
   {
-    title: <>Unlock Your <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-green-300 font-extrabold">Career Potential</span></>,
-    text: "Join Rizqa AI, your intelligent career assistant. Find the perfect role tailored specifically to your skills and aspirations."
+    title: <>Unlock Your <br/><span className="text-transparent bg-clip-text font-extrabold" style={{ backgroundImage: 'linear-gradient(135deg, #34e89e, #1aad72)' }}>Career Potential</span></>,
+    text: "Welcome back to Rizqa AI — your intelligent career companion. Sign in to explore personalized opportunities tailored to your expertise."
   },
   {
-    title: <>Discover <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-green-300 font-extrabold">New Opportunities</span></>,
-    text: "Our advanced AI matches you with positions you didn't even know existed, perfectly aligned with your unique skill set."
+    title: <>Discover <br/><span className="text-transparent bg-clip-text font-extrabold" style={{ backgroundImage: 'linear-gradient(135deg, #34e89e, #1aad72)' }}>New Opportunities</span></>,
+    text: "Our AI engine continuously scans the market to match you with roles perfectly aligned to your unique skill set and ambitions."
   },
   {
-    title: <>Accelerate Your <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-green-300 font-extrabold">Professional Growth</span></>,
-    text: "Experience seamless job hunting with tailored insights and step-by-step guidance to climb your career ladder."
+    title: <>Accelerate Your <br/><span className="text-transparent bg-clip-text font-extrabold" style={{ backgroundImage: 'linear-gradient(135deg, #34e89e, #1aad72)' }}>Professional Growth</span></>,
+    text: "From tailored job insights to interview preparation — everything you need to take the next step in your career, all in one place."
   }
 ];
 
 // Carousel component isolated so interval doesn't re-render the forms
 const HeroCarousel = ({ quotes }) => {
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
+  const [displayIndex, setDisplayIndex] = useState(0);
+  const [isFading, setIsFading] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentQuoteIndex((prev) => (prev + 1) % quotes.length);
+      setIsFading(true);
+      setTimeout(() => {
+        setCurrentQuoteIndex((prev) => (prev + 1) % quotes.length);
+        setIsFading(false);
+      }, 500);
     }, 6000);
     return () => clearInterval(interval);
   }, [quotes.length]);
+
+  useEffect(() => {
+    if (!isFading) {
+      setDisplayIndex(currentQuoteIndex);
+    }
+  }, [currentQuoteIndex, isFading]);
 
   return (
     <div className="hidden lg:flex lg:w-2/5 relative items-center justify-center overflow-hidden" style={{ background: '#071825' }}>
@@ -42,29 +54,63 @@ const HeroCarousel = ({ quotes }) => {
       
       {/* Hero Content */}
       <div className="relative z-10 flex flex-col justify-center p-16 max-w-xl h-full w-full">
-        <div className="flex items-center gap-3 mb-auto">
+        <Link to="/" className="flex items-center gap-3 mb-auto hover:opacity-80 transition-opacity">
           <div className="w-10 h-10 rounded-lg flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}>
             <FaLeaf className="w-5 h-5" />
           </div>
           <span className="text-xl font-bold tracking-tight text-white">Rizqa AI</span>
-        </div>
+        </Link>
 
-        <div className="my-auto transition-opacity duration-500 ease-in-out" key={currentQuoteIndex}>
-          <h1 className="text-5xl font-extrabold text-white mb-6 leading-[1.1] animate-fade-in-up">
-            {quotes[currentQuoteIndex].title}
-          </h1>
-          <p className="text-lg text-teal-100/80 font-medium leading-relaxed max-w-md animate-fade-in-up" style={{animationDelay: '100ms'}}>
-            {quotes[currentQuoteIndex].text}
-          </p>
+        <div className="my-auto" style={{ minHeight: '180px' }}>
+          <div
+            style={{
+              animation: isFading ? 'carousel-out 0.5s ease-in-out forwards' : 'carousel-in 0.6s ease-out forwards',
+            }}
+          >
+            <h1 className="text-5xl font-extrabold text-white mb-6 leading-[1.1]">
+              {quotes[displayIndex].title}
+            </h1>
+            <p className="text-lg font-medium leading-relaxed max-w-md" style={{ color: 'rgba(226,248,240,0.7)' }}>
+              {quotes[displayIndex].text}
+            </p>
+          </div>
         </div>
         
-        <div className="mt-auto flex items-center space-x-2">
-          {quotes.map((_, i) => (
-            <div 
-              key={i} 
-              style={{ height: '6px', borderRadius: '9999px', transition: 'all 0.5s', width: i === currentQuoteIndex ? '32px' : '8px', background: i === currentQuoteIndex ? '#34e89e' : 'rgba(52,232,158,0.25)' }}
-            ></div>
-          ))}
+        <div className="mt-auto flex items-center space-x-3">
+          {quotes.map((_, i) => {
+            const isActive = i === currentQuoteIndex;
+            const isPast = i < currentQuoteIndex;
+            return (
+              <div
+                key={i}
+                style={{
+                  height: '4px',
+                  borderRadius: '9999px',
+                  width: isActive ? '56px' : '24px',
+                  background: 'rgba(52,232,158,0.15)',
+                  overflow: 'hidden',
+                  position: 'relative',
+                  transition: 'width 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                }}
+              >
+                <div
+                  key={`fill-${i}-${currentQuoteIndex}`}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    height: '100%',
+                    borderRadius: '9999px',
+                    background: 'linear-gradient(90deg, #34e89e, #4ffdb0)',
+                    boxShadow: isActive ? '0 0 10px rgba(52,232,158,0.8), 0 0 20px rgba(52,232,158,0.4)' : 'none',
+                    width: isActive ? '0%' : isPast ? '100%' : '0%',
+                    ...(isActive && { animation: 'progress-fill 6s linear forwards' }),
+                    transition: !isActive ? 'width 0.4s ease' : 'none',
+                  }}
+                ></div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
@@ -78,7 +124,7 @@ const SplitScreenLayout = ({ children, isResetFlow = false }) => (
 
     {/* Right Panel - Form Area */}
     <div className="w-full lg:w-3/5 flex flex-col p-6 sm:p-10 relative overflow-y-auto custom-scrollbar" style={{ background: '#0a1e2e' }}>
-      <div className="w-full max-w-md mx-auto my-auto animate-fade-in-up py-4">
+      <div className="w-full max-w-md mx-auto my-auto animate-fade-in-up py-4 min-h-[540px] flex flex-col justify-center">
         {children}
       </div>
     </div>
@@ -245,12 +291,12 @@ export default function Login() {
   return (
     <SplitScreenLayout>
       {/* Mobile Header */}
-      <div className="lg:hidden mb-10 flex items-center gap-3">
+      <Link to="/" className="lg:hidden mb-6 flex items-center gap-3 hover:opacity-80 transition-opacity">
         <div className="w-10 h-10 rounded-lg flex items-center justify-center shadow-md" style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}>
           <FaLeaf className="w-5 h-5" />
         </div>
         <h1 className="text-xl font-bold" style={{ color: '#e2f8f0' }}>Rizqa AI</h1>
-      </div>
+      </Link>
 
       <div className="mb-6 sm:mb-8">
         <div className="flex p-1 rounded-xl mb-8 border" style={{ background: 'rgba(7,24,37,0.6)', borderColor: 'rgba(52,232,158,0.15)' }}>
