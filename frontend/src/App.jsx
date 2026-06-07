@@ -5,11 +5,13 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import CompleteProfile from './pages/CompleteProfile';
 import ChatBot from './pages/ChatBot';
+import PublishJob from './pages/PublishJob';
 import Admin from './pages/adminPages/Pipeline';
 import Datasources from './pages/adminPages/Datasources';
 import ScheduledPipelines from './pages/adminPages/ScheduledPipelines';
 import UsersManagement from './pages/adminPages/UsersManagement';
 import Welcome from './pages/adminPages/Welcome';
+import PublishRequests from './pages/adminPages/PublishRequests';
 import Layout from './components/adminPage/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import MainPage from './pages/mainPage';
@@ -32,6 +34,7 @@ function App() {
             }
           />
           <Route path="/" element={<MainPage />} />
+          <Route path="/publish-job" element={<PublishJob />} />
           <Route
             path="/chatbot"
             element={
@@ -86,6 +89,16 @@ function App() {
               <ProtectedRoute requiredRole="admin">
                 <Layout>
                   <ScheduledPipelines />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/publish-requests"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <Layout>
+                  <PublishRequests />
                 </Layout>
               </ProtectedRoute>
             }

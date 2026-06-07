@@ -301,6 +301,26 @@ const MainPage = () => {
             >
               Access Dashboard
             </Link>
+            <Link
+              to="/publish-job"
+              className="sora"
+              style={{
+                padding: "16px 36px", borderRadius: 14, fontSize: 16, fontWeight: 600,
+                background: "transparent", color: "#34e89e",
+                border: "2px solid #34e89e", textDecoration: "none",
+                backdropFilter: "blur(8px)", transition: "all 0.25s",
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = "rgba(52,232,158,0.15)";
+                e.currentTarget.style.transform = "translateY(-2px)";
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = "transparent";
+                e.currentTarget.style.transform = "translateY(0)";
+              }}
+            >
+              Apply to publish jobs
+            </Link>
           </motion.div>
 
           {/* Stats strip */}

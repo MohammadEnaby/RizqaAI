@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaHome, FaCogs, FaSignOutAlt, FaLeaf, FaDatabase, FaClock, FaUsers, FaRobot, FaTimes } from 'react-icons/fa';
+import { FaHome, FaCogs, FaSignOutAlt, FaLeaf, FaDatabase, FaClock, FaUsers, FaRobot, FaTimes, FaBriefcase } from 'react-icons/fa';
 import { useAuth } from '../../contexts/AuthContext';
 import { motion } from 'framer-motion';
 
@@ -82,6 +82,22 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                             }`}
                     />
                     <span className={`${isActive('/admin/users') ? 'text-green-500' : 'text-gray-400'}` }>Users</span>
+                </Link>
+
+                {/* ✅ PUBLISH REQUESTS */}
+                <Link
+                    to="/admin/publish-requests"
+                    onClick={handleLinkClick}
+                    className={`relative flex items-center gap-3 pl-8 pr-5 py-4 rounded-2xl transition-all duration-300 font-medium
+            ${isActive('/admin/publish-requests')
+                            ? 'border shadow-sm' : 'border-transparent'
+                        }`}
+                >
+                    <FaBriefcase
+                        className={`${isActive('/admin/publish-requests') ? 'text-green-500' : 'text-gray-400'
+                            }`}
+                    />
+                    <span className={`${isActive('/admin/publish-requests') ? 'text-green-500' : 'text-gray-400'}` }>Publish Requests</span>
                 </Link>
 
                 {/* ✅ PIPELINE */}
