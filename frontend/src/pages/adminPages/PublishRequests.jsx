@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { collection, query, orderBy, onSnapshot, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, addDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { FaCheckCircle, FaTimesCircle, FaSpinner } from 'react-icons/fa';
 
@@ -22,18 +22,37 @@ export default function PublishRequests() {
     return () => unsubscribe();
   }, []);
 
-  const handleAction = async (id, status, email) => {
+  const handleAction = async (request, status) => {
     try {
-      setActionLoading(id);
-      const docRef = doc(db, 'published_jobs', id);
-      await updateDoc(docRef, { status });
+      setActionLoading(request.id);
+      
+      if (status === 'approved') {
+        // Add to jobs collection
+        await addDoc(collection(db, 'jobs'), {
+          title: request.jobTitle || '',
+          location: request.address || '',
+          numberOfPositions: request.numberOfPositions || '',
+          requirements: request.requirements || '',
+          advantages: request.advantages || '',
+          companyName: request.companyName || '',
+          publisherName: request.publisherName || '',
+          email: request.email || '',
+          phone: request.phone || '',
+          source: 'User Submission',
+          createdAt: new Date()
+        });
+      }
+
+      // Remove from published_jobs collection
+      const docRef = doc(db, 'published_jobs', request.id);
+      await deleteDoc(docRef);
 
       // TODO: Call backend endpoint or EmailJS to send email notification to `email`.
-      console.log(`[Email Stub] Would send ${status} email to ${email}`);
+      console.log(`[Email Stub] Would send ${status} email to ${request.email}`);
 
     } catch (error) {
-      console.error("Error updating request:", error);
-      alert("Failed to update status.");
+      console.error("Error processing request:", error);
+      alert("Failed to process request.");
     } finally {
       setActionLoading(null);
     }
@@ -98,7 +117,7 @@ export default function PublishRequests() {
                         <div className="flex justify-end gap-2">
                           <button
                             disabled={actionLoading === req.id}
-                            onClick={() => handleAction(req.id, 'approved', req.email)}
+                            onClick={() => handleAction(req, 'approved')}
                             className="p-2 bg-green-500/10 text-green-400 rounded-lg hover:bg-green-500/20 transition-colors border border-green-500/30"
                             title="Approve"
                           >
@@ -106,7 +125,7 @@ export default function PublishRequests() {
                           </button>
                           <button
                             disabled={actionLoading === req.id}
-                            onClick={() => handleAction(req.id, 'rejected', req.email)}
+                            onClick={() => handleAction(req, 'rejected')}
                             className="p-2 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20 transition-colors border border-red-500/30"
                             title="Reject"
                           >
