@@ -280,28 +280,6 @@ const MainPage = () => {
               Start for Free <FaArrowRight size={14} />
             </Link>
             <Link
-              to="/login"
-              className="sora"
-              style={{
-                padding: "16px 36px", borderRadius: 14, fontSize: 16, fontWeight: 600,
-                background: "rgba(15,52,67,0.6)", color: "#e2f8f0",
-                border: "1px solid rgba(52,232,158,0.18)", textDecoration: "none",
-                backdropFilter: "blur(8px)", transition: "all 0.25s",
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.background = "rgba(15,52,67,0.9)";
-                e.currentTarget.style.borderColor = "rgba(52,232,158,0.32)";
-                e.currentTarget.style.transform = "translateY(-2px)";
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.background = "rgba(15,52,67,0.6)";
-                e.currentTarget.style.borderColor = "rgba(52,232,158,0.18)";
-                e.currentTarget.style.transform = "translateY(0)";
-              }}
-            >
-              Access Dashboard
-            </Link>
-            <Link
               to="/publish-job"
               className="sora"
               style={{
