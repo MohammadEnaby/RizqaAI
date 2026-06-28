@@ -258,6 +258,47 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
     # Sort by score descending
     found_jobs.sort(key=lambda x: x["score"], reverse=True)
             
+    # Fallback: if no matches were found, return the 5 most recent jobs
+    if not found_jobs:
+        fallback_docs = jobs_ref.order_by("post_time", direction=firestore.Query.DESCENDING).limit(5).stream()
+        for doc in fallback_docs:
+            data = doc.to_dict()
+            job_title_data = data.get("job_title")
+            if not job_title_data: continue
+            
+            if isinstance(job_title_data, dict):
+                display_title = job_title_data.get(user_lang) or job_title_data.get("en") or list(job_title_data.values())[0] if job_title_data else ""
+            else:
+                display_title = str(job_title_data)
+                
+            if not display_title: continue
+            
+            company_data = data.get("company")
+            if isinstance(company_data, dict):
+                display_company = company_data.get(user_lang) or company_data.get("en") or list(company_data.values())[0] if company_data else "Unknown"
+            elif company_data:
+                display_company = str(company_data)
+            else:
+                display_company = "Unknown"
+                
+            location_data = data.get("location")
+            if isinstance(location_data, dict):
+                display_location = location_data.get(user_lang) or location_data.get("en") or list(location_data.values())[0] if location_data else "Not specified"
+            elif location_data:
+                display_location = str(location_data)
+            else:
+                display_location = "Not specified"
+
+            found_jobs.append({
+                "score": 0,
+                "id": doc.id,
+                "title": display_title,
+                "company": display_company, 
+                "location": display_location,
+                "salary": data.get("wage_per_hour", "Not specified"),
+                "link": data.get("post_link") or data.get("contact_info")
+            })
+
     return found_jobs  # Return all matching jobs
 
 # --- Endpoints ---
@@ -429,6 +470,12 @@ async def chat_query(request: ChatMessage):
         analysis = extract_search_filters(request.message)
         intent = analysis.get("intent", "general")
         
+        # Override: Force intent to "search" if user uses job seeking phrases
+        msg_lower = request.message.lower()
+        job_seeking_phrases = ["need a job", "looking for a job", "find a job", "looking for work", "any job", "show me jobs", "jobs available", "available jobs", "search jobs", "dneed a job"]
+        if any(phrase in msg_lower for phrase in job_seeking_phrases):
+            intent = "search"
+        
         found_jobs = []
         if intent == "search":
             found_jobs = search_jobs_in_db(analysis)
@@ -438,8 +485,13 @@ async def chat_query(request: ChatMessage):
         model = genai.GenerativeModel('gemini-3.1-flash-lite')
         
         jobs_context = ""
+        is_fallback = False
         if found_jobs:
-            jobs_context = f"Found {len(found_jobs)} matches:\n"
+            is_fallback = all(job.get("score", 0) == 0 for job in found_jobs)
+            if is_fallback:
+                jobs_context = "NO EXACT MATCHES FOUND. However, here are the most recent job listings from the database:\n"
+            else:
+                jobs_context = f"Found {len(found_jobs)} matches:\n"
             for job in found_jobs:
                 jobs_context += f"- Job: {job['title']}\n  Location: {job['location']}\n  Pay: {job['salary']}\n  Link: {job['link']}\n"
         elif intent == "search":
@@ -461,6 +513,7 @@ async def chat_query(request: ChatMessage):
         - DO NOT create markdown tables or lists of jobs
         - DO NOT repeat job details (the UI will show job cards automatically)
         - If jobs were found, say something like "I found X jobs for you!" or "Here are the available positions"
+        - If NO EXACT MATCHES were found but recent jobs are shown, explain that you couldn't find exact matches but present these recent openings as alternatives
         - If this is a GREETING, respond warmly and ask how you can help
         - If NO jobs were found, apologize briefly and suggest trying different keywords or locations
         - Keep your response SHORT (1-2 sentences maximum)
