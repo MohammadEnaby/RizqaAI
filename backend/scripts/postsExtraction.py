@@ -137,6 +137,9 @@ def save_data(posts):
         print("[*] No new posts to save.")
         return
 
+    # Ensure the output directory exists
+    os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
+
     # Load existing data
     if os.path.exists(OUTPUT_FILE):
         try:
