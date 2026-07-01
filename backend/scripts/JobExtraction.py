@@ -239,6 +239,7 @@ def main():
 
     # Write all structured job offers as a proper JSON array to structuered_jobs.json
     output_path = os.path.join(backend_root, "Data", "structuered_jobs.json")
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, 'w', encoding='utf-8') as fw:
         json.dump(structured_results, fw, ensure_ascii=False, indent=4)
 
