@@ -7,7 +7,7 @@ import os
 import re  # Added for robust JSON extraction
 import json # Added for robust JSON extraction
 from typing import Optional, List, Dict, Any
-from datetime import datetime
+from datetime import datetime, timezone
 import firebase_admin
 from firebase_admin import firestore
 
@@ -131,15 +131,17 @@ def extract_search_filters(user_query: str) -> dict:
 def search_jobs_in_db(filters: dict) -> List[dict]:
     """
     Searches Firestore 'jobs' collection based on filters.
-    Performs in-memory filtering on recent jobs to avoid complex indexes.
+    Performs in-memory filtering on all recent/active jobs to avoid complex indexes.
     """
     database = get_db()
     jobs_ref = database.collection("jobs")
     
-    # optimize: fetch last 500 jobs (increased from 100 to catch more results)
-    docs = jobs_ref.order_by("post_time", direction=firestore.Query.DESCENDING).limit(500).stream()
+    # Fetch all jobs to perform in-memory filtering across all sources (scraped & user-submitted)
+    docs = jobs_ref.stream()
     
+    all_processed_jobs = []
     found_jobs = []
+    
     # Keywords is now a list
     keyword_list = filters.get("keywords", [])
     if isinstance(keyword_list, str): keyword_list = [keyword_list]
@@ -163,8 +165,11 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
     
     for doc in docs:
         data = doc.to_dict()
-        job_title_data = data.get("job_title")
-        if not job_title_data: continue
+        
+        # Support both 'job_title' (scraped) and 'title' (user submission)
+        job_title_data = data.get("job_title") or data.get("title")
+        if not job_title_data:
+            continue
         
         if isinstance(job_title_data, dict):
             titles_to_check = [str(v).lower() for v in job_title_data.values() if v]
@@ -173,7 +178,8 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
             titles_to_check = [str(job_title_data).lower()]
             display_title = str(job_title_data)
             
-        if not display_title: continue
+        if not display_title:
+            continue
         
         # Smart match logic
         match_score = 0
@@ -185,6 +191,7 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
                     match_score += 2
                     break # Matched one keyword, good enough for keyword score
         
+        # Support string/dictionary location fields
         location_data = data.get("location")
         if isinstance(location_data, dict):
             locations_to_check = [str(v).lower() for v in location_data.values() if v]
@@ -195,7 +202,7 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
         else:
             locations_to_check = []
             display_location = "Not specified"
-
+ 
         if location_list:
             # Flexible location match - check against all locations in the list
             for loc in location_list:
@@ -203,101 +210,84 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
                     match_score += 1
                     break  # One match is enough
             
-        # Decision Logic:
-        # 1. If we have keywords, we ideally want a keyword match.
-        #    BUT if we have a location match and no keyword match, should we show it?
-        #    User: "Selling in Jerusalem". 
-        #    If no sales jobs in JLM, showing "Waiter in JLM" is better than nothing? 
-        #    Let's stick to: Must match Keyword OR Location.
-        
-        # Decision Logic:
-        # Match Score Logic:
-        # - Keyword Match: +2
-        # - Location Match: +1
-        
-        # 1. User provided Keywords AND Location
-        if keyword_list and location_list:
-             # If neither matched, skip.
-             if match_score == 0: continue
-             # If at least one matched (score >= 1), we keep it. 
-             # (Allows "Waiter in Holon" to show "Waiter in Jerusalem" [score 2] or "Job in Holon" [score 1])
-
-        # 2. User provided ONLY Keywords (e.g. "Selling")
-        elif keyword_list and not location_list:
-             if match_score == 0: continue
-
-        # 3. User provided ONLY Location (e.g. "Holon")
-        elif location_list and not keyword_list:
-             # Critical Fix: match_score must be > 0 (which means location matched, since k-list matches gave 0)
-             if match_score == 0: continue
-
-        # 4. User provided NOTHING (e.g. "I want a job")
-        else:
-             pass # Return all (recent)
-
-
-        company_data = data.get("company")
+        # Support both 'company' (scraped) and 'companyName' (user submission)
+        company_data = data.get("company") or data.get("companyName")
         if isinstance(company_data, dict):
             display_company = company_data.get(user_lang) or company_data.get("en") or list(company_data.values())[0] if company_data else "Unknown"
         elif company_data:
             display_company = str(company_data)
         else:
             display_company = "Unknown"
+ 
+        # Support contact info/links for user submission (phone / email)
+        contact_link = data.get("post_link") or data.get("contact_info")
+        if not contact_link:
+            phone = data.get("phone")
+            email = data.get("email")
+            if phone:
+                contact_link = f"tel:{phone}"
+            elif email:
+                contact_link = f"mailto:{email}"
+            else:
+                contact_link = "Not specified"
 
-        # Map to JobResult structure
-        found_jobs.append({
+        # Get timestamp for in-memory sorting
+        ts = data.get("post_time") or data.get("createdAt") or data.get("scraped_at")
+        if isinstance(ts, datetime):
+            # Ensure timezone-aware UTC
+            doc_timestamp = ts if ts.tzinfo else ts.replace(tzinfo=timezone.utc)
+        elif isinstance(ts, str):
+            try:
+                doc_timestamp = datetime.fromisoformat(ts.replace("Z", "+00:00"))
+                if not doc_timestamp.tzinfo:
+                    doc_timestamp = doc_timestamp.replace(tzinfo=timezone.utc)
+            except ValueError:
+                doc_timestamp = datetime.min.replace(tzinfo=timezone.utc)
+        else:
+            doc_timestamp = datetime.min.replace(tzinfo=timezone.utc)
+
+        job_entry = {
             "score": match_score,
+            "timestamp": doc_timestamp,
             "id": doc.id,
             "title": display_title,
             "company": display_company, 
             "location": display_location,
-            "salary": data.get("wage_per_hour", "Not specified"),
-            "link": data.get("post_link") or data.get("contact_info")
-        })
-            
-    # Sort by score descending
-    found_jobs.sort(key=lambda x: x["score"], reverse=True)
-            
-    # Fallback: if no matches were found, return the 5 most recent jobs
-    if not found_jobs:
-        fallback_docs = jobs_ref.order_by("post_time", direction=firestore.Query.DESCENDING).limit(5).stream()
-        for doc in fallback_docs:
-            data = doc.to_dict()
-            job_title_data = data.get("job_title")
-            if not job_title_data: continue
-            
-            if isinstance(job_title_data, dict):
-                display_title = job_title_data.get(user_lang) or job_title_data.get("en") or list(job_title_data.values())[0] if job_title_data else ""
-            else:
-                display_title = str(job_title_data)
-                
-            if not display_title: continue
-            
-            company_data = data.get("company")
-            if isinstance(company_data, dict):
-                display_company = company_data.get(user_lang) or company_data.get("en") or list(company_data.values())[0] if company_data else "Unknown"
-            elif company_data:
-                display_company = str(company_data)
-            else:
-                display_company = "Unknown"
-                
-            location_data = data.get("location")
-            if isinstance(location_data, dict):
-                display_location = location_data.get(user_lang) or location_data.get("en") or list(location_data.values())[0] if location_data else "Not specified"
-            elif location_data:
-                display_location = str(location_data)
-            else:
-                display_location = "Not specified"
+            "salary": data.get("wage_per_hour") or data.get("salary") or "Not specified",
+            "link": contact_link
+        }
+        
+        all_processed_jobs.append(job_entry)
 
-            found_jobs.append({
-                "score": 0,
-                "id": doc.id,
-                "title": display_title,
-                "company": display_company, 
-                "location": display_location,
-                "salary": data.get("wage_per_hour", "Not specified"),
-                "link": data.get("post_link") or data.get("contact_info")
-            })
+        # Decision Logic:
+        # 1. User provided Keywords AND Location
+        if keyword_list and location_list:
+             if match_score > 0:
+                 found_jobs.append(job_entry)
+        # 2. User provided ONLY Keywords (e.g. "Selling")
+        elif keyword_list and not location_list:
+             if match_score > 0:
+                 found_jobs.append(job_entry)
+        # 3. User provided ONLY Location (e.g. "Holon")
+        elif location_list and not keyword_list:
+             if match_score > 0:
+                 found_jobs.append(job_entry)
+        # 4. User provided NOTHING (e.g. "I want a job")
+        else:
+             found_jobs.append(job_entry)
+
+    # Sort matches by score descending, then by timestamp descending
+    found_jobs.sort(key=lambda x: (x["score"], x["timestamp"]), reverse=True)
+            
+    # Fallback: if no matches were found, return the 5 most recent jobs from all processed jobs
+    if not found_jobs and all_processed_jobs:
+        all_processed_jobs.sort(key=lambda x: x["timestamp"], reverse=True)
+        found_jobs = all_processed_jobs[:5]
+ 
+    # Clean up fields that do not exist on Pydantic's JobResult model
+    for job in found_jobs:
+        job.pop("timestamp", None)
+        job.pop("score", None)
 
     return found_jobs  # Return all matching jobs
 

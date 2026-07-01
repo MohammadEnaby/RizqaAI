@@ -86,13 +86,16 @@ def scrape_group_posts(group_url: str, api_token: str):
             )
         return []
 
-    print(f"[*] Actor finished. Fetching results from dataset {run['defaultDatasetId']}...")
+    # Compatibly get default dataset ID from either a dictionary or a Run object (apify-client v3+)
+    dataset_id = getattr(run, "default_dataset_id", None) or (run.get("defaultDatasetId") if isinstance(run, dict) else None)
+
+    print(f"[*] Actor finished. Fetching results from dataset {dataset_id}...")
     
     # Fetch results
     clean_posts = []
     
     try:
-        for item in client.dataset(run["defaultDatasetId"]).iterate_items():
+        for item in client.dataset(dataset_id).iterate_items():
             # Map raw item to clean dictionary
             # Fields vary by actor, but commonly: text, url, timestamp, likes, imageUrl
             
