@@ -128,6 +128,31 @@ def extract_search_filters(user_query: str) -> dict:
         # print(f"Raw Gemini Output: {response.text if 'response' in locals() else 'No response'}") 
         return {"intent": "general"}
 
+def format_contact_link(post_link, contact_info, phone, email):
+    # If we have a web link, use it
+    for link in [post_link, contact_info]:
+        if link and isinstance(link, str) and (link.startswith("http://") or link.startswith("https://")):
+            return link
+            
+    # Check phone field
+    if phone and isinstance(phone, str):
+        clean_phone = "".join(c for c in phone if c.isdigit() or c == "+")
+        if clean_phone:
+            return f"tel:{clean_phone}"
+            
+    # Check contact_info for phone number
+    if contact_info and isinstance(contact_info, str):
+        phone_match = re.search(r'\+?[0-9][0-9\-\s]{5,}[0-9]', contact_info)
+        if phone_match:
+            clean_phone = "".join(c for c in phone_match.group(0) if c.isdigit() or c == "+")
+            return f"tel:{clean_phone}"
+            
+    # Fallback to email
+    if email and isinstance(email, str):
+        return f"mailto:{email}"
+        
+    return "Not specified"
+
 def search_jobs_in_db(filters: dict) -> List[dict]:
     """
     Searches Firestore 'jobs' collection based on filters.
@@ -220,16 +245,12 @@ def search_jobs_in_db(filters: dict) -> List[dict]:
             display_company = "Unknown"
  
         # Support contact info/links for user submission (phone / email)
-        contact_link = data.get("post_link") or data.get("contact_info")
-        if not contact_link:
-            phone = data.get("phone")
-            email = data.get("email")
-            if phone:
-                contact_link = f"tel:{phone}"
-            elif email:
-                contact_link = f"mailto:{email}"
-            else:
-                contact_link = "Not specified"
+        contact_link = format_contact_link(
+            data.get("post_link"),
+            data.get("contact_info"),
+            data.get("phone"),
+            data.get("email")
+        )
 
         # Get timestamp for in-memory sorting
         ts = data.get("post_time") or data.get("createdAt") or data.get("scraped_at")

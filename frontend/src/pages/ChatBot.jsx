@@ -2,8 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { FaLeaf, FaBrain, FaBuilding, FaMapMarkerAlt, FaMoneyBillWave, FaPaperPlane, FaUser } from 'react-icons/fa';
-import { FiPlus, FiMessageSquare, FiTrash2, FiMenu, FiLogOut, FiSettings, FiX, FiMoreVertical, FiSearch, FiArrowUpRight, FiBookmark, FiShare2, FiHelpCircle, FiCheckCircle } from 'react-icons/fi';
+import { FiPlus, FiMessageSquare, FiTrash2, FiMenu, FiLogOut, FiSettings, FiX, FiMoreVertical, FiSearch, FiArrowUpRight, FiBookmark, FiShare2, FiHelpCircle, FiCheckCircle, FiCheck } from 'react-icons/fi';
 import confetti from 'canvas-confetti';
+import { db } from '../firebase';
+import { doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 
 export default function ChatBot() {
     const { userProfile, currentUser, logout } = useAuth();
@@ -20,6 +22,7 @@ export default function ChatBot() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [selectedJob, setSelectedJob] = useState(null);
     const [appliedJobs, setAppliedJobs] = useState([]); // Track applied jobs
+    const [isAppliedModalOpen, setIsAppliedModalOpen] = useState(false);
     const messagesEndRef = useRef(null);
 
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -37,6 +40,27 @@ export default function ChatBot() {
         if (currentUser?.uid) {
             fetchSessions();
         }
+    }, [currentUser]);
+
+    // Load applied jobs on mount from Firestore
+    useEffect(() => {
+        const loadAppliedJobs = async () => {
+            if (currentUser?.uid && db) {
+                try {
+                    const userDocRef = doc(db, 'users', currentUser.uid);
+                    const userDoc = await getDoc(userDocRef);
+                    if (userDoc.exists()) {
+                        const data = userDoc.data();
+                        if (data.appliedJobsList) {
+                            setAppliedJobs(data.appliedJobsList);
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error loading applied jobs from Firestore:", error);
+                }
+            }
+        };
+        loadAppliedJobs();
     }, [currentUser]);
 
     // Load messages when session changes
@@ -187,11 +211,13 @@ export default function ChatBot() {
         handleSend(query);
     };
 
-    const handleApply = (e, job) => {
+    const handleApply = async (e, job) => {
         e.preventDefault();
-        const jobKey = job.link || job.title; // Unique identifier for the job
+        const jobKey = job.link || job.title;
         
-        if (!appliedJobs.includes(jobKey)) {
+        const isAlreadyApplied = appliedJobs.some(j => (j.link || j.title) === jobKey);
+        
+        if (!isAlreadyApplied) {
             // Trigger confetti
             confetti({
                 particleCount: 100,
@@ -199,8 +225,22 @@ export default function ChatBot() {
                 origin: { y: 0.6 },
                 colors: ['#34e89e', '#1aad72', '#ffffff']
             });
-            // Add to tracked jobs
-            setAppliedJobs(prev => [...prev, jobKey]);
+            
+            const updatedList = [...appliedJobs, job];
+            setAppliedJobs(updatedList);
+            
+            // Save to Firestore
+            if (currentUser?.uid && db) {
+                try {
+                    const userDocRef = doc(db, 'users', currentUser.uid);
+                    await updateDoc(userDocRef, {
+                        appliedJobsList: arrayUnion(job),
+                        appliedJobs: updatedList.length // Keep count synced
+                    });
+                } catch (error) {
+                    console.error("Error saving applied job to Firestore:", error);
+                }
+            }
         }
         
         // Open the job link in a new tab
@@ -225,13 +265,20 @@ export default function ChatBot() {
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
             `}>
                 {/* Sidebar Header */}
-                <div className="py-4 px-4">
+                <div className="py-4 px-4 space-y-2">
                     <button
                         onClick={createNewSession}
                         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold shadow-sm hover:shadow-md transition-all active:scale-95 group" style={{ background: 'linear-gradient(135deg, #34e89e, #1aad72)', color: '#071825' }}
                     >
                         <FiPlus className="text-xl group-hover:rotate-90 transition-transform" />
                         <span>New Conversation</span>
+                    </button>
+                    <button
+                        onClick={() => setIsAppliedModalOpen(true)}
+                        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold shadow-sm hover:shadow-md transition-all active:scale-95 border" style={{ background: 'rgba(15,52,67,0.4)', borderColor: 'rgba(52,232,158,0.2)', color: '#34e89e' }}
+                    >
+                        <FiCheckCircle className="text-lg" />
+                        <span>Applied Jobs ({appliedJobs.length})</span>
                     </button>
                 </div>
 
@@ -290,7 +337,11 @@ export default function ChatBot() {
                                 {currentUser?.email}
                             </div>
                             {appliedJobs.length > 0 && (
-                                <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold animate-fade-in-up shadow-sm border" style={{ background: 'rgba(52,232,158,0.15)', color: '#34e89e', borderColor: 'rgba(52,232,158,0.3)' }}>
+                                <div
+                                    onClick={() => setIsAppliedModalOpen(true)}
+                                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold animate-fade-in-up shadow-sm border cursor-pointer hover:scale-105 transition-transform"
+                                    style={{ background: 'rgba(52,232,158,0.15)', color: '#34e89e', borderColor: 'rgba(52,232,158,0.3)' }}
+                                >
                                     🎯 {appliedJobs.length} {appliedJobs.length === 1 ? 'Job' : 'Jobs'} Applied
                                 </div>
                             )}
@@ -590,16 +641,16 @@ export default function ChatBot() {
                             <button
                                 onClick={(e) => handleApply(e, selectedJob)}
                                 className={`relative flex items-center justify-center gap-2 w-full py-4 font-bold rounded-xl transition-all shadow-lg overflow-hidden group ${
-                                    appliedJobs.includes(selectedJob.link || selectedJob.title)
+                                    appliedJobs.some(j => (j.link || j.title) === (selectedJob.link || selectedJob.title))
                                         ? 'bg-gray-700/80 text-white/90 cursor-default border border-gray-600 shadow-none'
                                         : 'bg-[#064e3b] text-white hover:bg-[#085a44] hover:shadow-xl hover:-translate-y-0.5'
                                 }`}
                             >
-                                {!appliedJobs.includes(selectedJob.link || selectedJob.title) && (
+                                {!appliedJobs.some(j => (j.link || j.title) === (selectedJob.link || selectedJob.title)) && (
                                     <div className="absolute inset-0 w-full h-full animate-shimmer pointer-events-none opacity-50"></div>
                                 )}
                                 
-                                {appliedJobs.includes(selectedJob.link || selectedJob.title) ? (
+                                {appliedJobs.some(j => (j.link || j.title) === (selectedJob.link || selectedJob.title)) ? (
                                     <>
                                         <span className="relative z-10 text-gray-300">Track Application</span>
                                         <FiCheckCircle size={20} className="relative z-10 text-[#34e89e]" />
@@ -611,6 +662,77 @@ export default function ChatBot() {
                                     </>
                                 )}
                             </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Applied Jobs Modal */}
+            {isAppliedModalOpen && (
+                <div
+                    className="fixed inset-0 bg-black/40 backdrop-blur-md z-[60] flex items-center justify-center p-4 md:p-6 animate-fade-in-up"
+                    onClick={() => setIsAppliedModalOpen(false)}
+                >
+                    <div
+                        className="glass-panel rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden animate-scale-in"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Modal Header */}
+                        <div className="bg-[#064e3b] text-white px-6 py-5 flex items-center justify-between shrink-0">
+                            <div>
+                                <h2 className="text-lg font-bold flex items-center gap-2">
+                                    My Applied Jobs
+                                    <span className="bg-white/20 text-white text-[10px] px-2 py-0.5 rounded-full backdrop-blur-sm border border-white/30">{appliedJobs.length} total</span>
+                                </h2>
+                            </div>
+                            <button
+                                onClick={() => setIsAppliedModalOpen(false)}
+                                className="text-white/80 hover:text-white bg-black/10 hover:bg-black/20 rounded-full p-2 transition-all backdrop-blur-sm"
+                            >
+                                <FiX size={20} />
+                            </button>
+                        </div>
+
+                        {/* Modal Body */}
+                        <div className="p-6 md:p-8 overflow-y-auto custom-scrollbar space-y-4">
+                            {appliedJobs.length === 0 ? (
+                                <div className="text-center py-12 text-gray-500">
+                                    You haven't applied for any jobs yet.
+                                </div>
+                            ) : (
+                                appliedJobs.map((job, idx) => (
+                                    <div
+                                        key={idx}
+                                        onClick={() => {
+                                            setSelectedJob(job);
+                                            setIsAppliedModalOpen(false);
+                                        }}
+                                        className="backdrop-blur-md rounded-xl p-4 shadow-md border hover:shadow-lg transition-all cursor-pointer group/job relative overflow-hidden"
+                                        style={{ background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(52,232,158,0.2)' }}
+                                    >
+                                        <div className="flex items-start justify-between gap-4">
+                                            <div className="flex-1 min-w-0 pr-8">
+                                                <h4 className="font-bold text-gray-900 dark:text-white mb-2 group-hover/job:text-teal-400 transition-colors line-clamp-1">
+                                                    {job.title}
+                                                </h4>
+                                                <div className="flex flex-wrap gap-2 text-xs text-gray-600 dark:text-gray-400">
+                                                    <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-md">
+                                                        <FaBuilding className="text-gray-400 dark:text-gray-500" />
+                                                        <span className="truncate max-w-[120px] font-medium">{job.company}</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-md">
+                                                        <FaMapMarkerAlt className="text-gray-400 dark:text-gray-500" />
+                                                        <span className="truncate max-w-[100px] font-medium">{job.location}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="shrink-0 flex items-center justify-center p-2 rounded-lg bg-teal-50/80 dark:bg-teal-900/30 text-teal-400">
+                                                <FiArrowUpRight size={18} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
                         </div>
                     </div>
                 </div>
